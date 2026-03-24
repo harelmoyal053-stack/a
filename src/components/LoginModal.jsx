@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Phone, Mail, User, ArrowLeft, Loader2, CheckCircle } from 'lucide-react'
+import { cacheUser } from '../utils/user'
 
 const BACKDROP = { position: 'fixed', inset: 0, zIndex: 9999 }
 
-export default function LoginModal({ onClose }) {
+export default function LoginModal({ onClose, onLogin }) {
   const [step,     setStep]     = useState(1) // 1=form, 2=success
   const [loading,  setLoading]  = useState(false)
   const [form,     setForm]     = useState({ name: '', phone: '', email: '' })
@@ -23,8 +24,31 @@ export default function LoginModal({ onClose }) {
     e.preventDefault()
     if (!validate()) return
     setLoading(true)
-    // Simulate API call
-    await new Promise(r => setTimeout(r, 1200))
+
+    // Try the real API first; fall back to local-only on failure
+    let savedUser = null
+    try {
+      const res = await fetch('/api/users', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ name: form.name, email: form.email || `${Date.now()}@dropprice.guest`, phone: form.phone }),
+      })
+      const data = await res.json()
+      if (res.ok && data.user) savedUser = data.user
+    } catch { /* API unavailable — create local identity below */ }
+
+    if (!savedUser) {
+      // Demo/offline mode: create a local user identity
+      savedUser = {
+        id:    `local_${Date.now()}`,
+        name:  form.name,
+        email: form.email || '',
+        phone: form.phone,
+      }
+    }
+
+    cacheUser(savedUser)
+    onLogin?.(savedUser)
     setLoading(false)
     setStep(2)
   }

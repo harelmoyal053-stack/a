@@ -49,6 +49,9 @@ export default function App() {
   const [modalDeal,        setModalDeal]        = useState(null)
   const [priceDropToast,   setPriceDropToast]   = useState(null)
   const [loginOpen,        setLoginOpen]        = useState(false)
+  const [loggedInUser,     setLoggedInUser]     = useState(() => {
+    try { const r = localStorage.getItem('dropprice_user'); return r ? JSON.parse(r) : null } catch { return null }
+  })
 
   // ── Capture ?ref=&deal= params from invite links on first mount ────────────
   useEffect(() => {
@@ -138,6 +141,7 @@ export default function App() {
         myGroupsCount={myGroups.length}
         onNavigate={navigate}
         onLogin={() => setLoginOpen(true)}
+        user={loggedInUser}
       />
       <StatsBar />
       <HeroSection />
@@ -286,7 +290,12 @@ export default function App() {
 
       {/* Login modal */}
       <AnimatePresence>
-        {loginOpen && <LoginModal onClose={() => setLoginOpen(false)} />}
+        {loginOpen && (
+          <LoginModal
+            onClose={() => setLoginOpen(false)}
+            onLogin={(user) => { setLoggedInUser(user); setLoginOpen(false) }}
+          />
+        )}
       </AnimatePresence>
     </div>
   )

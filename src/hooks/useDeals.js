@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { STATIC_DEALS } from '../data/staticDeals'
 
-// ── Countdown helper ──────────────────────────────────────────────────────────
+// ── Countdown helpers ─────────────────────────────────────────────────────────
 function secondsUntil(isoString) {
   return Math.max(0, Math.floor((new Date(isoString) - Date.now()) / 1000))
 }
@@ -15,18 +16,17 @@ function formatSeconds(total) {
 /**
  * useDeals()
  * ──────────
- * 1. Fetches all active deals from GET /api/deals on mount.
- * 2. Opens an SSE stream at GET /api/deals/events/stream to receive:
- *    - 'deal:updated'  → replace the updated deal in state
- *    - 'price:dropped' → trigger a toast + confetti (via onPriceDrop callback)
- *    - 'group:joined'  → lightweight participant count update
- * 3. Runs a 1-second interval to tick down countdown timers.
+ * 1. Fetches deals from GET /api/deals. Falls back to STATIC_DEALS when the API
+ *    is unavailable (e.g. GitHub Pages deployment).
+ * 2. Opens an SSE stream for real-time updates (skipped if API unavailable).
+ * 3. Ticks countdown timers every second.
  */
 export function useDeals({ onPriceDrop } = {}) {
-  const [deals,   setDeals]   = useState([])
-  const [timers,  setTimers]  = useState({})  // { dealId: "HH:MM:SS" }
-  const [loading, setLoading] = useState(true)
-  const [error,   setError]   = useState(null)
+  const [deals,      setDeals]      = useState([])
+  const [timers,     setTimers]     = useState({})
+  const [loading,    setLoading]    = useState(true)
+  const [error,      setError]      = useState(null)
+  const [isStatic,   setIsStatic]   = useState(false)
 
   const onPriceDropRef = useRef(onPriceDrop)
   useEffect(() => { onPriceDropRef.current = onPriceDrop }, [onPriceDrop])
@@ -34,15 +34,27 @@ export function useDeals({ onPriceDrop } = {}) {
   // ── Initialise timers from deals ─────────────────────────────────────────
   const initTimers = useCallback((dealList) => {
     const t = {}
-    dealList.forEach((d) => {
-      t[d.id] = formatSeconds(secondsUntil(d.endTime))
-    })
+    dealList.forEach((d) => { t[d.id] = formatSeconds(secondsUntil(d.endTime)) })
     setTimers(t)
   }, [])
 
-  // ── Fetch deals ───────────────────────────────────────────────────────────
+  // ── Fetch deals (fall back to static on error) ────────────────────────────
   useEffect(() => {
     let mounted = true
+
+    // Abort early if clearly on GitHub Pages with no backend
+    const isGhPages = typeof window !== 'undefined' &&
+      (window.location.hostname.includes('github.io') ||
+       window.location.hostname.includes('github.com'))
+
+    if (isGhPages) {
+      setDeals(STATIC_DEALS)
+      initTimers(STATIC_DEALS)
+      setIsStatic(true)
+      setLoading(false)
+      return
+    }
+
     fetch('/api/deals')
       .then((r) => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`)
@@ -54,12 +66,15 @@ export function useDeals({ onPriceDrop } = {}) {
         initTimers(deals)
         setLoading(false)
       })
-      .catch((e) => {
+      .catch(() => {
         if (!mounted) return
-        console.error('[useDeals] שגיאה בטעינת עסקאות:', e)
-        setError('לא ניתן לטעון עסקאות — בדוק שהשרת פועל')
+        // API unavailable — use static demo data instead of showing an error
+        setDeals(STATIC_DEALS)
+        initTimers(STATIC_DEALS)
+        setIsStatic(true)
         setLoading(false)
       })
+
     return () => { mounted = false }
   }, [initTimers])
 
@@ -82,49 +97,43 @@ export function useDeals({ onPriceDrop } = {}) {
     return () => clearInterval(iv)
   }, [deals])
 
-  // ── SSE subscription ──────────────────────────────────────────────────────
+  // ── SSE subscription (skip in static/demo mode) ───────────────────────────
   useEffect(() => {
-    const es = new EventSource('/api/deals/events/stream')
+    if (isStatic) return
 
-    es.addEventListener('deal:updated', (e) => {
-      const updated = JSON.parse(e.data)
-      setDeals((prev) => prev.map((d) => (d.id === updated.id ? updated : d)))
-      // Re-sync timer for this deal
-      setTimers((prev) => ({
-        ...prev,
-        [updated.id]: formatSeconds(secondsUntil(updated.endTime)),
-      }))
-    })
+    let es
+    try {
+      es = new EventSource('/api/deals/events/stream')
 
-    es.addEventListener('price:dropped', (e) => {
-      const payload = JSON.parse(e.data)
-      onPriceDropRef.current?.(payload)
-    })
+      es.addEventListener('deal:updated', (e) => {
+        const updated = JSON.parse(e.data)
+        setDeals((prev) => prev.map((d) => (d.id === updated.id ? updated : d)))
+        setTimers((prev) => ({
+          ...prev,
+          [updated.id]: formatSeconds(secondsUntil(updated.endTime)),
+        }))
+      })
 
-    es.addEventListener('group:joined', (e) => {
-      const { productId, newCount } = JSON.parse(e.data)
-      setDeals((prev) =>
-        prev.map((d) =>
-          d.id === productId ? { ...d, currentBuyers: newCount } : d,
-        ),
-      )
-    })
+      es.addEventListener('price:dropped', (e) => {
+        onPriceDropRef.current?.(JSON.parse(e.data))
+      })
 
-    es.onerror = () => {
-      // SSE will auto-reconnect; nothing to do
-    }
+      es.addEventListener('group:joined', (e) => {
+        const { productId, newCount } = JSON.parse(e.data)
+        setDeals((prev) =>
+          prev.map((d) => d.id === productId ? { ...d, currentBuyers: newCount } : d)
+        )
+      })
 
-    return () => es.close()
-  }, [])
+      es.onerror = () => { /* SSE auto-reconnects */ }
+    } catch (_) {}
 
-  /**
-   * Optimistically update a deal in local state (used by useJoin for instant UI).
-   */
+    return () => es?.close()
+  }, [isStatic])
+
   const updateDeal = useCallback((updatedDeal) => {
-    setDeals((prev) =>
-      prev.map((d) => (d.id === updatedDeal.id ? updatedDeal : d)),
-    )
+    setDeals((prev) => prev.map((d) => (d.id === updatedDeal.id ? updatedDeal : d)))
   }, [])
 
-  return { deals, timers, loading, error, updateDeal }
+  return { deals, timers, loading, error, isStatic, updateDeal }
 }

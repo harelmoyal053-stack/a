@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   ArrowRight, Users, Clock, TrendingDown, Shield, Truck,
-  RotateCcw, ChevronLeft, ChevronRight, Tag, Zap, CheckCircle, Share2
+  RotateCcw, ChevronLeft, ChevronRight, Tag, Zap, CheckCircle, Share2,
+  Calculator, Minus, Plus
 } from 'lucide-react'
 
 import ShareMenu    from '../components/ShareMenu'
@@ -15,6 +16,140 @@ const getSlides = (deal) => [
   { emoji: deal.emoji, label: 'זווית נוספת', scale: 'scale-75' },
   { emoji: '📦', label: 'אריזה' },
 ]
+
+// ── Savings Calculator ────────────────────────────────────────────────────────
+function SavingsCalculator({ deal }) {
+  const [qty, setQty] = useState(1)
+
+  const tiers = deal.priceTiers || []
+  const currentTier = [...tiers].reverse().find(t => deal.currentBuyers >= t.buyers) || tiers[0]
+  const nextTier    = tiers.find(t => t.buyers > deal.currentBuyers)
+  const maxQty      = 10
+
+  const totalNow      = (currentTier?.price ?? deal.currentPrice) * qty
+  const totalNext     = nextTier ? nextTier.price * qty : null
+  const totalOriginal = deal.originalPrice * qty
+  const savedNow      = totalOriginal - totalNow
+
+  return (
+    <div className="rounded-2xl overflow-hidden"
+      style={{ background: 'rgba(8,12,24,0.8)', border: '1px solid rgba(0,255,136,0.15)' }}>
+      {/* Header */}
+      <div className="px-4 py-3 flex items-center justify-between"
+        style={{ borderBottom: '1px solid rgba(255,255,255,0.07)', background: 'rgba(0,255,136,0.04)' }}>
+        <div className="flex items-center gap-1.5">
+          <span className="text-xs text-slate-500 font-semibold">כמה תחסוך?</span>
+          <span className="w-2 h-2 rounded-full bg-neon-green animate-pulse" />
+        </div>
+        <div className="flex items-center gap-2">
+          <h3 className="font-black text-white text-base">מחשבון חיסכון</h3>
+          <Calculator className="w-4 h-4 text-neon-green" />
+        </div>
+      </div>
+
+      <div className="p-4 space-y-4">
+        {/* Quantity selector */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <motion.button
+              onClick={() => setQty(q => Math.max(1, q - 1))}
+              disabled={qty <= 1}
+              className="w-9 h-9 rounded-xl flex items-center justify-center font-bold transition-all disabled:opacity-30"
+              style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)' }}
+              whileTap={{ scale: 0.9 }}
+            >
+              <Minus className="w-4 h-4 text-slate-300" />
+            </motion.button>
+            <span className="w-10 text-center text-2xl font-black text-white">{qty}</span>
+            <motion.button
+              onClick={() => setQty(q => Math.min(maxQty, q + 1))}
+              disabled={qty >= maxQty}
+              className="w-9 h-9 rounded-xl flex items-center justify-center font-bold transition-all disabled:opacity-30"
+              style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)' }}
+              whileTap={{ scale: 0.9 }}
+            >
+              <Plus className="w-4 h-4 text-slate-300" />
+            </motion.button>
+          </div>
+          <span className="text-sm text-slate-400 font-semibold">כמות יחידות</span>
+        </div>
+
+        {/* Tier table */}
+        <div className="space-y-2">
+          {tiers.map((tier, i) => {
+            const isCurrentTier = deal.currentBuyers >= tier.buyers &&
+              (i === tiers.length - 1 || deal.currentBuyers < tiers[i + 1].buyers)
+            const isNextTier = nextTier && tier.buyers === nextTier.buyers
+            const total = tier.price * qty
+            const saved = (deal.originalPrice - tier.price) * qty
+            const pct   = Math.round(((deal.originalPrice - tier.price) / deal.originalPrice) * 100)
+
+            return (
+              <motion.div key={i}
+                className="flex items-center justify-between px-3 py-2.5 rounded-xl"
+                style={
+                  isCurrentTier
+                    ? { background: 'rgba(0,255,136,0.1)', border: '1px solid rgba(0,255,136,0.3)' }
+                    : isNextTier
+                      ? { background: 'rgba(255,165,0,0.06)', border: '1px solid rgba(255,165,0,0.2)' }
+                      : { background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }
+                }
+                animate={{ scale: isCurrentTier ? 1.01 : 1 }}
+              >
+                <div className="flex items-center gap-2">
+                  {isCurrentTier && (
+                    <span className="text-[10px] font-black px-1.5 py-0.5 rounded-full"
+                      style={{ background: 'rgba(0,255,136,0.2)', color: '#00ff88', border: '1px solid rgba(0,255,136,0.3)' }}>
+                      פעיל ✓
+                    </span>
+                  )}
+                  {isNextTier && (
+                    <span className="text-[10px] font-black px-1.5 py-0.5 rounded-full"
+                      style={{ background: 'rgba(255,165,0,0.2)', color: '#ffa500', border: '1px solid rgba(255,165,0,0.3)' }}>
+                      הבא
+                    </span>
+                  )}
+                  <span className={`text-sm font-bold ${isCurrentTier ? 'text-neon-green' : 'text-amber-400'}`}>
+                    חיסכון ₪{saved.toLocaleString()} ({pct}%)
+                  </span>
+                </div>
+                <div className="text-right">
+                  <span className={`font-black text-lg leading-none ${isCurrentTier ? 'text-neon-green' : 'text-slate-300'}`}>
+                    ₪{total.toLocaleString()}
+                  </span>
+                  <p className="text-xs text-slate-600">{tier.buyers === 0 ? 'ללא קבוצה' : `${tier.buyers}+ קונים`}</p>
+                </div>
+              </motion.div>
+            )
+          })}
+        </div>
+
+        {/* Summary row */}
+        <div className="rounded-xl p-3 text-right"
+          style={{ background: 'rgba(0,255,136,0.06)', border: '1px solid rgba(0,255,136,0.15)' }}>
+          <div className="flex items-baseline justify-between">
+            <span className="text-neon-green font-black text-lg">₪{totalNow.toLocaleString()}</span>
+            <span className="text-sm font-semibold text-white">מחיר עכשיו ({qty} יחידות)</span>
+          </div>
+          <div className="flex items-baseline justify-between mt-1">
+            <span className="text-slate-500 text-sm line-through">₪{totalOriginal.toLocaleString()}</span>
+            <span className="text-xs text-slate-400">מחיר מקורי</span>
+          </div>
+          <div className="flex items-center justify-between mt-2 pt-2"
+            style={{ borderTop: '1px solid rgba(0,255,136,0.15)' }}>
+            <span className="font-black text-neon-green">חוסך ₪{savedNow.toLocaleString()} 💰</span>
+            <span className="text-xs text-slate-400">החיסכון שלך היום</span>
+          </div>
+          {totalNext && (
+            <p className="text-xs text-amber-400 font-semibold mt-1.5">
+              עם {nextTier.buyers} קונים: ₪{totalNext.toLocaleString()} (חוסך עוד ₪{(totalNow - totalNext).toLocaleString()})
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export default function ProductDetailPage({ deal, timeLeft, isJoined, onJoin, onBack }) {
   const [slide,           setSlide]           = useState(0)
@@ -243,6 +378,9 @@ export default function ProductDetailPage({ deal, timeLeft, isJoined, onJoin, on
                 </div>
               </div>
             </div>
+
+            {/* ── SAVINGS CALCULATOR ──────────────────────────────────────── */}
+            <SavingsCalculator deal={deal} />
 
             {/* ── ACTIVITY FEED / GROUP CHAT ──────────────────────────────── */}
             <ActivityFeed productId={deal.id} />

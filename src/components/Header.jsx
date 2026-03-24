@@ -1,8 +1,9 @@
 import { Search, Store, User, Bell, LayoutDashboard, Zap, LogIn } from 'lucide-react'
 import { getCachedUser } from '../utils/user'
 
-export default function Header({ searchQuery, setSearchQuery, myGroupsCount = 0, onNavigate, onLogin }) {
-  const user = getCachedUser()
+export default function Header({ searchQuery, setSearchQuery, myGroupsCount = 0, onNavigate, onLogin, user: userProp }) {
+  // Allow parent to pass user (for instant re-render after login), fall back to localStorage
+  const user = userProp !== undefined ? userProp : getCachedUser()
   return (
     <header className="sticky top-0 z-50"
       style={{

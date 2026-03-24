@@ -132,6 +132,24 @@ const PRODUCTS = [
     ],
     initialBuyers: 19,
   },
+  {
+    title: 'סוף שבוע באילת - מלון 4★',
+    subtitle: '2 לילות + ארוחת בוקר | אפריל 2026',
+    emoji: '🏖️',
+    category: 'נסיעות',
+    badge: 'עסקת הדגל',
+    badgeColor: 'bg-cyan-600',
+    basePrice: 1299, originalPrice: 1299, currentPrice: 799,
+    targetBuyers: 40, endTime: hoursFromNow(6),
+    rating: 4.8, reviews: 562,
+    tiers: [
+      { requiredParticipants: 0,  priceAtTier: 1299 },
+      { requiredParticipants: 15, priceAtTier: 999  },
+      { requiredParticipants: 30, priceAtTier: 799  },
+      { requiredParticipants: 50, priceAtTier: 699  },
+    ],
+    initialBuyers: 24,
+  },
 ]
 
 // ── Realistic Hebrew activity feed messages per deal ─────────────────────────

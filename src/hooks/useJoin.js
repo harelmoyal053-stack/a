@@ -1,20 +1,16 @@
 import { useState, useCallback } from 'react'
-import { ensureUser } from '../utils/user'
+import { ensureUser, cacheUser } from '../utils/user'
 import { getPendingRef, clearPendingRef } from '../utils/invite'
 
 /**
  * useJoin({ onSuccess, onPriceDrop })
  * ────────────────────────────────────
- * Manages the full join flow:
- *   1. Ensure the guest user exists in the backend.
- *   2. POST /api/join with optimistic UI update.
- *   3. On success: call onSuccess(deal, result).
- *   4. On price drop: call onPriceDrop(payload).
- *   5. On error: surface a Hebrew error message.
+ * Manages the full join flow. Falls back to a mock join in demo/static mode
+ * (when the backend API is unavailable — e.g. GitHub Pages).
  */
 export function useJoin({ onSuccess, onPriceDrop } = {}) {
-  const [joining,  setJoining]  = useState(null)  // productId currently being joined
-  const [error,    setError]    = useState(null)
+  const [joining, setJoining] = useState(null)
+  const [error,   setError]   = useState(null)
 
   const join = useCallback(async (deal) => {
     setError(null)
@@ -37,17 +33,13 @@ export function useJoin({ onSuccess, onPriceDrop } = {}) {
       const data = await res.json()
 
       if (!res.ok) {
+        // Real API error (e.g. already joined) — surface it
         setError(data.error ?? 'שגיאה בהצטרפות לקבוצה')
         return { ok: false, error: data.error }
       }
 
-      // Clear referral after successful join (one-time use)
       clearPendingRef()
-
-      // 4. Notify parent with updated deal
       onSuccess?.(data.deal, data)
-
-      // 4. Notify if price dropped
       if (data.priceDropped) {
         onPriceDrop?.({
           productId:    data.deal.id,
@@ -58,12 +50,31 @@ export function useJoin({ onSuccess, onPriceDrop } = {}) {
           message:      data.message,
         })
       }
-
       return { ok: true, ...data }
-    } catch (e) {
-      const msg = 'בעיית רשת — בדוק את החיבור שלך'
-      setError(msg)
-      return { ok: false, error: msg }
+
+    } catch {
+      // API is unavailable (GitHub Pages / no backend) — simulate a successful join
+      await new Promise(r => setTimeout(r, 900)) // realistic loading feel
+
+      // Try to ensure a local user (will use localStorage if /api/users also fails)
+      let user = null
+      try { user = await ensureUser() } catch { /* ignored */ }
+
+      // If ensureUser failed (no backend), create a local guest identity
+      if (!user?.id) {
+        const adj   = ['מהיר', 'חכם', 'אמיץ', 'שמח', 'נבון']
+        const nouns = ['פנדה', 'דרקון', 'ברדלס', 'עיט', 'נמר']
+        const name  = `${adj[Math.floor(Math.random() * adj.length)]} ${nouns[Math.floor(Math.random() * nouns.length)]}`
+        user = { id: `local_${Date.now()}`, name, email: '' }
+        try { cacheUser(user) } catch {}
+      }
+
+      const mockDeal = {
+        ...deal,
+        currentBuyers: deal.currentBuyers + 1,
+      }
+      onSuccess?.(mockDeal, { ok: true, deal: mockDeal })
+      return { ok: true, deal: mockDeal }
     } finally {
       setJoining(null)
     }
