@@ -1,5 +1,8 @@
 'use strict'
-require('dotenv').config()
+// ── db.js MUST be required first — it sets DATABASE_URL to the absolute path
+// of the SQLite file before any Prisma Client is instantiated.
+const prisma = require('./db')
+
 const express = require('express')
 const cors    = require('cors')
 
@@ -17,7 +20,7 @@ app.use(cors({
 }))
 app.use(express.json())
 
-// Request logger (dev mode)
+// Request logger
 app.use((req, _res, next) => {
   console.log(`[${new Date().toLocaleTimeString('he-IL')}] ${req.method} ${req.path}`)
   next()
@@ -28,7 +31,6 @@ app.use('/api/deals',  dealsRouter)
 app.use('/api/join',   joinRouter)
 app.use('/api/users',  usersRouter)
 
-// Health check
 app.get('/api/health', (_req, res) => {
   res.json({ ok: true, message: 'DropPrice API פעיל 🚀', ts: new Date().toISOString() })
 })
@@ -39,16 +41,33 @@ app.use((err, _req, res, _next) => {
   res.status(500).json({
     ok:    false,
     error: 'שגיאת שרת פנימית — נסה שנית',
-    ...(process.env.NODE_ENV !== 'production' && { details: err.message }),
+    details: err.message,
   })
 })
 
-// ── 404 ────────────────────────────────────────────────────────────────────────
 app.use((_req, res) => res.status(404).json({ error: 'הנתיב לא נמצא' }))
 
-// ── Start ─────────────────────────────────────────────────────────────────────
-app.listen(PORT, () => {
-  console.log(`\n🟢 DropPrice Server פועל על פורט ${PORT}`)
-  console.log(`   API:    http://localhost:${PORT}/api/health`)
-  console.log(`   Events: http://localhost:${PORT}/api/deals/events/stream\n`)
-})
+// ── Start: verify DB before accepting traffic ─────────────────────────────────
+async function start() {
+  try {
+    const productCount = await prisma.product.count()
+    const memberCount  = await prisma.groupMember.count()
+    console.log(`[DB] ✓ ${productCount} מוצרים | ${memberCount} חברי קבוצה`)
+
+    if (productCount === 0) {
+      console.warn('[DB] ⚠️  הבסיס נתונים ריק! הרץ: npm run db:seed')
+    }
+  } catch (e) {
+    console.error('[DB] ✗ שגיאה בחיבור לבסיס נתונים:', e.message)
+    process.exit(1)
+  }
+
+  app.listen(PORT, () => {
+    console.log(`\n🟢 DropPrice Server פועל על פורט ${PORT}`)
+    console.log(`   API:    http://localhost:${PORT}/api/health`)
+    console.log(`   Events: http://localhost:${PORT}/api/deals/events/stream`)
+    console.log(`   הרץ "npm run dev" בתיקייה הראשית כדי להפעיל גם את Vite\n`)
+  })
+}
+
+start()

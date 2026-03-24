@@ -197,7 +197,7 @@ export default function JoinModal({ deal, onConfirm, onClose }) {
                 <strong className="text-neon-green">{deal.targetBuyers - deal.currentBuyers - 1}</strong> קונים נוספים נדרשים!
               </p>
               <motion.button
-                onClick={() => onConfirm(deal)}
+                onClick={onClose}
                 className="w-full btn-neon py-3.5 rounded-xl font-black text-base"
                 whileTap={{ scale: 0.97 }}
               >

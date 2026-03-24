@@ -1,6 +1,6 @@
 'use strict'
-const { PrismaClient, Prisma } = require('@prisma/client')
-const prisma = new PrismaClient()
+// Use the shared singleton — DATABASE_URL absolute path is set there
+const prisma = require('../db')
 
 // ── Helper: compute the applicable tier for a given buyer count ───────────────
 function computeTier(memberCount, tiers) {

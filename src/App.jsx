@@ -36,7 +36,13 @@ export default function App() {
 
   const [searchQuery,      setSearchQuery]      = useState('')
   const [selectedCategory, setSelectedCategory] = useState('הכל')
-  const [joinedDeals,      setJoinedDeals]      = useState(new Set())   // productIds
+  // Restore joined set from localStorage so button state survives refreshes
+  const [joinedDeals, setJoinedDeals] = useState(() => {
+    try {
+      const raw = localStorage.getItem('dropprice_joined')
+      return raw ? new Set(JSON.parse(raw)) : new Set()
+    } catch { return new Set() }
+  })
   const [myGroups,         setMyGroups]         = useState([])
   const [modalDeal,        setModalDeal]        = useState(null)
   const [priceDropToast,   setPriceDropToast]   = useState(null)
@@ -50,8 +56,13 @@ export default function App() {
   const { deals, timers, loading, error, updateDeal } = useDeals({ onPriceDrop: handlePriceDrop })
 
   // ── Join logic ──────────────────────────────────────────────────────────────
-  const handleJoinSuccess = useCallback((updatedDeal, result) => {
-    setJoinedDeals(prev => new Set([...prev, updatedDeal.id]))
+  const handleJoinSuccess = useCallback((updatedDeal) => {
+    // Persist joined state to localStorage so it survives page refreshes
+    setJoinedDeals(prev => {
+      const next = new Set([...prev, updatedDeal.id])
+      try { localStorage.setItem('dropprice_joined', JSON.stringify([...next])) } catch (_) {}
+      return next
+    })
     setMyGroups(prev => {
       if (prev.find(g => g.id === updatedDeal.id)) return prev
       return [...prev, {
@@ -61,7 +72,8 @@ export default function App() {
       }]
     })
     updateDeal(updatedDeal)
-    setModalDeal(null)
+    // Do NOT close modal here — let JoinModal show its success step 2 first.
+    // The modal's "מעולה, תודה!" button calls onClose which sets modalDeal(null).
   }, [updateDeal])
 
   const { join, joining } = useJoin({

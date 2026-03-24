@@ -1,10 +1,8 @@
 'use strict'
-const express      = require('express')
-const { PrismaClient } = require('@prisma/client')
+const express          = require('express')
+const prisma           = require('../db')
 const { getUserJoins } = require('../services/groupService')
-
 const router = express.Router()
-const prisma = new PrismaClient()
 
 // ── POST /api/users — get-or-create guest user ────────────────────────────────
 // Body: { name, email, phone? }
