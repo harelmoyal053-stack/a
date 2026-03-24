@@ -4,6 +4,10 @@ import DealCard from './components/DealCard'
 import HeroSection from './components/HeroSection'
 import StatsBar from './components/StatsBar'
 import JoinModal from './components/JoinModal'
+import ProductDetailPage from './pages/ProductDetailPage'
+import CheckoutPage from './pages/CheckoutPage'
+import DashboardPage from './pages/DashboardPage'
+import BusinessPortalPage from './pages/BusinessPortalPage'
 import './App.css'
 
 const deals = [
@@ -18,10 +22,10 @@ const deals = [
     originalPrice: 149,
     nextPrice: 69,
     priceTiers: [
-      { buyers: 0, price: 149 },
-      { buyers: 10, price: 89 },
-      { buyers: 25, price: 69 },
-      { buyers: 50, price: 55 },
+      { buyers: 0,  price: 149 },
+      { buyers: 10, price: 89  },
+      { buyers: 25, price: 69  },
+      { buyers: 50, price: 55  },
     ],
     currentBuyers: 18,
     targetBuyers: 25,
@@ -44,8 +48,8 @@ const deals = [
     originalPrice: 89,
     nextPrice: 35,
     priceTiers: [
-      { buyers: 0, price: 89 },
-      { buyers: 5, price: 45 },
+      { buyers: 0,  price: 89 },
+      { buyers: 5,  price: 45 },
       { buyers: 15, price: 35 },
       { buyers: 30, price: 28 },
     ],
@@ -70,9 +74,9 @@ const deals = [
     originalPrice: 198,
     nextPrice: 125,
     priceTiers: [
-      { buyers: 0, price: 198 },
-      { buyers: 20, price: 142 },
-      { buyers: 50, price: 125 },
+      { buyers: 0,   price: 198 },
+      { buyers: 20,  price: 142 },
+      { buyers: 50,  price: 125 },
       { buyers: 100, price: 110 },
     ],
     currentBuyers: 37,
@@ -96,10 +100,10 @@ const deals = [
     originalPrice: 110,
     nextPrice: 52,
     priceTiers: [
-      { buyers: 0, price: 110 },
-      { buyers: 8, price: 65 },
-      { buyers: 20, price: 52 },
-      { buyers: 40, price: 42 },
+      { buyers: 0,  price: 110 },
+      { buyers: 8,  price: 65  },
+      { buyers: 20, price: 52  },
+      { buyers: 40, price: 42  },
     ],
     currentBuyers: 14,
     targetBuyers: 20,
@@ -122,7 +126,7 @@ const deals = [
     originalPrice: 320,
     nextPrice: 159,
     priceTiers: [
-      { buyers: 0, price: 320 },
+      { buyers: 0,  price: 320 },
       { buyers: 15, price: 189 },
       { buyers: 30, price: 159 },
       { buyers: 60, price: 139 },
@@ -148,10 +152,10 @@ const deals = [
     originalPrice: 135,
     nextPrice: 62,
     priceTiers: [
-      { buyers: 0, price: 135 },
-      { buyers: 12, price: 78 },
-      { buyers: 25, price: 62 },
-      { buyers: 50, price: 49 },
+      { buyers: 0,  price: 135 },
+      { buyers: 12, price: 78  },
+      { buyers: 25, price: 62  },
+      { buyers: 50, price: 49  },
     ],
     currentBuyers: 19,
     targetBuyers: 25,
@@ -165,97 +169,189 @@ const deals = [
   },
 ]
 
+// ── Navigation helpers ────────────────────────────────────────────────────────
+
+function useNav() {
+  const [stack, setStack] = useState([{ page: 'home' }])
+
+  const current = stack[stack.length - 1]
+
+  const navigate = (page, data = {}) => {
+    setStack(s => [...s, { page, ...data }])
+    window.scrollTo({ top: 0, behavior: 'instant' })
+  }
+
+  const goBack = () => {
+    setStack(s => s.length > 1 ? s.slice(0, -1) : s)
+    window.scrollTo({ top: 0, behavior: 'instant' })
+  }
+
+  const goHome = () => {
+    setStack([{ page: 'home' }])
+    window.scrollTo({ top: 0, behavior: 'instant' })
+  }
+
+  return { current, navigate, goBack, goHome }
+}
+
+// ── App ───────────────────────────────────────────────────────────────────────
+
 function App() {
-  const [searchQuery, setSearchQuery] = useState('')
+  const { current, navigate, goBack, goHome } = useNav()
+  const [searchQuery, setSearchQuery]       = useState('')
   const [selectedCategory, setSelectedCategory] = useState('הכל')
-  const [joinedDeals, setJoinedDeals] = useState(new Set())
-  const [modalDeal, setModalDeal] = useState(null)
-  const [timers, setTimers] = useState({})
+  const [joinedDeals, setJoinedDeals]       = useState(new Set())
+  const [myGroups, setMyGroups]             = useState([])
+  const [modalDeal, setModalDeal]           = useState(null)
+  const [timers, setTimers]                 = useState({})
 
+  // Live countdown timers
   useEffect(() => {
-    const initialTimers = {}
-    deals.forEach(deal => {
-      initialTimers[deal.id] = deal.timeLeft
-    })
-    setTimers(initialTimers)
-
-    const interval = setInterval(() => {
+    const init = {}
+    deals.forEach(d => { init[d.id] = d.timeLeft })
+    setTimers(init)
+    const iv = setInterval(() => {
       setTimers(prev => {
-        const updated = { ...prev }
-        Object.keys(updated).forEach(id => {
-          updated[id] = decrementTime(updated[id])
-        })
-        return updated
+        const next = { ...prev }
+        Object.keys(next).forEach(id => { next[id] = tick(next[id]) })
+        return next
       })
     }, 1000)
-
-    return () => clearInterval(interval)
+    return () => clearInterval(iv)
   }, [])
 
-  const decrementTime = (timeStr) => {
-    const [h, m, s] = timeStr.split(':').map(Number)
-    let totalSeconds = h * 3600 + m * 60 + s - 1
-    if (totalSeconds < 0) totalSeconds = 0
-    const hours = Math.floor(totalSeconds / 3600)
-    const minutes = Math.floor((totalSeconds % 3600) / 60)
-    const seconds = totalSeconds % 60
-    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+  const tick = (t) => {
+    const [h, m, s] = t.split(':').map(Number)
+    let total = h * 3600 + m * 60 + s - 1
+    if (total < 0) total = 0
+    return [
+      String(Math.floor(total / 3600)).padStart(2, '0'),
+      String(Math.floor((total % 3600) / 60)).padStart(2, '0'),
+      String(total % 60).padStart(2, '0'),
+    ].join(':')
   }
 
   const categories = ['הכל', ...new Set(deals.map(d => d.category))]
 
-  const filteredDeals = deals.filter(deal => {
-    const matchesSearch = deal.title.includes(searchQuery) || deal.subtitle.includes(searchQuery)
-    const matchesCategory = selectedCategory === 'הכל' || deal.category === selectedCategory
-    return matchesSearch && matchesCategory
+  const filteredDeals = deals.filter(d => {
+    const q = searchQuery.trim()
+    const matchSearch = !q || d.title.includes(q) || d.subtitle.includes(q)
+    const matchCat    = selectedCategory === 'הכל' || d.category === selectedCategory
+    return matchSearch && matchCat
   })
 
-  const handleJoin = (deal) => {
-    setModalDeal(deal)
-  }
+  // ── Join handlers ────────────────────────────────────────────────────────
 
-  const confirmJoin = (deal) => {
+  // From home-page card → quick modal
+  const handleCardJoin = (deal) => setModalDeal(deal)
+
+  // From product-detail page → checkout
+  const handleDetailJoin = (deal) => navigate('checkout', { deal })
+
+  const confirmModalJoin = (deal) => {
     setJoinedDeals(prev => new Set([...prev, deal.id]))
+    setMyGroups(prev => [...prev, {
+      ...deal, joinedAt: new Date().toLocaleDateString('he-IL'),
+      status: 'active',
+    }])
     setModalDeal(null)
   }
 
+  const handleCheckoutSuccess = (deal, orderData) => {
+    setJoinedDeals(prev => new Set([...prev, deal.id]))
+    setMyGroups(prev => {
+      if (prev.find(g => g.id === deal.id)) return prev
+      return [...prev, {
+        ...deal, joinedAt: new Date().toLocaleDateString('he-IL'),
+        status: 'active', orderData,
+      }]
+    })
+  }
+
+  // ── Render ───────────────────────────────────────────────────────────────
+
+  const { page, deal } = current
+
+  if (page === 'product' && deal) {
+    return (
+      <ProductDetailPage
+        deal={deal}
+        timeLeft={timers[deal.id] || deal.timeLeft}
+        isJoined={joinedDeals.has(deal.id)}
+        onJoin={handleDetailJoin}
+        onBack={goBack}
+      />
+    )
+  }
+
+  if (page === 'checkout' && deal) {
+    return (
+      <CheckoutPage
+        deal={deal}
+        onSuccess={handleCheckoutSuccess}
+        onBack={goBack}
+      />
+    )
+  }
+
+  if (page === 'dashboard') {
+    return (
+      <DashboardPage
+        myGroups={myGroups}
+        onBack={goBack}
+      />
+    )
+  }
+
+  if (page === 'business') {
+    return (
+      <BusinessPortalPage
+        onBack={goBack}
+        onSubmit={() => {}}
+      />
+    )
+  }
+
+  // ── Home page ────────────────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50 font-['Rubik',Arial,sans-serif]" dir="rtl">
-      <Header searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+      <Header
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        myGroupsCount={myGroups.length}
+        onNavigate={navigate}
+      />
       <StatsBar />
       <HeroSection />
 
-      {/* Category Filter */}
+      {/* Category filter */}
       <div className="max-w-7xl mx-auto px-4 pb-4 pt-6">
         <div className="flex gap-2 overflow-x-auto pb-2 flex-row-reverse">
           {categories.map(cat => (
-            <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
+            <button key={cat} onClick={() => setSelectedCategory(cat)}
               className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all duration-200 ${
                 selectedCategory === cat
                   ? 'bg-green-600 text-white shadow-md shadow-green-200'
                   : 'bg-white text-gray-600 border border-gray-200 hover:border-green-400 hover:text-green-600'
-              }`}
-            >
+              }`}>
               {cat}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Section Title */}
+      {/* Section title */}
       <div className="max-w-7xl mx-auto px-4 pb-4">
         <div className="flex items-center gap-3 justify-end">
           <div>
             <h2 className="text-2xl font-bold text-gray-800">עסקאות פעילות</h2>
             <p className="text-sm text-gray-500">הצטרף עכשיו לפני שהמחיר עולה</p>
           </div>
-          <div className="w-1 h-10 bg-green-500 rounded-full"></div>
+          <div className="w-1 h-10 bg-green-500 rounded-full" />
         </div>
       </div>
 
-      {/* Deals Grid */}
+      {/* Deals grid */}
       <main className="max-w-7xl mx-auto px-4 pb-12">
         {filteredDeals.length === 0 ? (
           <div className="text-center py-20">
@@ -270,7 +366,8 @@ function App() {
                 deal={deal}
                 timeLeft={timers[deal.id] || deal.timeLeft}
                 isJoined={joinedDeals.has(deal.id)}
-                onJoin={handleJoin}
+                onJoin={handleCardJoin}
+                onCardClick={() => navigate('product', { deal })}
               />
             ))}
           </div>
@@ -280,7 +377,7 @@ function App() {
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-8 text-center">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center justify-center gap-2 mb-3">
+          <div className="flex items-center justify-center gap-1 mb-3">
             <span className="text-2xl font-black text-green-400">Drop</span>
             <span className="text-2xl font-black text-white">Price</span>
           </div>
@@ -289,9 +386,9 @@ function App() {
         </div>
       </footer>
 
-      {/* Modal */}
+      {/* Quick-join modal (from home cards) */}
       {modalDeal && (
-        <JoinModal deal={modalDeal} onConfirm={confirmJoin} onClose={() => setModalDeal(null)} />
+        <JoinModal deal={modalDeal} onConfirm={confirmModalJoin} onClose={() => setModalDeal(null)} />
       )}
     </div>
   )

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Clock, Users, ChevronDown, TrendingDown, CheckCircle, Tag, Flame } from 'lucide-react'
 
-export default function DealCard({ deal, timeLeft, isJoined, onJoin }) {
+export default function DealCard({ deal, timeLeft, isJoined, onJoin, onCardClick }) {
   const [progressWidth, setProgressWidth] = useState(0)
   const [showTiers, setShowTiers] = useState(false)
 
@@ -20,7 +20,10 @@ export default function DealCard({ deal, timeLeft, isJoined, onJoin }) {
   const [hh, mm, ss] = (timeLeft || '00:00:00').split(':')
 
   return (
-    <div className="bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 hover:-translate-y-1.5 group flex flex-col">
+    <div
+      className="bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 hover:-translate-y-1.5 group flex flex-col cursor-pointer"
+      onClick={onCardClick}
+    >
 
       {/* Product Image Area */}
       <div className={`relative h-52 bg-gradient-to-br ${deal.bgColor} flex items-center justify-center overflow-hidden shrink-0`}>
@@ -151,7 +154,7 @@ export default function DealCard({ deal, timeLeft, isJoined, onJoin }) {
             <div className="flex justify-between items-center mt-1">
               <button
                 className="text-green-600 hover:text-green-800 text-xs flex items-center gap-0.5 font-medium hover:underline"
-                onClick={() => setShowTiers(!showTiers)}
+                onClick={e => { e.stopPropagation(); setShowTiers(!showTiers) }}
               >
                 <span>שלבי מחיר</span>
                 <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${showTiers ? 'rotate-180' : ''}`} />
@@ -246,7 +249,7 @@ export default function DealCard({ deal, timeLeft, isJoined, onJoin }) {
             </div>
           ) : (
             <button
-              onClick={() => onJoin(deal)}
+              onClick={e => { e.stopPropagation(); onJoin(deal) }}
               className="w-full bg-gradient-to-l from-green-600 to-emerald-500 hover:from-green-700 hover:to-emerald-600 active:scale-95 text-white py-3 rounded-xl font-bold text-sm transition-all duration-200 shadow-lg shadow-green-200 hover:shadow-green-300 hover:shadow-xl flex items-center justify-center gap-2"
             >
               <Users className="w-4 h-4" />
