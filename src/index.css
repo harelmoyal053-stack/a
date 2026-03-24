@@ -2,58 +2,178 @@
 @tailwind components;
 @tailwind utilities;
 
-* {
-  box-sizing: border-box;
-}
+/* ── Base ─────────────────────────────────────────────────────────────── */
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
 
 body {
   margin: 0;
   font-family: 'Rubik', Arial, sans-serif;
   direction: rtl;
-  background-color: #f0fdf4;
+  background-color: #050810;
+  color: #e2eaf8;
+  overflow-x: hidden;
 }
 
-#root {
-  width: 100%;
-  min-height: 100vh;
+/* ── Scrollbar ─────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: #0a0e1a; }
+::-webkit-scrollbar-thumb { background: #00ff88; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #00cc6a; }
+
+/* ── Glassmorphism ─────────────────────────────────────────────────────── */
+.glass {
+  background: rgba(15, 22, 42, 0.72);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.glass-bright {
+  background: rgba(30, 45, 80, 0.55);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+.glass-neon {
+  background: rgba(0, 255, 136, 0.06);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(0, 255, 136, 0.22);
 }
 
-@layer utilities {
-  .progress-bar-animate {
-    transition: width 1.5s ease-out;
-  }
-
-  .card-hover {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-  }
-
-  .card-hover:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
-  }
-
-  .shimmer-bg {
-    background: linear-gradient(
-      90deg,
-      #e8f5e9 25%,
-      #c8e6c9 50%,
-      #e8f5e9 75%
-    );
-    background-size: 200% 100%;
-    animation: shimmer 2s infinite;
-  }
+/* ── Neon text ─────────────────────────────────────────────────────────── */
+.neon-green {
+  color: #00ff88;
+  text-shadow: 0 0 10px rgba(0,255,136,0.75), 0 0 22px rgba(0,255,136,0.35);
+}
+.neon-blue {
+  color: #00b4ff;
+  text-shadow: 0 0 10px rgba(0,180,255,0.75), 0 0 22px rgba(0,180,255,0.35);
 }
 
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+/* ── Card interactions ─────────────────────────────────────────────────── */
+.card-neon {
+  border: 1px solid rgba(255,255,255,0.08);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+.card-neon:hover {
+  border-color: rgba(0,255,136,0.35) !important;
+  box-shadow: 0 0 30px rgba(0,255,136,0.15), 0 20px 60px rgba(0,0,0,0.6) !important;
 }
 
-@keyframes countdown-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
+/* ── Neon progress bar ─────────────────────────────────────────────────── */
+.progress-neon {
+  background: linear-gradient(90deg, #009950, #00ff88, #00f5ff, #00ff88, #009950);
+  background-size: 200% 100%;
+  animation: shimmerDark 2.5s linear infinite;
 }
 
-.countdown-active {
-  animation: countdown-pulse 1s ease-in-out infinite;
+/* ── Fire icon ─────────────────────────────────────────────────────────── */
+@keyframes fireFlicker {
+  0%   { filter: drop-shadow(0 0 3px #ff4500) drop-shadow(0 0 6px #ff6600); transform: scale(1) rotate(-2deg); }
+  25%  { filter: drop-shadow(0 0 9px #ffaa00) drop-shadow(0 0 18px #ff6600); transform: scale(1.12) rotate(1deg); }
+  60%  { filter: drop-shadow(0 0 6px #ff3300) drop-shadow(0 0 14px #ff9900); transform: scale(1.06) rotate(-1deg); }
+  100% { filter: drop-shadow(0 0 10px #ffcc00) drop-shadow(0 0 22px #ff4500); transform: scale(1.14) rotate(2deg); }
+}
+.fire-icon { animation: fireFlicker 0.55s ease-in-out infinite; display: inline-block; }
+
+/* ── Countdown urgent glow ─────────────────────────────────────────────── */
+@keyframes urgentGlow {
+  0%,100% { color: #ff4444; text-shadow: 0 0 8px rgba(255,68,68,0.9); }
+  50%     { color: #ff0000; text-shadow: 0 0 20px rgba(255,0,0,1), 0 0 40px rgba(255,0,0,0.5); }
+}
+.urgent-digit { animation: urgentGlow 0.9s ease-in-out infinite; }
+
+/* ── Neon button ───────────────────────────────────────────────────────── */
+.btn-neon {
+  background: linear-gradient(135deg, #00ff88, #00b4ff);
+  box-shadow: 0 0 20px rgba(0,255,136,0.4), 0 4px 18px rgba(0,0,0,0.5);
+  transition: box-shadow 0.2s ease, transform 0.15s ease;
+  color: #020408;
+}
+.btn-neon:hover {
+  box-shadow: 0 0 36px rgba(0,255,136,0.65), 0 4px 28px rgba(0,0,0,0.5);
+  transform: translateY(-1px);
+}
+.btn-neon:active { transform: scale(0.97); }
+
+/* ── Hot badge pulse ───────────────────────────────────────────────────── */
+@keyframes hotPulse {
+  0%,100% { box-shadow: 0 0 8px rgba(255,107,53,0.5); }
+  50%     { box-shadow: 0 0 22px rgba(255,200,0,0.85), 0 0 44px rgba(255,107,53,0.5); }
+}
+.hot-badge { animation: hotPulse 1.4s ease-in-out infinite; }
+
+/* ── Celebration particles ─────────────────────────────────────────────── */
+@keyframes particleFall {
+  0%   { transform: translateY(0) rotate(0deg) scale(1);   opacity: 1; }
+  100% { transform: translateY(80px) rotate(720deg) scale(0); opacity: 0; }
+}
+.particle { animation: particleFall 0.9s ease-out forwards; }
+
+/* ── Price-drop flash ──────────────────────────────────────────────────── */
+@keyframes priceFlash {
+  0%  { transform: scale(1); }
+  20% { transform: scale(1.45); }
+  45% { transform: scale(0.92); }
+  65% { transform: scale(1.12); }
+  100%{ transform: scale(1); }
+}
+.price-flash { animation: priceFlash 0.65s ease-out; }
+
+/* ── Float bounce (invite button) ─────────────────────────────────────── */
+@keyframes floatBounce {
+  0%,100% { transform: translateY(0) scale(1); }
+  50%     { transform: translateY(-9px) scale(1.05); }
+}
+.float-bounce { animation: floatBounce 2.6s ease-in-out infinite; }
+
+/* ── Entry animations ──────────────────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-entry { animation: fadeUp 0.5s ease-out forwards; }
+
+/* ── Scan line overlay ─────────────────────────────────────────────────── */
+.scanlines {
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0,255,136,0.015) 0px,
+    rgba(0,255,136,0.015) 1px,
+    transparent 1px,
+    transparent 5px
+  );
+  pointer-events: none;
+}
+
+/* ── Neon input ────────────────────────────────────────────────────────── */
+.input-dark {
+  background: rgba(10, 14, 26, 0.8);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: #e2eaf8;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.input-dark::placeholder { color: rgba(255,255,255,0.3); }
+.input-dark:focus {
+  outline: none;
+  border-color: rgba(0,255,136,0.5);
+  box-shadow: 0 0 0 3px rgba(0,255,136,0.12);
+}
+
+/* ── Gradient text ─────────────────────────────────────────────────────── */
+.gradient-text {
+  background: linear-gradient(135deg, #00ff88, #00b4ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Circuit board decorative bg ──────────────────────────────────────── */
+.circuit-bg {
+  background-image:
+    linear-gradient(rgba(0,255,136,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,255,136,0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
 }

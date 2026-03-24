@@ -1,65 +1,116 @@
-import { TrendingDown, Users, Shield, Zap } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { TrendingDown, Users, Shield, Zap, Flame } from 'lucide-react'
+
+const PILLS = [
+  { icon: TrendingDown, label: 'מחירים יורדים בזמן אמת', color: 'text-neon-green' },
+  { icon: Users,        label: 'קהילה של 52,000+ קונים',  color: 'text-neon-blue' },
+  { icon: Shield,       label: 'אחריות מלאה על כל עסקה', color: 'text-neon-green' },
+]
 
 export default function HeroSection() {
   return (
-    <div className="relative bg-gradient-to-l from-green-800 via-green-600 to-emerald-500 text-white py-12 px-4 overflow-hidden" dir="rtl">
-      {/* Background decorative blobs */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute -top-16 -right-16 w-72 h-72 rounded-full bg-white/5 blur-2xl" />
-        <div className="absolute -bottom-24 -left-16 w-96 h-96 rounded-full bg-emerald-300/10 blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full bg-green-300/10 blur-2xl" />
-        <span className="absolute top-5 left-10 text-4xl opacity-20 animate-bounce select-none">💰</span>
-        <span className="absolute bottom-6 right-16 text-3xl opacity-20 select-none" style={{ animation: 'bounce 2.2s infinite 0.6s' }}>🛒</span>
-        <span className="absolute top-8 left-1/3 text-2xl opacity-15 select-none" style={{ animation: 'bounce 2s infinite 1.1s' }}>⭐</span>
-        <span className="absolute bottom-10 left-1/4 text-xl opacity-10 select-none" style={{ animation: 'bounce 2.5s infinite 0.3s' }}>🏷️</span>
-      </div>
+    <div className="relative overflow-hidden py-14 px-4" dir="rtl"
+      style={{ background: 'linear-gradient(160deg, #020b18 0%, #050810 40%, #030a14 100%)' }}>
+
+      {/* Circuit grid */}
+      <div className="absolute inset-0 circuit-bg opacity-60" />
+
+      {/* Glow orbs */}
+      <div className="absolute -top-20 -right-20 w-80 h-80 rounded-full pointer-events-none"
+        style={{ background: 'radial-gradient(circle, rgba(0,255,136,0.08) 0%, transparent 70%)' }} />
+      <div className="absolute -bottom-24 -left-20 w-96 h-96 rounded-full pointer-events-none"
+        style={{ background: 'radial-gradient(circle, rgba(0,180,255,0.07) 0%, transparent 70%)' }} />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 rounded-full pointer-events-none"
+        style={{ background: 'radial-gradient(circle, rgba(123,47,247,0.05) 0%, transparent 70%)' }} />
+
+      {/* Floating decorative emojis */}
+      <span className="absolute top-6 left-10 text-4xl opacity-20 animate-float select-none" style={{ animationDelay: '0s' }}>💰</span>
+      <span className="absolute bottom-8 right-16 text-3xl opacity-15 animate-float select-none" style={{ animationDelay: '0.8s' }}>🛒</span>
+      <span className="absolute top-10 left-1/3 text-2xl opacity-10 animate-float select-none" style={{ animationDelay: '1.4s' }}>⚡</span>
+      <span className="absolute bottom-12 left-1/4 text-xl opacity-10 animate-float select-none" style={{ animationDelay: '0.4s' }}>🏷️</span>
 
       <div className="max-w-7xl mx-auto relative z-10 text-center">
-        {/* Pill */}
-        <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm border border-white/30 rounded-full px-4 py-1.5 mb-5 text-sm font-semibold">
-          <Zap className="w-4 h-4 text-yellow-300 shrink-0" />
-          <span>קנייה קבוצתית חכמה — כמה שיותר, כך זול יותר!</span>
-        </div>
+
+        {/* Pill tag */}
+        <motion.div
+          className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 mb-5 text-sm font-semibold"
+          style={{
+            background: 'rgba(0,255,136,0.08)',
+            border: '1px solid rgba(0,255,136,0.3)',
+            color: '#00ff88',
+            boxShadow: '0 0 20px rgba(0,255,136,0.1)',
+          }}
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.1 }}
+        >
+          <span className="fire-icon text-base">🔥</span>
+          <span>טירוף המחירים — כמה שיותר קונים, כך זול יותר!</span>
+        </motion.div>
 
         {/* Headline */}
-        <h1 className="text-4xl md:text-5xl font-black mb-4 leading-tight tracking-tight">
-          הצטרף לקבוצה,{' '}
-          <span className="text-yellow-300 drop-shadow-sm">חסוך כסף</span>
-        </h1>
-        <p className="text-green-100 text-lg md:text-xl max-w-2xl mx-auto mb-8 leading-relaxed">
+        <motion.h1
+          className="text-4xl md:text-6xl font-black mb-4 leading-tight tracking-tight"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          <span className="text-white">הצטרף לקבוצה,</span>{' '}
+          <br className="sm:hidden" />
+          <span className="gradient-text">חסוך בטירוף</span>
+        </motion.h1>
+
+        <motion.p
+          className="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto mb-8 leading-relaxed"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
           כשיותר אנשים מצטרפים — המחיר יורד לכולם.{' '}
-          <span className="font-bold text-white">DropPrice</span> מחברת קונים יחד לעסקאות שאי אפשר לסרב להן.
-        </p>
+          <span className="font-black" style={{ color: '#00ff88' }}>DropPrice</span> מחברת קונים לעסקאות שאי אפשר לסרב להן.
+        </motion.p>
 
         {/* Feature pills */}
-        <div className="flex flex-wrap justify-center gap-3 mb-8">
-          <div className="flex items-center gap-2 bg-white/15 backdrop-blur-sm border border-white/20 rounded-full px-4 py-2 text-sm font-medium hover:bg-white/25 transition-colors">
-            <TrendingDown className="w-4 h-4 text-yellow-300" />
-            <span>מחירים יורדים בזמן אמת</span>
-          </div>
-          <div className="flex items-center gap-2 bg-white/15 backdrop-blur-sm border border-white/20 rounded-full px-4 py-2 text-sm font-medium hover:bg-white/25 transition-colors">
-            <Users className="w-4 h-4 text-yellow-300" />
-            <span>קהילה של 52,000+ קונים</span>
-          </div>
-          <div className="flex items-center gap-2 bg-white/15 backdrop-blur-sm border border-white/20 rounded-full px-4 py-2 text-sm font-medium hover:bg-white/25 transition-colors">
-            <Shield className="w-4 h-4 text-yellow-300" />
-            <span>אחריות מלאה על כל עסקה</span>
-          </div>
-        </div>
+        <motion.div
+          className="flex flex-wrap justify-center gap-3 mb-8"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
+        >
+          {PILLS.map(({ icon: Icon, label, color }, i) => (
+            <div key={i}
+              className="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all cursor-default"
+              style={{
+                background: 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                backdropFilter: 'blur(10px)',
+              }}>
+              <Icon className={`w-4 h-4 ${color}`} />
+              <span className="text-slate-300">{label}</span>
+            </div>
+          ))}
+        </motion.div>
 
         {/* CTA row */}
-        <div className="flex flex-wrap items-center justify-center gap-4">
-          <button
+        <motion.div
+          className="flex flex-wrap items-center justify-center gap-4"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+        >
+          <motion.button
+            className="btn-neon flex items-center gap-2 px-7 py-3.5 rounded-2xl font-black text-base"
+            whileHover={{ scale: 1.04 }}
+            whileTap={{ scale: 0.97 }}
             onClick={() => document.querySelector('main')?.scrollIntoView({ behavior: 'smooth' })}
-            className="flex items-center gap-2 bg-white text-green-700 hover:bg-green-50 active:bg-green-100 font-black px-7 py-3 rounded-2xl shadow-xl transition-all duration-200 text-base"
           >
+            <Flame className="w-5 h-5" />
             <span>גלה עסקאות עכשיו</span>
-            <span className="text-base">↓</span>
-          </button>
-          <p className="text-green-100 text-sm">
+          </motion.button>
+          <p className="text-slate-500 text-sm">
             הצטרפו כבר <strong className="text-white">52,840</strong> קונים מרוצים
           </p>
-        </div>
+        </motion.div>
       </div>
     </div>
   )

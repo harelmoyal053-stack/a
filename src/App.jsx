@@ -1,9 +1,13 @@
 import { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Flame, Zap, Filter } from 'lucide-react'
 import Header from './components/Header'
 import DealCard from './components/DealCard'
 import HeroSection from './components/HeroSection'
 import StatsBar from './components/StatsBar'
 import JoinModal from './components/JoinModal'
+import LiveTicker from './components/LiveTicker'
+import InviteButton from './components/InviteButton'
 import ProductDetailPage from './pages/ProductDetailPage'
 import CheckoutPage from './pages/CheckoutPage'
 import DashboardPage from './pages/DashboardPage'
@@ -169,43 +173,24 @@ const deals = [
   },
 ]
 
-// ── Navigation helpers ────────────────────────────────────────────────────────
-
 function useNav() {
   const [stack, setStack] = useState([{ page: 'home' }])
-
-  const current = stack[stack.length - 1]
-
-  const navigate = (page, data = {}) => {
-    setStack(s => [...s, { page, ...data }])
-    window.scrollTo({ top: 0, behavior: 'instant' })
-  }
-
-  const goBack = () => {
-    setStack(s => s.length > 1 ? s.slice(0, -1) : s)
-    window.scrollTo({ top: 0, behavior: 'instant' })
-  }
-
-  const goHome = () => {
-    setStack([{ page: 'home' }])
-    window.scrollTo({ top: 0, behavior: 'instant' })
-  }
-
+  const current  = stack[stack.length - 1]
+  const navigate = (page, data = {}) => { setStack(s => [...s, { page, ...data }]); window.scrollTo({ top: 0, behavior: 'instant' }) }
+  const goBack   = () => { setStack(s => s.length > 1 ? s.slice(0, -1) : s); window.scrollTo({ top: 0, behavior: 'instant' }) }
+  const goHome   = () => { setStack([{ page: 'home' }]); window.scrollTo({ top: 0, behavior: 'instant' }) }
   return { current, navigate, goBack, goHome }
 }
 
-// ── App ───────────────────────────────────────────────────────────────────────
-
 function App() {
-  const { current, navigate, goBack, goHome } = useNav()
-  const [searchQuery, setSearchQuery]       = useState('')
-  const [selectedCategory, setSelectedCategory] = useState('הכל')
-  const [joinedDeals, setJoinedDeals]       = useState(new Set())
-  const [myGroups, setMyGroups]             = useState([])
-  const [modalDeal, setModalDeal]           = useState(null)
-  const [timers, setTimers]                 = useState({})
+  const { current, navigate, goBack } = useNav()
+  const [searchQuery,       setSearchQuery]       = useState('')
+  const [selectedCategory,  setSelectedCategory]  = useState('הכל')
+  const [joinedDeals,       setJoinedDeals]       = useState(new Set())
+  const [myGroups,          setMyGroups]          = useState([])
+  const [modalDeal,         setModalDeal]         = useState(null)
+  const [timers,            setTimers]            = useState({})
 
-  // Live countdown timers
   useEffect(() => {
     const init = {}
     deals.forEach(d => { init[d.id] = d.timeLeft })
@@ -231,90 +216,39 @@ function App() {
     ].join(':')
   }
 
-  const categories = ['הכל', ...new Set(deals.map(d => d.category))]
-
+  const categories  = ['הכל', ...new Set(deals.map(d => d.category))]
   const filteredDeals = deals.filter(d => {
     const q = searchQuery.trim()
-    const matchSearch = !q || d.title.includes(q) || d.subtitle.includes(q)
-    const matchCat    = selectedCategory === 'הכל' || d.category === selectedCategory
-    return matchSearch && matchCat
+    return (!q || d.title.includes(q) || d.subtitle.includes(q)) &&
+      (selectedCategory === 'הכל' || d.category === selectedCategory)
   })
 
-  // ── Join handlers ────────────────────────────────────────────────────────
-
-  // From home-page card → quick modal
-  const handleCardJoin = (deal) => setModalDeal(deal)
-
-  // From product-detail page → checkout
-  const handleDetailJoin = (deal) => navigate('checkout', { deal })
-
-  const confirmModalJoin = (deal) => {
+  const handleCardJoin       = (deal) => setModalDeal(deal)
+  const handleDetailJoin     = (deal) => navigate('checkout', { deal })
+  const confirmModalJoin     = (deal) => {
     setJoinedDeals(prev => new Set([...prev, deal.id]))
-    setMyGroups(prev => [...prev, {
-      ...deal, joinedAt: new Date().toLocaleDateString('he-IL'),
-      status: 'active',
-    }])
+    setMyGroups(prev => [...prev, { ...deal, joinedAt: new Date().toLocaleDateString('he-IL'), status: 'active' }])
     setModalDeal(null)
   }
-
   const handleCheckoutSuccess = (deal, orderData) => {
     setJoinedDeals(prev => new Set([...prev, deal.id]))
-    setMyGroups(prev => {
-      if (prev.find(g => g.id === deal.id)) return prev
-      return [...prev, {
-        ...deal, joinedAt: new Date().toLocaleDateString('he-IL'),
-        status: 'active', orderData,
-      }]
-    })
+    setMyGroups(prev => prev.find(g => g.id === deal.id) ? prev : [...prev, { ...deal, joinedAt: new Date().toLocaleDateString('he-IL'), status: 'active', orderData }])
   }
-
-  // ── Render ───────────────────────────────────────────────────────────────
 
   const { page, deal } = current
 
-  if (page === 'product' && deal) {
-    return (
-      <ProductDetailPage
-        deal={deal}
-        timeLeft={timers[deal.id] || deal.timeLeft}
-        isJoined={joinedDeals.has(deal.id)}
-        onJoin={handleDetailJoin}
-        onBack={goBack}
-      />
-    )
-  }
+  // ── Sub-pages ──────────────────────────────────────────────────────────────
+  if (page === 'product' && deal)  return <ProductDetailPage deal={deal} timeLeft={timers[deal.id] || deal.timeLeft} isJoined={joinedDeals.has(deal.id)} onJoin={handleDetailJoin} onBack={goBack} />
+  if (page === 'checkout' && deal) return <CheckoutPage deal={deal} onSuccess={handleCheckoutSuccess} onBack={goBack} />
+  if (page === 'dashboard')        return <DashboardPage myGroups={myGroups} onBack={goBack} />
+  if (page === 'business')         return <BusinessPortalPage onBack={goBack} onSubmit={() => {}} />
 
-  if (page === 'checkout' && deal) {
-    return (
-      <CheckoutPage
-        deal={deal}
-        onSuccess={handleCheckoutSuccess}
-        onBack={goBack}
-      />
-    )
-  }
-
-  if (page === 'dashboard') {
-    return (
-      <DashboardPage
-        myGroups={myGroups}
-        onBack={goBack}
-      />
-    )
-  }
-
-  if (page === 'business') {
-    return (
-      <BusinessPortalPage
-        onBack={goBack}
-        onSubmit={() => {}}
-      />
-    )
-  }
-
-  // ── Home page ────────────────────────────────────────────────────────────
+  // ── Home ───────────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50 font-['Rubik',Arial,sans-serif]" dir="rtl">
+    <div className="min-h-screen" style={{ background: '#050810' }} dir="rtl">
+      {/* Live ticker – above everything */}
+      <LiveTicker />
+
       <Header
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
@@ -328,68 +262,114 @@ function App() {
       <div className="max-w-7xl mx-auto px-4 pb-4 pt-6">
         <div className="flex gap-2 overflow-x-auto pb-2 flex-row-reverse">
           {categories.map(cat => (
-            <button key={cat} onClick={() => setSelectedCategory(cat)}
-              className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all duration-200 ${
+            <motion.button
+              key={cat}
+              onClick={() => setSelectedCategory(cat)}
+              whileTap={{ scale: 0.95 }}
+              className={`px-4 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all duration-200 ${
                 selectedCategory === cat
-                  ? 'bg-green-600 text-white shadow-md shadow-green-200'
-                  : 'bg-white text-gray-600 border border-gray-200 hover:border-green-400 hover:text-green-600'
-              }`}>
+                  ? 'text-dark-900'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+              style={selectedCategory === cat ? {
+                background: 'linear-gradient(135deg, #00ff88, #00b4ff)',
+                boxShadow: '0 0 18px rgba(0,255,136,0.4)',
+              } : {
+                background: 'rgba(255,255,255,0.05)',
+                border: '1px solid rgba(255,255,255,0.1)',
+              }}
+            >
               {cat}
-            </button>
+            </motion.button>
           ))}
         </div>
       </div>
 
-      {/* Section title */}
-      <div className="max-w-7xl mx-auto px-4 pb-4">
-        <div className="flex items-center gap-3 justify-end">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-800">עסקאות פעילות</h2>
-            <p className="text-sm text-gray-500">הצטרף עכשיו לפני שהמחיר עולה</p>
+      {/* Section header */}
+      <div className="max-w-7xl mx-auto px-4 pb-5">
+        <div className="flex items-center justify-end gap-3">
+          <div className="text-right">
+            <h2 className="text-2xl font-black text-white">עסקאות פעילות</h2>
+            <p className="text-sm text-slate-500">הצטרף עכשיו לפני שהמחיר יעלה</p>
           </div>
-          <div className="w-1 h-10 bg-green-500 rounded-full" />
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl"
+            style={{ background: 'rgba(0,255,136,0.1)', border: '1px solid rgba(0,255,136,0.25)' }}>
+            <Flame className="w-4 h-4 text-neon-green" />
+            <span className="text-sm font-black text-neon-green">{filteredDeals.length}</span>
+            <span className="text-xs text-slate-400">פעילות</span>
+          </div>
         </div>
       </div>
 
       {/* Deals grid */}
-      <main className="max-w-7xl mx-auto px-4 pb-12">
-        {filteredDeals.length === 0 ? (
-          <div className="text-center py-20">
-            <p className="text-6xl mb-4">🔍</p>
-            <p className="text-xl text-gray-500">לא נמצאו עסקאות התואמות לחיפוש</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredDeals.map(deal => (
-              <DealCard
-                key={deal.id}
-                deal={deal}
-                timeLeft={timers[deal.id] || deal.timeLeft}
-                isJoined={joinedDeals.has(deal.id)}
-                onJoin={handleCardJoin}
-                onCardClick={() => navigate('product', { deal })}
-              />
-            ))}
-          </div>
-        )}
+      <main className="max-w-7xl mx-auto px-4 pb-14">
+        <AnimatePresence mode="wait">
+          {filteredDeals.length === 0 ? (
+            <motion.div
+              key="empty"
+              className="text-center py-24"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <p className="text-6xl mb-4">🔍</p>
+              <p className="text-xl font-semibold text-slate-400">לא נמצאו עסקאות</p>
+              <p className="text-slate-600 mt-1">נסה חיפוש אחר</p>
+            </motion.div>
+          ) : (
+            <motion.div
+              key={selectedCategory}
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+              initial="hidden"
+              animate="show"
+              variants={{ hidden: {}, show: { transition: { staggerChildren: 0.07 } } }}
+            >
+              {filteredDeals.map(d => (
+                <motion.div
+                  key={d.id}
+                  variants={{ hidden: { opacity: 0, y: 40 }, show: { opacity: 1, y: 0, transition: { duration: 0.45, ease: 'easeOut' } } }}
+                >
+                  <DealCard
+                    deal={d}
+                    timeLeft={timers[d.id] || d.timeLeft}
+                    isJoined={joinedDeals.has(d.id)}
+                    onJoin={handleCardJoin}
+                    onCardClick={() => navigate('product', { deal: d })}
+                  />
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </main>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-8 text-center">
+      <footer style={{ background: 'rgba(2,4,8,0.95)', borderTop: '1px solid rgba(0,255,136,0.1)' }}
+        className="py-10 text-center">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center justify-center gap-1 mb-3">
-            <span className="text-2xl font-black text-green-400">Drop</span>
+          <div className="flex items-center justify-center gap-0.5 mb-3">
+            <span className="text-2xl font-black" style={{ color: '#00ff88', textShadow: '0 0 14px rgba(0,255,136,0.6)' }}>Drop</span>
             <span className="text-2xl font-black text-white">Price</span>
+            <span className="w-2 h-2 rounded-full mr-1 inline-block animate-pulse"
+              style={{ background: '#00ff88', boxShadow: '0 0 8px rgba(0,255,136,0.9)' }} />
           </div>
-          <p className="text-gray-400 text-sm">חסכו יחד, קנו חכם יותר 🛍️</p>
-          <p className="text-gray-600 text-xs mt-3">© 2026 DropPrice. כל הזכויות שמורות.</p>
+          <p className="text-slate-500 text-sm mb-1">חסכו יחד, קנו חכם יותר 🛍️</p>
+          <div className="flex items-center justify-center gap-4 mt-4">
+            {['תנאי שימוש', 'פרטיות', 'צור קשר', 'עזרה'].map(l => (
+              <button key={l} className="text-xs text-slate-600 hover:text-neon-green transition-colors">{l}</button>
+            ))}
+          </div>
+          <p className="text-slate-700 text-xs mt-4">© 2026 DropPrice. כל הזכויות שמורות.</p>
         </div>
       </footer>
 
-      {/* Quick-join modal (from home cards) */}
+      {/* Quick-join modal */}
       {modalDeal && (
         <JoinModal deal={modalDeal} onConfirm={confirmModalJoin} onClose={() => setModalDeal(null)} />
       )}
+
+      {/* Floating invite button */}
+      <InviteButton />
     </div>
   )
 }

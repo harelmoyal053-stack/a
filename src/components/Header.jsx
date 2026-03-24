@@ -1,87 +1,104 @@
-import { Search, Store, User, Bell, LayoutDashboard } from 'lucide-react'
+import { Search, Store, User, Bell, LayoutDashboard, Zap } from 'lucide-react'
 
 export default function Header({ searchQuery, setSearchQuery, myGroupsCount = 0, onNavigate }) {
   return (
-    <header className="sticky top-0 z-50 bg-white/98 backdrop-blur-md border-b border-gray-100 shadow-sm">
+    <header className="sticky top-0 z-50"
+      style={{
+        background: 'rgba(5,8,16,0.85)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        borderBottom: '1px solid rgba(0,255,136,0.12)',
+        boxShadow: '0 4px 30px rgba(0,0,0,0.5)',
+      }}>
       <div className="max-w-7xl mx-auto px-4 py-3">
         <div className="flex items-center justify-between gap-4" dir="rtl">
 
-          {/* RIGHT: Logo + divider + Search + Create Store */}
+          {/* RIGHT: Logo + Search + Create Store */}
           <div className="flex items-center gap-3 flex-1 min-w-0">
 
             {/* Logo */}
             <button
               onClick={() => onNavigate('home')}
-              className="flex items-center gap-0.5 shrink-0 select-none hover:opacity-80 transition-opacity"
+              className="flex items-center gap-0.5 shrink-0 select-none hover:opacity-85 transition-opacity"
             >
-              <span className="text-2xl font-black text-green-600 tracking-tight leading-none">Drop</span>
-              <span className="text-2xl font-black text-gray-900 tracking-tight leading-none">Price</span>
-              <span className="w-2 h-2 rounded-full bg-green-500 mb-3 mr-0.5 animate-pulse inline-block" />
+              <span className="text-2xl font-black leading-none"
+                style={{ color: '#00ff88', textShadow: '0 0 14px rgba(0,255,136,0.7)' }}>
+                Drop
+              </span>
+              <span className="text-2xl font-black text-white leading-none">Price</span>
+              <span className="w-2 h-2 rounded-full mb-3 mr-0.5 inline-block animate-pulse"
+                style={{ background: '#00ff88', boxShadow: '0 0 8px rgba(0,255,136,0.9)' }} />
             </button>
 
             {/* Divider */}
-            <div className="w-px h-8 bg-gray-200 shrink-0 hidden sm:block" />
+            <div className="w-px h-7 hidden sm:block" style={{ background: 'rgba(0,255,136,0.2)' }} />
 
             {/* Search */}
             <div className="relative flex-1 max-w-xs hidden sm:block">
-              <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'rgba(0,255,136,0.5)' }} />
               <input
                 type="text"
                 placeholder="חיפוש..."
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                className="w-full pr-10 pl-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent transition-all duration-200 placeholder-gray-400"
+                className="input-dark w-full pr-10 pl-4 py-2.5 rounded-xl text-sm"
                 dir="rtl"
               />
             </div>
 
-            {/* Create Store Button */}
+            {/* Create Store */}
             <button
               onClick={() => onNavigate('business')}
-              className="hidden sm:flex items-center gap-2 bg-green-600 hover:bg-green-700 active:bg-green-800 text-white px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 shadow-md shadow-green-200 hover:shadow-green-300 hover:shadow-lg shrink-0"
+              className="hidden sm:flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all shrink-0 btn-neon"
             >
               <Store className="w-4 h-4" />
               <span>יצירת חנות</span>
             </button>
           </div>
 
-          {/* LEFT: Dashboard + Bell + Avatar */}
+          {/* LEFT: My Groups + Bell + Avatar */}
           <div className="flex items-center gap-1 shrink-0">
 
             {/* My Groups */}
             <button
               onClick={() => onNavigate('dashboard')}
-              className="relative hidden sm:flex items-center gap-1.5 px-3 py-2 text-gray-600 hover:text-green-700 hover:bg-green-50 rounded-xl transition-all font-semibold text-sm"
+              className="relative hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all font-semibold text-sm text-slate-400 hover:text-neon-green hover:bg-neon-green/5"
             >
               <LayoutDashboard className="w-4 h-4" />
               <span>הקבוצות שלי</span>
               {myGroupsCount > 0 && (
-                <span className="absolute -top-1 -left-1 w-4 h-4 bg-green-500 text-white text-[10px] font-black rounded-full flex items-center justify-center">
+                <span className="absolute -top-1 -left-1 w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-black text-dark-900"
+                  style={{ background: '#00ff88', boxShadow: '0 0 8px rgba(0,255,136,0.6)' }}>
                   {myGroupsCount}
                 </span>
               )}
             </button>
 
-            {/* Notification Bell */}
-            <button className="relative p-2 hover:bg-gray-50 rounded-xl transition-colors hidden sm:flex items-center justify-center">
-              <Bell className="w-5 h-5 text-gray-500" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border border-white" />
+            {/* Bell */}
+            <button className="relative p-2 rounded-xl transition-colors text-slate-500 hover:text-neon-green hover:bg-neon-green/5 hidden sm:flex items-center">
+              <Bell className="w-5 h-5" />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border border-dark-900"
+                style={{ boxShadow: '0 0 6px rgba(239,68,68,0.7)' }} />
             </button>
 
-            {/* User Avatar */}
+            {/* Avatar */}
             <button
               onClick={() => onNavigate('dashboard')}
-              className="group flex items-center gap-2.5 p-1.5 hover:bg-gray-50 rounded-xl transition-all duration-200"
+              className="group flex items-center gap-2.5 p-1.5 rounded-xl transition-all hover:bg-neon-green/5"
             >
               <div className="relative">
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-green-400 to-emerald-600 flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
-                  <User className="w-5 h-5 text-white" />
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center shadow-md"
+                  style={{ background: 'linear-gradient(135deg, #00ff88, #00b4ff)', boxShadow: '0 0 14px rgba(0,255,136,0.3)' }}>
+                  <User className="w-5 h-5 text-dark-900" />
                 </div>
-                <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-400 border-2 border-white rounded-full" />
+                <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-neon-green rounded-full border-2"
+                  style={{ borderColor: '#050810', boxShadow: '0 0 6px rgba(0,255,136,0.8)' }} />
               </div>
               <div className="hidden md:block text-right leading-tight">
-                <p className="text-xs font-semibold text-gray-700">אריאל כהן</p>
-                <p className="text-xs text-green-600 font-medium">חבר פרימיום ✦</p>
+                <p className="text-xs font-semibold text-white">אריאל כהן</p>
+                <p className="text-xs font-medium" style={{ color: '#00ff88' }}>
+                  <Zap className="w-3 h-3 inline mb-0.5" /> פרו-גיימר
+                </p>
               </div>
             </button>
           </div>
@@ -90,31 +107,29 @@ export default function Header({ searchQuery, setSearchQuery, myGroupsCount = 0,
         {/* Mobile row */}
         <div className="mt-3 flex gap-2 sm:hidden">
           <div className="relative flex-1">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'rgba(0,255,136,0.5)' }} />
             <input
               type="text"
               placeholder="חיפוש..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="w-full pr-10 pl-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent"
+              className="input-dark w-full pr-10 pl-4 py-2.5 rounded-xl text-sm"
               dir="rtl"
             />
           </div>
-          <button
-            onClick={() => onNavigate('dashboard')}
-            className="relative flex items-center gap-1 bg-gray-100 text-gray-600 px-3 py-2 rounded-xl text-sm font-bold shrink-0"
-          >
+          <button onClick={() => onNavigate('dashboard')}
+            className="relative flex items-center gap-1 px-3 py-2 rounded-xl text-sm font-bold shrink-0 text-slate-400"
+            style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }}>
             <LayoutDashboard className="w-4 h-4" />
             {myGroupsCount > 0 && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 text-white text-[10px] font-black rounded-full flex items-center justify-center">
+              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-black text-dark-900"
+                style={{ background: '#00ff88' }}>
                 {myGroupsCount}
               </span>
             )}
           </button>
-          <button
-            onClick={() => onNavigate('business')}
-            className="flex items-center gap-1.5 bg-green-600 active:bg-green-800 text-white px-3 py-2 rounded-xl text-sm font-bold shrink-0 shadow-md shadow-green-200"
-          >
+          <button onClick={() => onNavigate('business')}
+            className="btn-neon flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-bold shrink-0">
             <Store className="w-4 h-4" />
             <span>חנות</span>
           </button>
