@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Clock, Users, ChevronDown, TrendingDown, CheckCircle, Tag } from 'lucide-react'
+import { Clock, Users, ChevronDown, TrendingDown, CheckCircle, Tag, Flame } from 'lucide-react'
 
 export default function DealCard({ deal, timeLeft, isJoined, onJoin }) {
   const [progressWidth, setProgressWidth] = useState(0)
@@ -16,20 +16,26 @@ export default function DealCard({ deal, timeLeft, isJoined, onJoin }) {
     return () => clearTimeout(timer)
   }, [progress])
 
+  // Parse countdown digits for segmented display
+  const [hh, mm, ss] = (timeLeft || '00:00:00').split(':')
+
   return (
     <div className="bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 hover:-translate-y-1.5 group flex flex-col">
 
       {/* Product Image Area */}
-      <div className={`relative h-48 bg-gradient-to-br ${deal.bgColor} flex items-center justify-center overflow-hidden shrink-0`}>
-        {/* Subtle grid pattern overlay */}
-        <div className="absolute inset-0 opacity-10"
+      <div className={`relative h-52 bg-gradient-to-br ${deal.bgColor} flex items-center justify-center overflow-hidden shrink-0`}>
+        {/* Subtle dot-grid pattern */}
+        <div className="absolute inset-0 opacity-20"
           style={{
-            backgroundImage: 'radial-gradient(circle, #00000015 1px, transparent 1px)',
-            backgroundSize: '20px 20px'
+            backgroundImage: 'radial-gradient(circle, rgba(0,0,0,0.08) 1px, transparent 1px)',
+            backgroundSize: '18px 18px'
           }}
         />
 
-        {/* Discount Badge — top right (RTL: visually right) */}
+        {/* Soft light orb behind emoji */}
+        <div className="absolute w-36 h-36 rounded-full bg-white/30 blur-2xl" />
+
+        {/* Discount Badge — top right (RTL) */}
         <div className="absolute top-3 right-3 z-10">
           <div className="bg-red-500 text-white text-xs font-black px-2.5 py-1.5 rounded-xl shadow-lg flex items-center gap-1">
             <Tag className="w-3 h-3" />
@@ -37,14 +43,26 @@ export default function DealCard({ deal, timeLeft, isJoined, onJoin }) {
           </div>
         </div>
 
-        {/* Category Badge — top left */}
-        <div className="absolute top-3 left-3 z-10">
-          <span className="bg-white/85 backdrop-blur-sm text-gray-600 text-xs font-semibold px-2.5 py-1 rounded-lg shadow-sm">
-            {deal.category}
-          </span>
-        </div>
+        {/* Hot indicator for nearly-there deals */}
+        {isAlmostThere && (
+          <div className="absolute top-3 left-3 z-10">
+            <div className="bg-orange-500 text-white text-xs font-black px-2.5 py-1.5 rounded-xl shadow-lg flex items-center gap-1">
+              <Flame className="w-3 h-3" />
+              <span>כמעט הגענו!</span>
+            </div>
+          </div>
+        )}
 
-        {/* Status Badge — bottom right */}
+        {/* Category Badge — top left (when no hot badge) */}
+        {!isAlmostThere && (
+          <div className="absolute top-3 left-3 z-10">
+            <span className="bg-white/85 backdrop-blur-sm text-gray-600 text-xs font-semibold px-2.5 py-1 rounded-lg shadow-sm">
+              {deal.category}
+            </span>
+          </div>
+        )}
+
+        {/* Status / named Badge — bottom right */}
         <div className="absolute bottom-3 right-3 z-10">
           <span className={`${deal.badgeColor} text-white text-xs font-bold px-3 py-1 rounded-full shadow-md`}>
             {deal.badge}
@@ -53,13 +71,16 @@ export default function DealCard({ deal, timeLeft, isJoined, onJoin }) {
 
         {/* Large Emoji / Product Visual */}
         <div className="relative z-10 flex flex-col items-center">
-          <span className="text-8xl drop-shadow-lg group-hover:scale-110 transition-transform duration-400 select-none">
+          <span className="text-8xl drop-shadow-lg group-hover:scale-110 transition-transform duration-300 select-none leading-none">
             {deal.emoji}
+          </span>
+          <span className="mt-2 text-xs font-bold text-gray-600/70 bg-white/50 backdrop-blur-sm px-3 py-1 rounded-full shadow-sm">
+            {deal.subtitle}
           </span>
         </div>
 
         {/* Shine sweep on hover */}
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out pointer-events-none" />
       </div>
 
       {/* Card Body */}
@@ -78,9 +99,8 @@ export default function DealCard({ deal, timeLeft, isJoined, onJoin }) {
           <span className="text-xs text-gray-400">({deal.reviews.toLocaleString()} ביקורות)</span>
         </div>
 
-        {/* Title & Subtitle */}
-        <h3 className="font-black text-gray-900 text-base leading-snug mb-0.5">{deal.title}</h3>
-        <p className="text-xs text-gray-500 mb-3">{deal.subtitle}</p>
+        {/* Title */}
+        <h3 className="font-black text-gray-900 text-base leading-snug mb-3">{deal.title}</h3>
 
         {/* Price + Progress Block */}
         <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-3 mb-3 border border-green-100">
@@ -89,7 +109,7 @@ export default function DealCard({ deal, timeLeft, isJoined, onJoin }) {
             <div className="flex items-center gap-1.5">
               <TrendingDown className="w-3.5 h-3.5 text-green-600 shrink-0" />
               <span className="text-xs text-green-700 font-semibold">
-                המחיר הבא: <span className="font-black">₪{deal.nextPrice}</span>
+                הבא: <span className="font-black text-green-800">₪{deal.nextPrice}</span>
               </span>
             </div>
             <div className="text-right">
@@ -97,8 +117,8 @@ export default function DealCard({ deal, timeLeft, isJoined, onJoin }) {
                 <span className="text-xs text-gray-400 line-through">₪{deal.originalPrice}</span>
                 <span className="text-2xl font-black text-green-600 leading-none">₪{deal.currentPrice}</span>
               </div>
-              <p className="text-xs text-emerald-600 font-semibold text-right">
-                חסכון: ₪{deal.savings}
+              <p className="text-xs text-emerald-600 font-bold text-right">
+                חיסכון: ₪{deal.savings}
               </p>
             </div>
           </div>
@@ -121,9 +141,8 @@ export default function DealCard({ deal, timeLeft, isJoined, onJoin }) {
                 }`}
                 style={{ width: `${progressWidth}%` }}
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-[shimmer_2s_infinite]" />
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent" style={{ animation: 'shimmer 2s infinite' }} />
               </div>
-              {/* Milestone ticks */}
               {[33, 66].map(pct => (
                 <div key={pct} className="absolute top-0 bottom-0 w-px bg-white/50" style={{ right: `${pct}%` }} />
               ))}
@@ -158,7 +177,7 @@ export default function DealCard({ deal, timeLeft, isJoined, onJoin }) {
               return (
                 <div
                   key={i}
-                  className={`flex justify-between items-center px-3 py-2.5 text-sm border-b border-gray-100 last:border-0 transition-colors ${
+                  className={`flex justify-between items-center px-3 py-2.5 text-sm border-b border-gray-100 last:border-0 ${
                     isActive ? 'bg-green-50' : isPast ? 'bg-gray-50' : ''
                   }`}
                 >
@@ -166,39 +185,39 @@ export default function DealCard({ deal, timeLeft, isJoined, onJoin }) {
                     ₪{tier.price}
                   </span>
                   <span className={`text-xs ${isPast ? 'text-gray-400' : 'text-gray-500'}`}>{tier.buyers}+ קונים</span>
-                  {isActive && (
-                    <span className="text-xs bg-green-500 text-white px-2 py-0.5 rounded-full font-bold">פעיל ✓</span>
-                  )}
-                  {isPast && (
-                    <span className="text-xs bg-gray-300 text-gray-500 px-2 py-0.5 rounded-full">הושג</span>
-                  )}
-                  {!isActive && !isPast && (
-                    <span className="text-xs text-gray-400">בקרוב</span>
-                  )}
+                  {isActive && <span className="text-xs bg-green-500 text-white px-2 py-0.5 rounded-full font-bold">פעיל ✓</span>}
+                  {isPast && <span className="text-xs bg-gray-300 text-gray-500 px-2 py-0.5 rounded-full">הושג</span>}
+                  {!isActive && !isPast && <span className="text-xs text-gray-400">בקרוב</span>}
                 </div>
               )
             })}
           </div>
         )}
 
-        {/* Countdown Timer */}
-        <div className={`rounded-xl px-3 py-2.5 mb-3 flex items-center justify-center gap-2 ${
-          isUrgent
-            ? 'bg-red-50 border border-red-200'
-            : 'bg-gray-50 border border-gray-200'
+        {/* Countdown Timer — segmented digital style */}
+        <div className={`rounded-xl px-3 py-2 mb-3 flex items-center justify-center gap-2 ${
+          isUrgent ? 'bg-red-50 border border-red-200' : 'bg-gray-900 border border-gray-800'
         }`}>
-          <Clock className={`w-4 h-4 shrink-0 ${isUrgent ? 'text-red-500 animate-pulse' : 'text-gray-400'}`} />
-          <span className={`font-black text-xl tracking-widest font-mono ${isUrgent ? 'text-red-600 animate-pulse' : 'text-gray-700'}`}>
-            {timeLeft}
-          </span>
-          <span className={`text-xs font-semibold ${isUrgent ? 'text-red-500' : 'text-gray-500'}`}>נותרו</span>
+          <Clock className={`w-3.5 h-3.5 shrink-0 ${isUrgent ? 'text-red-500 animate-pulse' : 'text-green-400'}`} />
+          <div className="flex items-center gap-1" dir="ltr">
+            {[hh, mm, ss].map((seg, i) => (
+              <span key={i} className="flex items-center gap-1">
+                <span className={`font-mono font-black text-lg tracking-wider px-1.5 py-0.5 rounded-md ${
+                  isUrgent ? 'text-red-600 bg-red-100' : 'text-green-400 bg-gray-800'
+                }`}>
+                  {seg}
+                </span>
+                {i < 2 && <span className={`font-black text-lg leading-none mb-1 ${isUrgent ? 'text-red-400' : 'text-gray-500'}`}>:</span>}
+              </span>
+            ))}
+          </div>
+          <span className={`text-xs font-semibold ${isUrgent ? 'text-red-500' : 'text-gray-400'}`}>נותרו</span>
         </div>
 
         {/* Participants Row */}
         <div className="flex items-center justify-between mb-3.5">
-          {/* Avatar stack */}
           <div className="flex items-center" style={{ direction: 'ltr' }}>
-            {['🧑', '👩', '👨', '🙍'].map((emoji, i) => (
+            {['🧑','👩','👨','🙍'].map((emoji, i) => (
               <div
                 key={i}
                 className="w-6 h-6 rounded-full bg-gradient-to-br from-green-300 to-emerald-500 border-2 border-white flex items-center justify-center text-xs -ml-1 first:ml-0 shadow-sm"
