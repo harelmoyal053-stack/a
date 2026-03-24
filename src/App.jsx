@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Flame, WifiOff, Loader2 } from 'lucide-react'
 
@@ -18,6 +18,7 @@ import BusinessPortalPage from './pages/BusinessPortalPage'
 
 import { useDeals } from './hooks/useDeals'
 import { useJoin  } from './hooks/useJoin'
+import { capturePendingRef } from './utils/invite'
 
 import './App.css'
 
@@ -46,6 +47,16 @@ export default function App() {
   const [myGroups,         setMyGroups]         = useState([])
   const [modalDeal,        setModalDeal]        = useState(null)
   const [priceDropToast,   setPriceDropToast]   = useState(null)
+
+  // ── Capture ?ref=&deal= params from invite links on first mount ────────────
+  useEffect(() => {
+    const { dealId } = capturePendingRef()
+    if (dealId && deals.length > 0) {
+      const found = deals.find(d => d.id === dealId)
+      if (found) navigate('product', { deal: found })
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deals.length])
 
   // ── Price-drop handler (SSE + join response) ────────────────────────────────
   const handlePriceDrop = useCallback((payload) => {

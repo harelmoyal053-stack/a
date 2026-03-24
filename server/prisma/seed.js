@@ -134,9 +134,39 @@ const PRODUCTS = [
   },
 ]
 
+// ── Realistic Hebrew activity feed messages per deal ─────────────────────────
+const ACTIVITY_TEMPLATES = [
+  // [type, userName, content template — {n} = buyers remaining, {p} = next price]
+  ['join',    'System',   'ברוכים הבאים לקבוצה! הצטרפו עד כה {buyers} אנשים 🙌'],
+  ['chat',    'דני כהן',  'יאללה חברים, שתפו בקבוצת ה-WhatsApp שנוריד את המחיר 🔥'],
+  ['chat',    'מיכל לוי', 'שיתפתי בקבוצת האמהות, בדרך עוד אנשים 💪'],
+  ['join',    'System',   'עוד {remaining} קונים ומגיעים למחיר ₪{nextPrice}! ⏳'],
+  ['chat',    'שרה מ.',   'מישהו יכול לשתף בקבוצת החברים? ננסה להגיע ל-{remaining} יחד'],
+  ['chat',    'יוסי ב.',  'כבר שיתפתי בגרופ של העבודה, מחכים לתגובות 👍'],
+  ['chat',    'נועה ג.',  'הדיל הזה מטורף! שיתפתי גם בטלגרם 📣'],
+  ['referral','System',   '🔗 אבי הצטרף דרך שיתוף של דני! כבר {buyers} בקבוצה'],
+  ['chat',    'רן ש.',    'מחיר כזה לא ראיתי בשום מקום אחר 😱'],
+]
+
+async function seedActivity(productId, buyers, nextPrice, remaining) {
+  const messages = ACTIVITY_TEMPLATES.slice(0, 7).map(([ type, userName, tpl ], i) => ({
+    productId,
+    type,
+    userName,
+    content: tpl
+      .replace('{buyers}', buyers)
+      .replace('{nextPrice}', nextPrice)
+      .replace('{remaining}', remaining),
+    // Stagger times so they look natural
+    createdAt: new Date(Date.now() - (7 - i) * 8 * 60 * 1000),
+  }))
+  await prisma.activityMessage.createMany({ data: messages })
+}
+
 async function main() {
   const maxBuyers = Math.max(...PRODUCTS.map(p => p.initialBuyers))
   console.log(`🌱 מנקה נתונים ישנים...`)
+  await prisma.activityMessage.deleteMany()
   await prisma.groupMember.deleteMany()
   await prisma.group.deleteMany()
   await prisma.tier.deleteMany()
@@ -175,6 +205,12 @@ async function main() {
     if (correctPrice !== productData.currentPrice) {
       await prisma.product.update({ where: { id: product.id }, data: { currentPrice: correctPrice } })
     }
+
+    // Seed activity feed for this deal
+    const nextTierData = sortedTiers.find(t => t.requiredParticipants > initialBuyers)
+    const nextPrice = nextTierData?.priceAtTier ?? correctPrice
+    const remaining = nextTierData ? (nextTierData.requiredParticipants - initialBuyers) : 0
+    await seedActivity(product.id, initialBuyers, nextPrice, remaining)
 
     console.log(`  ✓ "${product.title}" — ${initialBuyers} קונים, מחיר נוכחי ₪${correctPrice}`)
   }

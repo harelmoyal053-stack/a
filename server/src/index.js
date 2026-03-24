@@ -6,9 +6,10 @@ const prisma = require('./db')
 const express = require('express')
 const cors    = require('cors')
 
-const dealsRouter = require('./routes/deals')
-const joinRouter  = require('./routes/join')
-const usersRouter = require('./routes/users')
+const dealsRouter    = require('./routes/deals')
+const joinRouter     = require('./routes/join')
+const usersRouter    = require('./routes/users')
+const activityRouter = require('./routes/activity')
 
 const app  = express()
 const PORT = process.env.PORT || 3001
@@ -27,9 +28,10 @@ app.use((req, _res, next) => {
 })
 
 // ── Routes ─────────────────────────────────────────────────────────────────────
-app.use('/api/deals',  dealsRouter)
-app.use('/api/join',   joinRouter)
-app.use('/api/users',  usersRouter)
+app.use('/api/deals',    dealsRouter)
+app.use('/api/join',     joinRouter)
+app.use('/api/users',    usersRouter)
+app.use('/api/activity', activityRouter)
 
 app.get('/api/health', (_req, res) => {
   res.json({ ok: true, message: 'DropPrice API פעיל 🚀', ts: new Date().toISOString() })

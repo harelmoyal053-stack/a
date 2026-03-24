@@ -1,18 +1,14 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   ArrowRight, Users, Clock, TrendingDown, Shield, Truck,
-  RotateCcw, ChevronLeft, ChevronRight, Tag, Zap, CheckCircle
+  RotateCcw, ChevronLeft, ChevronRight, Tag, Zap, CheckCircle, Share2
 } from 'lucide-react'
 
-const RECENT_JOINERS = [
-  { name: 'מיכל כ.', time: 'לפני 2 דקות', emoji: '👩' },
-  { name: 'דניאל ל.', time: 'לפני 5 דקות', emoji: '🧑' },
-  { name: 'שרה מ.', time: 'לפני 12 דקות', emoji: '👩' },
-  { name: 'אביב ר.', time: 'לפני 18 דקות', emoji: '👨' },
-  { name: 'נועה ג.', time: 'לפני 25 דקות', emoji: '👩' },
-  { name: 'יוסי ב.', time: 'לפני 31 דקות', emoji: '🧔' },
-]
+import ShareMenu    from '../components/ShareMenu'
+import ActivityFeed from '../components/ActivityFeed'
+import VipBadge     from '../components/VipBadge'
+import { getCachedUser } from '../utils/user'
 
 const getSlides = (deal) => [
   { emoji: deal.emoji, label: 'תמונה ראשית' },
@@ -21,8 +17,13 @@ const getSlides = (deal) => [
 ]
 
 export default function ProductDetailPage({ deal, timeLeft, isJoined, onJoin, onBack }) {
-  const [slide, setSlide]               = useState(0)
-  const [showAllJoiners, setShowAllJoiners] = useState(false)
+  const [slide,           setSlide]           = useState(0)
+  const [showAllJoiners,  setShowAllJoiners]  = useState(false)
+  const [shareOpen,       setShareOpen]       = useState(false)
+  const [currentUser,     setCurrentUser]     = useState(null)
+
+  // Load cached user for VIP display
+  useEffect(() => { setCurrentUser(getCachedUser()) }, [])
 
   const slides      = getSlides(deal)
   const discountPct = Math.round(((deal.originalPrice - deal.currentPrice) / deal.originalPrice) * 100)
@@ -33,7 +34,6 @@ export default function ProductDetailPage({ deal, timeLeft, isJoined, onJoin, on
 
   const prevSlide = () => setSlide(i => (i - 1 + slides.length) % slides.length)
   const nextSlide = () => setSlide(i => (i + 1) % slides.length)
-  const joiners   = showAllJoiners ? RECENT_JOINERS : RECENT_JOINERS.slice(0, 3)
 
   const CARD = 'glass border border-white/8 rounded-2xl p-5 shadow-glass'
 
@@ -43,12 +43,22 @@ export default function ProductDetailPage({ deal, timeLeft, isJoined, onJoin, on
       <div className="sticky top-0 z-40"
         style={{ background: 'rgba(5,8,16,0.9)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(0,255,136,0.12)' }}>
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {/* Share button in nav */}
+            <motion.button
+              onClick={() => setShareOpen(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-sm transition-all"
+              style={{ background: 'rgba(0,255,136,0.1)', border: '1px solid rgba(0,255,136,0.25)', color: '#00ff88' }}
+              whileTap={{ scale: 0.95 }}>
+              <Share2 className="w-4 h-4" />
+              <span className="hidden sm:inline">שתף</span>
+            </motion.button>
+          </div>
+          <p className="text-sm font-bold text-white truncate max-w-[200px] sm:max-w-xs">{deal.title}</p>
           <button onClick={onBack}
             className="flex items-center gap-1.5 text-slate-400 hover:text-neon-green font-semibold transition-colors text-sm">
             <ArrowRight className="w-5 h-5" /><span>חזרה</span>
           </button>
-          <p className="text-sm font-bold text-white truncate max-w-[200px] sm:max-w-xs">{deal.title}</p>
-          <div className="w-16" />
         </div>
       </div>
 
@@ -59,44 +69,33 @@ export default function ProductDetailPage({ deal, timeLeft, isJoined, onJoin, on
           style={{ height: 300, background: 'linear-gradient(135deg, #0a0e1a, #0f1628)', border: '1px solid rgba(0,255,136,0.12)' }}>
           <div className="absolute inset-0 scanlines" />
 
-          {/* Glow orbs */}
-          <div className="absolute inset-0 pointer-events-none"
-            style={{ background: 'radial-gradient(circle at 60% 50%, rgba(0,255,136,0.07), transparent 70%)' }} />
-
-          <div className="absolute top-4 right-4 z-10">
-            <div className="flex items-center gap-1.5 text-sm font-black px-3 py-1.5 rounded-xl"
-              style={{ background: 'rgba(239,68,68,0.2)', border: '1px solid rgba(239,68,68,0.5)', color: '#ff6b6b', boxShadow: '0 0 12px rgba(239,68,68,0.3)' }}>
-              <Tag className="w-4 h-4" />-{discountPct}%
-            </div>
-          </div>
-          <div className="absolute top-4 left-4 z-10">
-            <span className={`${deal.badgeColor} text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md`}>{deal.badge}</span>
-          </div>
-
           <AnimatePresence mode="wait">
             <motion.div key={slide}
               className="absolute inset-0 flex flex-col items-center justify-center"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 1.05 }}
-              transition={{ duration: 0.25 }}>
-              <div className="w-40 h-40 rounded-full flex items-center justify-center"
-                style={{ background: 'rgba(0,255,136,0.06)', border: '1px solid rgba(0,255,136,0.15)' }}>
-                <span className={`text-[90px] leading-none drop-shadow-xl select-none ${slides[slide].scale || ''}`}>
-                  {slides[slide].emoji}
-                </span>
-              </div>
-              <span className="mt-4 text-xs font-semibold text-slate-500 glass px-4 py-1.5 rounded-full">
+              initial={{ opacity: 0, scale: 0.85 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 1.1 }}
+              transition={{ duration: 0.35 }}>
+              <span className={`text-9xl drop-shadow-2xl ${slides[slide].scale ?? ''}`}
+                style={{ filter: 'drop-shadow(0 0 40px rgba(0,255,136,0.3))' }}>
+                {slides[slide].emoji}
+              </span>
+              <span className="text-xs text-slate-600 mt-4 font-medium tracking-wider uppercase">
                 {slides[slide].label}
               </span>
             </motion.div>
           </AnimatePresence>
 
-          <button onClick={prevSlide}
+          {/* Discount pill */}
+          <div className="absolute top-4 right-4 px-3 py-1.5 rounded-full text-xs font-black"
+            style={{ background: 'rgba(239,68,68,0.85)', backdropFilter: 'blur(8px)', color: '#fff' }}>
+            -{discountPct}% הנחה
+          </div>
+
+          {/* Nav arrows */}
+          <button onClick={nextSlide}
             className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center z-10 glass hover:bg-neon-green/10 transition-colors">
             <ChevronRight className="w-5 h-5 text-slate-300" />
           </button>
-          <button onClick={nextSlide}
+          <button onClick={prevSlide}
             className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center z-10 glass hover:bg-neon-green/10 transition-colors">
             <ChevronLeft className="w-5 h-5 text-slate-300" />
           </button>
@@ -106,8 +105,7 @@ export default function ProductDetailPage({ deal, timeLeft, isJoined, onJoin, on
               <button key={i} onClick={() => setSlide(i)}
                 className="rounded-full transition-all duration-200"
                 style={{
-                  width: i === slide ? 24 : 10,
-                  height: 10,
+                  width: i === slide ? 24 : 10, height: 10,
                   background: i === slide ? '#00ff88' : 'rgba(255,255,255,0.25)',
                   boxShadow: i === slide ? '0 0 8px rgba(0,255,136,0.6)' : 'none',
                 }} />
@@ -121,11 +119,24 @@ export default function ProductDetailPage({ deal, timeLeft, isJoined, onJoin, on
           {/* LEFT: main content */}
           <div className="lg:col-span-2 space-y-5">
 
-            {/* Title */}
+            {/* Title + VIP */}
             <div className={CARD}>
-              <h2 className="text-2xl font-black text-white mb-1">{deal.title}</h2>
-              <p className="text-slate-500 text-sm mb-4">{deal.subtitle}</p>
-              <div className="flex items-center gap-2">
+              <div className="flex items-start justify-between gap-3 mb-3">
+                <div className="flex-1">
+                  {currentUser?.isVip && (
+                    <VipBadge
+                      referralCount={currentUser.referralCount}
+                      isVip={currentUser.isVip}
+                      size="sm"
+                    />
+                  )}
+                </div>
+                <div className="text-right">
+                  <h2 className="text-2xl font-black text-white mb-1">{deal.title}</h2>
+                  <p className="text-slate-500 text-sm">{deal.subtitle}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 justify-end">
                 {[1,2,3,4,5].map(i => (
                   <svg key={i} className={`w-4 h-4 ${i <= Math.round(deal.rating) ? 'text-yellow-400' : 'text-slate-700'}`} fill="currentColor" viewBox="0 0 20 20">
                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
@@ -135,6 +146,34 @@ export default function ProductDetailPage({ deal, timeLeft, isJoined, onJoin, on
                 <span className="text-sm text-slate-600">({deal.reviews.toLocaleString()} ביקורות)</span>
               </div>
             </div>
+
+            {/* ── INVITE BANNER ───────────────────────────────────────────── */}
+            <motion.button
+              onClick={() => setShareOpen(true)}
+              className="w-full rounded-2xl p-4 text-right transition-all"
+              style={{
+                background: 'linear-gradient(135deg, rgba(0,255,136,0.08), rgba(123,47,247,0.08))',
+                border: '1px solid rgba(0,255,136,0.25)',
+                boxShadow: '0 0 20px rgba(0,255,136,0.06)',
+              }}
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0"
+                  style={{ background: 'linear-gradient(135deg, #00ff88, #00b4ff)', color: '#020408', fontSize: 22 }}>
+                  🔗
+                </div>
+                <div className="flex-1">
+                  <p className="font-black text-white text-base">הזמן חברים & הורד את המחיר</p>
+                  <p className="text-sm text-slate-400 mt-0.5">
+                    כל חבר שמצטרף מוריד את המחיר לכולם •{' '}
+                    <span className="text-purple-400 font-bold">VIP לאחר 3 הפניות 🌟</span>
+                  </p>
+                </div>
+                <Share2 className="w-5 h-5 text-neon-green shrink-0" />
+              </div>
+            </motion.button>
 
             {/* Price tiers */}
             <div className={CARD}>
@@ -148,23 +187,18 @@ export default function ProductDetailPage({ deal, timeLeft, isJoined, onJoin, on
                   {deal.priceTiers.map((tier, i) => {
                     const isActive = deal.currentBuyers >= tier.buyers &&
                       (i === deal.priceTiers.length - 1 || deal.currentBuyers < deal.priceTiers[i + 1].buyers)
-                    const isPast   = !isActive && deal.currentBuyers >= tier.buyers
-                    const isNext   = !isActive && !isPast && i > 0 &&
-                      deal.currentBuyers < tier.buyers &&
-                      deal.currentBuyers >= deal.priceTiers[i - 1].buyers
+                    const isPast = !isActive && deal.currentBuyers >= tier.buyers
+                    const isNext = !isActive && !isPast && i > 0 &&
+                      deal.currentBuyers < tier.buyers && deal.currentBuyers >= deal.priceTiers[i - 1].buyers
                     const priceDrop = i > 0 ? deal.priceTiers[i - 1].price - tier.price : 0
-
                     return (
-                      <div key={i} className={`flex gap-4 p-4 rounded-xl border-2 transition-all ${
-                        isActive ? '' : isNext ? '' : isPast ? 'opacity-50' : ''
-                      }`}
+                      <div key={i} className={`flex gap-4 p-4 rounded-xl border-2 transition-all ${isPast ? 'opacity-50' : ''}`}
                         style={
                           isActive ? { background: 'rgba(0,255,136,0.08)', borderColor: 'rgba(0,255,136,0.4)', boxShadow: '0 0 20px rgba(0,255,136,0.1)' } :
                           isNext   ? { background: 'rgba(255,165,0,0.06)', borderColor: 'rgba(255,165,0,0.3)' } :
-                          isPast   ? { background: 'rgba(255,255,255,0.02)', borderColor: 'rgba(255,255,255,0.06)' } :
                                      { background: 'rgba(255,255,255,0.02)', borderColor: 'rgba(255,255,255,0.08)' }
                         }>
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-black shrink-0 shadow-sm`}
+                        <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-black shrink-0"
                           style={
                             isActive ? { background: 'linear-gradient(135deg, #00ff88, #00b4ff)', color: '#020408' } :
                             isNext   ? { background: 'rgba(255,165,0,0.2)', color: '#ffa500', border: '1px solid rgba(255,165,0,0.4)' } :
@@ -210,47 +244,15 @@ export default function ProductDetailPage({ deal, timeLeft, isJoined, onJoin, on
               </div>
             </div>
 
-            {/* Recent joiners */}
-            <div className={CARD}>
-              <div className="flex items-center justify-between mb-4">
-                <button className="text-sm text-neon-blue/80 hover:text-neon-blue font-semibold"
-                  onClick={() => setShowAllJoiners(v => !v)}>
-                  {showAllJoiners ? 'הצג פחות' : 'הצג הכל'}
-                </button>
-                <div className="flex items-center gap-2">
-                  <h3 className="font-black text-white text-lg">הצטרפו לאחרונה</h3>
-                  <Users className="w-5 h-5 text-neon-green" />
-                </div>
-              </div>
-              <div className="space-y-3">
-                {joiners.map((j, i) => (
-                  <motion.div key={i} className="flex items-center gap-3 justify-end"
-                    initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.07 }}>
-                    <div className="text-right">
-                      <p className="text-sm font-semibold text-slate-300">{j.name}</p>
-                      <p className="text-xs text-slate-600">{j.time} · הצטרף/ה לקבוצה</p>
-                    </div>
-                    <div className="w-10 h-10 rounded-full flex items-center justify-center text-lg border-2 shadow"
-                      style={{ background: 'linear-gradient(135deg, #00cc6a, #009950)', borderColor: 'rgba(0,255,136,0.3)' }}>
-                      {j.emoji}
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-              <div className="mt-4 pt-4 text-center" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-                <p className="text-sm text-slate-500">
-                  <span className="font-black text-neon-green">{deal.currentBuyers}</span> אנשים הצטרפו לקבוצה זו
-                </p>
-              </div>
-            </div>
+            {/* ── ACTIVITY FEED / GROUP CHAT ──────────────────────────────── */}
+            <ActivityFeed productId={deal.id} />
 
             {/* Trust badges */}
             <div className="grid grid-cols-3 gap-3">
               {[
-                { icon: Shield,    label: 'תשלום מאובטח', sub: 'הצפנת SSL',        color: '#00ff88' },
-                { icon: Truck,     label: 'משלוח חינם',  sub: 'לכל הארץ',          color: '#00b4ff' },
-                { icon: RotateCcw, label: 'ביטול חינם',  sub: 'עד סגירת עסקה',    color: '#7b2ff7' },
+                { icon: Shield,    label: 'תשלום מאובטח', sub: 'הצפנת SSL',       color: '#00ff88' },
+                { icon: Truck,     label: 'משלוח חינם',   sub: 'לכל הארץ',         color: '#00b4ff' },
+                { icon: RotateCcw, label: 'ביטול חינם',   sub: 'עד סגירת עסקה',   color: '#7b2ff7' },
               ].map(({ icon: Icon, label, sub, color }, i) => (
                 <div key={i} className="glass rounded-xl p-3 text-center"
                   style={{ border: `1px solid ${color}20` }}>
@@ -324,6 +326,21 @@ export default function ProductDetailPage({ deal, timeLeft, isJoined, onJoin, on
                 )}
                 <p className="text-center text-xs text-slate-600 mt-3">לא יחויב עכשיו · ביטול חינם</p>
               </div>
+
+              {/* Share card in sidebar */}
+              <motion.button onClick={() => setShareOpen(true)}
+                className="w-full rounded-2xl p-4 text-right"
+                style={{ background: 'rgba(0,255,136,0.06)', border: '1px solid rgba(0,255,136,0.2)' }}
+                whileTap={{ scale: 0.97 }}>
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">📣</span>
+                  <div className="flex-1">
+                    <p className="font-black text-sm text-white">הזמן חברים & הורד מחיר</p>
+                    <p className="text-xs text-slate-500 mt-0.5">שלח לינק ייחודי לחברים</p>
+                  </div>
+                  <Share2 className="w-4 h-4 text-neon-green shrink-0" />
+                </div>
+              </motion.button>
             </div>
           </div>
         </div>
@@ -332,7 +349,16 @@ export default function ProductDetailPage({ deal, timeLeft, isJoined, onJoin, on
       {/* ── Sticky mobile bar ─────────────────────────────────────────────── */}
       <div className="fixed bottom-0 inset-x-0 z-50 px-4 py-3 lg:hidden"
         style={{ background: 'rgba(5,8,16,0.95)', backdropFilter: 'blur(16px)', borderTop: '1px solid rgba(0,255,136,0.15)' }}>
-        <div className="flex items-center gap-3 max-w-5xl mx-auto">
+        <div className="flex items-center gap-2 max-w-5xl mx-auto">
+          {/* Share button */}
+          <motion.button
+            onClick={() => setShareOpen(true)}
+            className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
+            style={{ background: 'rgba(0,255,136,0.1)', border: '1px solid rgba(0,255,136,0.3)' }}
+            whileTap={{ scale: 0.92 }}>
+            <Share2 className="w-5 h-5 text-neon-green" />
+          </motion.button>
+
           <div className="flex-1 text-right leading-tight">
             <div className="flex items-baseline gap-1.5 justify-end">
               <span className="text-xs text-slate-600 line-through">₪{deal.originalPrice}</span>
@@ -340,6 +366,7 @@ export default function ProductDetailPage({ deal, timeLeft, isJoined, onJoin, on
             </div>
             <p className="text-xs text-amber-400 font-semibold">עוד {remaining} קונים להוזלה</p>
           </div>
+
           {isJoined ? (
             <div className="flex-1 glass-neon py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2">
               <CheckCircle className="w-4 h-4 text-neon-green" /><span className="text-neon-green">הצטרפת ✓</span>
@@ -353,6 +380,9 @@ export default function ProductDetailPage({ deal, timeLeft, isJoined, onJoin, on
           )}
         </div>
       </div>
+
+      {/* ── Share Menu ───────────────────────────────────────────────────── */}
+      {shareOpen && <ShareMenu deal={deal} onClose={() => setShareOpen(false)} />}
     </div>
   )
 }

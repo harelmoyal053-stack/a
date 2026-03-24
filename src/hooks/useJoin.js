@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react'
 import { ensureUser } from '../utils/user'
+import { getPendingRef, clearPendingRef } from '../utils/invite'
 
 /**
  * useJoin({ onSuccess, onPriceDrop })
@@ -23,11 +24,14 @@ export function useJoin({ onSuccess, onPriceDrop } = {}) {
       // 1. Get or create guest user
       const user = await ensureUser()
 
-      // 2. Call the API
+      // 2. Include referral if arriving via invite link
+      const referredBy = getPendingRef()
+
+      // 3. Call the API
       const res = await fetch('/api/join', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ userId: user.id, productId: deal.id }),
+        body:    JSON.stringify({ userId: user.id, productId: deal.id, referredBy }),
       })
 
       const data = await res.json()
@@ -37,7 +41,10 @@ export function useJoin({ onSuccess, onPriceDrop } = {}) {
         return { ok: false, error: data.error }
       }
 
-      // 3. Notify parent with updated deal
+      // Clear referral after successful join (one-time use)
+      clearPendingRef()
+
+      // 4. Notify parent with updated deal
       onSuccess?.(data.deal, data)
 
       // 4. Notify if price dropped

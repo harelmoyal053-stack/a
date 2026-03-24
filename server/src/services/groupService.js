@@ -83,7 +83,7 @@ async function getDeal(productId) {
 
 // ── Core business logic: join a group ─────────────────────────────────────────
 // Returns: { deal, priceDropped, oldPrice, newPrice, newCount, message }
-async function joinGroup(userId, productId) {
+async function joinGroup(userId, productId, referredBy = null) {
   return prisma.$transaction(async (tx) => {
     // 1. Fetch product + tiers (with lock via select for update is unavailable in SQLite,
     //    but $transaction serialises writes)
@@ -112,7 +112,7 @@ async function joinGroup(userId, productId) {
     if (alreadyJoined) throw new Error('כבר הצטרפת לקבוצה זו')
 
     // 4. Add member
-    await tx.groupMember.create({ data: { groupId: group.id, userId } })
+    await tx.groupMember.create({ data: { groupId: group.id, userId, referredBy } })
     const newCount = group.members.length + 1
 
     // 5. Calculate new tier

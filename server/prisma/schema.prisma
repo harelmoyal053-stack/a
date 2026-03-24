@@ -7,19 +7,20 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ── Users ──────────────────────────────────────────────────────────────────────
 model User {
-  id        String   @id @default(cuid())
-  name      String
-  email     String   @unique
-  avatar    String?
-  phone     String?
-  createdAt DateTime @default(now())
+  id            String   @id @default(cuid())
+  name          String
+  email         String   @unique
+  avatar        String?
+  phone         String?
+  referralCount Int      @default(0)
+  isVip         Boolean  @default(false)
+  createdAt     DateTime @default(now())
 
   memberships GroupMember[]
+  activity    ActivityMessage[]
 }
 
-// ── Products ───────────────────────────────────────────────────────────────────
 model Product {
   id            String   @id @default(cuid())
   title         String
@@ -29,9 +30,9 @@ model Product {
   category      String
   badge         String?
   badgeColor    String?
-  basePrice     Float    // original retail price
-  currentPrice  Float    // live price (drops as tiers are hit)
-  originalPrice Float    // alias kept for frontend compat
+  basePrice     Float
+  currentPrice  Float
+  originalPrice Float
   targetBuyers  Int      @default(50)
   endTime       DateTime
   rating        Float    @default(4.5)
@@ -39,23 +40,22 @@ model Product {
   isActive      Boolean  @default(true)
   createdAt     DateTime @default(now())
 
-  tiers  Tier[]
-  groups Group[]
+  tiers    Tier[]
+  groups   Group[]
+  activity ActivityMessage[]
 }
 
-// ── Tiers ──────────────────────────────────────────────────────────────────────
 model Tier {
   id                   String  @id @default(cuid())
   productId            String
-  requiredParticipants Int     // buyers needed to unlock this tier
-  priceAtTier          Float   // price per unit at this tier
+  requiredParticipants Int
+  priceAtTier          Float
 
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@index([productId, requiredParticipants])
 }
 
-// ── Groups (one per product) ───────────────────────────────────────────────────
 model Group {
   id        String   @id @default(cuid())
   productId String   @unique
@@ -65,12 +65,12 @@ model Group {
   members GroupMember[]
 }
 
-// ── Group membership ───────────────────────────────────────────────────────────
 model GroupMember {
-  id       String   @id @default(cuid())
-  groupId  String
-  userId   String
-  joinedAt DateTime @default(now())
+  id         String   @id @default(cuid())
+  groupId    String
+  userId     String
+  referredBy String?  // userId of whoever shared the invite link
+  joinedAt   DateTime @default(now())
 
   group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
   user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -78,4 +78,22 @@ model GroupMember {
   @@unique([groupId, userId])
   @@index([groupId])
   @@index([userId])
+}
+
+// ── Activity Feed ──────────────────────────────────────────────────────────────
+// Stores both user chat messages and system events (joins, price drops, referrals)
+model ActivityMessage {
+  id        String   @id @default(cuid())
+  productId String
+  userId    String?  // null for system-generated messages
+  userName  String
+  content   String
+  type      String   @default("chat")  // "chat" | "join" | "referral" | "milestone"
+  emoji     String?
+  createdAt DateTime @default(now())
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user    User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([productId, createdAt])
 }
