@@ -23,18 +23,34 @@ export default function JoinModal({ deal, onConfirm, onClose }) {
   const [phone, setPhone]     = useState('')
   const [agreed, setAgreed]   = useState(false)
   const [loading, setLoading] = useState(false)
+  const [apiError, setApiError] = useState(null)
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (!name || !phone || !agreed) return
     setLoading(true)
-    setTimeout(() => {
+    setApiError(null)
+
+    try {
+      // Pass the collected details to the parent's join handler
+      // (onConfirm calls useJoin.join which POSTs to /api/join)
+      const result = await onConfirm(deal, { name, phone })
+
+      if (result?.ok === false) {
+        setApiError(result.error ?? 'שגיאה בהצטרפות')
+        setLoading(false)
+        return
+      }
+
       setLoading(false)
       setStep(2)
       playSuccess()
       confetti({ particleCount: 100, spread: 80, origin: { y: 0.5 },
         colors: ['#00ff88', '#00b4ff', '#7b2ff7', '#ffffff'] })
-    }, 1500)
+    } catch {
+      setApiError('בעיית רשת — נסה שנית')
+      setLoading(false)
+    }
   }
 
   return (
@@ -106,6 +122,15 @@ export default function JoinModal({ deal, onConfirm, onClose }) {
                   </div>
                 ))}
               </div>
+
+              {/* API error */}
+              {apiError && (
+                <div className="flex items-start gap-2.5 rounded-xl p-3 mb-4"
+                  style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)' }}>
+                  <AlertCircle className="w-4 h-4 text-red-400 mt-0.5 shrink-0" />
+                  <p className="text-xs text-red-300 leading-relaxed font-semibold">{apiError}</p>
+                </div>
+              )}
 
               {/* Notice */}
               <div className="flex items-start gap-2.5 rounded-xl p-3 mb-5"

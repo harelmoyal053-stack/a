@@ -1,0 +1,81 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ── Users ──────────────────────────────────────────────────────────────────────
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  avatar    String?
+  phone     String?
+  createdAt DateTime @default(now())
+
+  memberships GroupMember[]
+}
+
+// ── Products ───────────────────────────────────────────────────────────────────
+model Product {
+  id            String   @id @default(cuid())
+  title         String
+  subtitle      String?
+  description   String?
+  emoji         String   @default("🛍️")
+  category      String
+  badge         String?
+  badgeColor    String?
+  basePrice     Float    // original retail price
+  currentPrice  Float    // live price (drops as tiers are hit)
+  originalPrice Float    // alias kept for frontend compat
+  targetBuyers  Int      @default(50)
+  endTime       DateTime
+  rating        Float    @default(4.5)
+  reviews       Int      @default(0)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+
+  tiers  Tier[]
+  groups Group[]
+}
+
+// ── Tiers ──────────────────────────────────────────────────────────────────────
+model Tier {
+  id                   String  @id @default(cuid())
+  productId            String
+  requiredParticipants Int     // buyers needed to unlock this tier
+  priceAtTier          Float   // price per unit at this tier
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId, requiredParticipants])
+}
+
+// ── Groups (one per product) ───────────────────────────────────────────────────
+model Group {
+  id        String   @id @default(cuid())
+  productId String   @unique
+  createdAt DateTime @default(now())
+
+  product Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
+  members GroupMember[]
+}
+
+// ── Group membership ───────────────────────────────────────────────────────────
+model GroupMember {
+  id       String   @id @default(cuid())
+  groupId  String
+  userId   String
+  joinedAt DateTime @default(now())
+
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, userId])
+  @@index([groupId])
+  @@index([userId])
+}

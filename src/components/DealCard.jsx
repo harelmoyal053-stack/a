@@ -84,7 +84,7 @@ function TierRow({ tier, idx, totalTiers, currentBuyers, originalPrice }) {
 }
 
 // ── Main DealCard ─────────────────────────────────────────────────────────────
-export default function DealCard({ deal, timeLeft, isJoined, onJoin, onCardClick }) {
+export default function DealCard({ deal, timeLeft, isJoined, isJoining, onJoin, onCardClick }) {
   const [progressWidth, setProgressWidth] = useState(0)
   const [showTiers, setShowTiers]         = useState(false)
   const [celebrated, setCelebrated]       = useState(false)
@@ -419,11 +419,22 @@ export default function DealCard({ deal, timeLeft, isJoined, onJoin, onCardClick
           ) : (
             <motion.button
               onClick={e => { e.stopPropagation(); onJoin(deal) }}
-              className="w-full btn-neon py-3 rounded-xl font-black text-sm flex items-center justify-center gap-2"
+              disabled={isJoining}
+              className="w-full btn-neon disabled:opacity-60 py-3 rounded-xl font-black text-sm flex items-center justify-center gap-2"
               whileTap={{ scale: 0.97 }}
             >
-              <Zap className="w-4 h-4" />
-              <span>הצטרף לחגיגה</span>
+              {isJoining ? (
+                <>
+                  <div className="w-4 h-4 border-2 rounded-full animate-spin"
+                    style={{ borderColor: 'rgba(2,4,8,0.3)', borderTopColor: '#020408' }} />
+                  <span>מצטרף...</span>
+                </>
+              ) : (
+                <>
+                  <Zap className="w-4 h-4" />
+                  <span>הצטרף לחגיגה</span>
+                </>
+              )}
             </motion.button>
           )}
         </div>
