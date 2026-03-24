@@ -1,6 +1,8 @@
-import { Search, Store, User, Bell, LayoutDashboard, Zap } from 'lucide-react'
+import { Search, Store, User, Bell, LayoutDashboard, Zap, LogIn } from 'lucide-react'
+import { getCachedUser } from '../utils/user'
 
-export default function Header({ searchQuery, setSearchQuery, myGroupsCount = 0, onNavigate }) {
+export default function Header({ searchQuery, setSearchQuery, myGroupsCount = 0, onNavigate, onLogin }) {
+  const user = getCachedUser()
   return (
     <header className="sticky top-0 z-50"
       style={{
@@ -94,13 +96,27 @@ export default function Header({ searchQuery, setSearchQuery, myGroupsCount = 0,
                 <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-neon-green rounded-full border-2"
                   style={{ borderColor: '#050810', boxShadow: '0 0 6px rgba(0,255,136,0.8)' }} />
               </div>
-              <div className="hidden md:block text-right leading-tight">
-                <p className="text-xs font-semibold text-white">אריאל כהן</p>
-                <p className="text-xs font-medium" style={{ color: '#00ff88' }}>
-                  <Zap className="w-3 h-3 inline mb-0.5" /> פרו-גיימר
-                </p>
-              </div>
+              {user && (
+                <div className="hidden md:block text-right leading-tight">
+                  <p className="text-xs font-semibold text-white">{user.name}</p>
+                  <p className="text-xs font-medium" style={{ color: '#00ff88' }}>
+                    <Zap className="w-3 h-3 inline mb-0.5" /> חבר פעיל
+                  </p>
+                </div>
+              )}
             </button>
+
+            {/* Login button — shown when no user yet */}
+            {!user && (
+              <button
+                onClick={onLogin}
+                className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-bold transition-all text-slate-300 hover:text-white"
+                style={{ background: 'rgba(0,255,136,0.1)', border: '1px solid rgba(0,255,136,0.25)' }}
+              >
+                <LogIn className="w-4 h-4" />
+                <span>כניסה</span>
+              </button>
+            )}
           </div>
         </div>
 

@@ -10,6 +10,7 @@ import JoinModal      from './components/JoinModal'
 import LiveTicker     from './components/LiveTicker'
 import InviteButton   from './components/InviteButton'
 import PriceDropToast from './components/PriceDropToast'
+import LoginModal     from './components/LoginModal'
 
 import ProductDetailPage  from './pages/ProductDetailPage'
 import CheckoutPage       from './pages/CheckoutPage'
@@ -47,6 +48,7 @@ export default function App() {
   const [myGroups,         setMyGroups]         = useState([])
   const [modalDeal,        setModalDeal]        = useState(null)
   const [priceDropToast,   setPriceDropToast]   = useState(null)
+  const [loginOpen,        setLoginOpen]        = useState(false)
 
   // ── Capture ?ref=&deal= params from invite links on first mount ────────────
   useEffect(() => {
@@ -135,6 +137,7 @@ export default function App() {
         setSearchQuery={setSearchQuery}
         myGroupsCount={myGroups.length}
         onNavigate={navigate}
+        onLogin={() => setLoginOpen(true)}
       />
       <StatsBar />
       <HeroSection />
@@ -280,6 +283,11 @@ export default function App() {
       )}
 
       <InviteButton />
+
+      {/* Login modal */}
+      <AnimatePresence>
+        {loginOpen && <LoginModal onClose={() => setLoginOpen(false)} />}
+      </AnimatePresence>
     </div>
   )
 }

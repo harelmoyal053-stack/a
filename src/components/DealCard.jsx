@@ -171,7 +171,7 @@ export default function DealCard({ deal, timeLeft, isJoined, isJoining, onJoin, 
                 borderColor: 'rgba(255,107,53,0.6)',
                 color: '#ff8c57',
               }}>
-              <span className="fire-icon">🔥</span> HOT
+              <span className="fire-icon">🔥</span> חם
             </div>
           </div>
         )}

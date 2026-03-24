@@ -1,17 +1,6 @@
 import { motion } from 'framer-motion'
 import { ArrowRight, Users, Package, TrendingDown, Clock, CheckCircle, Truck, AlertCircle, Star, Zap } from 'lucide-react'
-
-const MOCK_GROUPS = [
-  { id: 'm1', title: 'מזגן אינוורטר 1.5 כ״ס', subtitle: 'מותג Samsung | א-קלאס', emoji: '❄️',
-    currentPrice: 1290, originalPrice: 2100, currentBuyers: 48, targetBuyers: 50,
-    joinedAt: '22 במרץ 2026', status: 'active' },
-  { id: 'm2', title: 'אוזניות Sony WH-1000XM5', subtitle: 'ביטול רעשים פעיל', emoji: '🎧',
-    currentPrice: 899, originalPrice: 1499, currentBuyers: 30, targetBuyers: 30,
-    joinedAt: '18 במרץ 2026', status: 'shipped', tracking: 'IL1234567890' },
-  { id: 'm3', title: 'סל אורגני 5 ק״ג', subtitle: 'ירקות ופירות | ישיר מהחקלאי', emoji: '🥦',
-    currentPrice: 55, originalPrice: 90, currentBuyers: 12, targetBuyers: 20,
-    joinedAt: '20 במרץ 2026', status: 'expired' },
-]
+import { getCachedUser } from '../utils/user'
 
 const STATUS = {
   active:  { label: 'ממתין לקונים',   icon: Clock,       color: '#ffa500', bg: 'rgba(255,165,0,0.1)',   border: 'rgba(255,165,0,0.3)' },
@@ -21,7 +10,8 @@ const STATUS = {
 }
 
 export default function DashboardPage({ myGroups, onBack }) {
-  const allGroups    = [...myGroups, ...MOCK_GROUPS]
+  const user         = getCachedUser()
+  const allGroups    = myGroups
   const totalSaved   = allGroups.reduce((a, g) => a + (g.originalPrice - g.currentPrice), 0)
   const activeCount  = allGroups.filter(g => g.status === 'active').length
   const successCount = allGroups.filter(g => g.status === 'shipped' || g.status === 'success').length
@@ -56,13 +46,15 @@ export default function DashboardPage({ myGroups, onBack }) {
             </div>
             <div className="flex-1 text-right">
               <div className="flex items-center gap-2 justify-end mb-0.5">
-                <h2 className="text-2xl font-black text-white">אריאל כהן</h2>
-                <span className="text-xs font-black px-2.5 py-0.5 rounded-full flex items-center gap-1"
-                  style={{ background: 'rgba(255,204,0,0.15)', color: '#ffcc00', border: '1px solid rgba(255,204,0,0.3)' }}>
-                  <Star className="w-3 h-3 fill-current" />פרו-גיימר
-                </span>
+                <h2 className="text-2xl font-black text-white">{user?.name || 'אורח'}</h2>
+                {allGroups.length >= 3 && (
+                  <span className="text-xs font-black px-2.5 py-0.5 rounded-full flex items-center gap-1"
+                    style={{ background: 'rgba(255,204,0,0.15)', color: '#ffcc00', border: '1px solid rgba(255,204,0,0.3)' }}>
+                    <Star className="w-3 h-3 fill-current" />חוסך מנוסה
+                  </span>
+                )}
               </div>
-              <p className="text-slate-400 text-sm">arikahen@email.com</p>
+              <p className="text-slate-400 text-sm">{user?.email || ''}</p>
               <div className="flex items-center gap-1.5 mt-1">
                 <Zap className="w-3.5 h-3.5 text-neon-green" />
                 <span className="text-xs font-semibold text-neon-green">חסכת ₪{totalSaved.toLocaleString()} עד היום!</span>
