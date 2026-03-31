@@ -1,17 +1,746 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="he" dir="rtl">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DropPrice - קנייה קבוצתית חכמה</title>
-    <meta name="description" content="DropPrice - הצטרף לקבוצות קנייה, שלם פחות. כמה שיותר קונים, כך המחיר יורד!" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet" />
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>השוואת מחירים - סופרמרקטים</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: linear-gradient(135deg, #f0f4ff 0%, #e8f5e9 100%);
+      min-height: 100vh;
+      color: #1a1a2e;
+      direction: rtl;
+    }
+
+    header {
+      background: linear-gradient(90deg, #1a237e, #283593);
+      color: white;
+      padding: 28px 24px 22px;
+      text-align: center;
+      box-shadow: 0 4px 16px rgba(26,35,126,0.18);
+    }
+
+    header h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    header p {
+      font-size: 1rem;
+      opacity: 0.82;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 36px auto;
+      padding: 0 16px;
+    }
+
+    /* ---- Input Card ---- */
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 30px 28px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      margin-bottom: 28px;
+    }
+
+    .card h2 {
+      font-size: 1.2rem;
+      margin-bottom: 16px;
+      color: #1a237e;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card h2 span.icon {
+      font-size: 1.4rem;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 120px;
+      border: 2px solid #c5cae9;
+      border-radius: 10px;
+      padding: 14px 16px;
+      font-size: 1.05rem;
+      font-family: inherit;
+      resize: vertical;
+      direction: rtl;
+      transition: border-color 0.2s;
+      color: #222;
+      line-height: 1.7;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: #3949ab;
+      box-shadow: 0 0 0 3px rgba(57,73,171,0.12);
+    }
+
+    .hint {
+      font-size: 0.83rem;
+      color: #888;
+      margin-top: 8px;
+    }
+
+    .btn-compare {
+      display: block;
+      width: 100%;
+      margin-top: 20px;
+      padding: 15px;
+      background: linear-gradient(90deg, #1a237e, #3949ab);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.15rem;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 4px 12px rgba(26,35,126,0.22);
+    }
+
+    .btn-compare:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(26,35,126,0.3);
+    }
+
+    .btn-compare:active {
+      transform: translateY(0);
+    }
+
+    /* ---- Results ---- */
+    #results {
+      display: none;
+    }
+
+    .winner-banner {
+      background: linear-gradient(135deg, #2e7d32, #43a047);
+      color: white;
+      border-radius: 16px;
+      padding: 26px 28px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      box-shadow: 0 4px 20px rgba(46,125,50,0.25);
+      flex-wrap: wrap;
+    }
+
+    .winner-icon {
+      font-size: 3.2rem;
+      flex-shrink: 0;
+    }
+
+    .winner-text h3 {
+      font-size: 1.05rem;
+      font-weight: 500;
+      opacity: 0.88;
+      margin-bottom: 4px;
+    }
+
+    .winner-text .winner-name {
+      font-size: 1.9rem;
+      font-weight: 800;
+    }
+
+    .winner-text .winner-price {
+      font-size: 1.15rem;
+      margin-top: 4px;
+      opacity: 0.92;
+    }
+
+    .savings-badge {
+      margin-right: auto;
+      background: rgba(255,255,255,0.2);
+      border-radius: 12px;
+      padding: 10px 18px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .savings-badge .save-amount {
+      font-size: 1.7rem;
+      font-weight: 800;
+    }
+
+    .savings-badge .save-label {
+      font-size: 0.8rem;
+      opacity: 0.85;
+    }
+
+    /* ---- Comparison Grid ---- */
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .market-col {
+      background: #fff;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 2px 14px rgba(0,0,0,0.07);
+      transition: transform 0.2s;
+    }
+
+    .market-col:hover {
+      transform: translateY(-3px);
+    }
+
+    .market-col.cheapest {
+      box-shadow: 0 4px 22px rgba(46,125,50,0.22);
+      border: 2px solid #43a047;
+    }
+
+    .market-header {
+      padding: 16px 18px;
+      text-align: center;
+      position: relative;
+    }
+
+    .market-logo {
+      font-size: 2rem;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .market-name {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: white;
+    }
+
+    .cheapest-tag {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(255,255,255,0.22);
+      border: 1px solid rgba(255,255,255,0.35);
+      color: white;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 20px;
+    }
+
+    .market-items {
+      padding: 14px 16px;
+    }
+
+    .item-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 7px 0;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 0.92rem;
+    }
+
+    .item-row:last-child {
+      border-bottom: none;
+    }
+
+    .item-name {
+      color: #444;
+      flex: 1;
+    }
+
+    .item-price {
+      font-weight: 600;
+      color: #1a237e;
+      white-space: nowrap;
+    }
+
+    .item-not-found {
+      color: #aaa;
+      font-size: 0.82rem;
+      font-style: italic;
+    }
+
+    .market-total {
+      background: #f5f7ff;
+      border-top: 2px solid #e8eaf6;
+      padding: 14px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 700;
+    }
+
+    .market-total .total-label {
+      color: #555;
+      font-size: 0.95rem;
+    }
+
+    .market-total .total-price {
+      font-size: 1.25rem;
+      color: #1a237e;
+    }
+
+    .market-col.cheapest .market-total .total-price {
+      color: #2e7d32;
+    }
+
+    /* ---- Breakdown Table ---- */
+    .breakdown-card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 24px 26px;
+      box-shadow: 0 2px 14px rgba(0,0,0,0.07);
+      margin-bottom: 28px;
+    }
+
+    .breakdown-card h2 {
+      font-size: 1.1rem;
+      color: #1a237e;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    table.breakdown-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.93rem;
+    }
+
+    table.breakdown-table th {
+      background: #e8eaf6;
+      color: #283593;
+      padding: 10px 14px;
+      text-align: right;
+      font-weight: 700;
+    }
+
+    table.breakdown-table td {
+      padding: 9px 14px;
+      border-bottom: 1px solid #f0f0f0;
+      text-align: right;
+    }
+
+    table.breakdown-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    table.breakdown-table tr:hover td {
+      background: #f9f9ff;
+    }
+
+    .cheapest-cell {
+      color: #2e7d32;
+      font-weight: 700;
+    }
+
+    .not-available {
+      color: #bbb;
+      font-size: 0.82rem;
+    }
+
+    /* ---- Error & Warning ---- */
+    .error-msg {
+      background: #fff3e0;
+      border: 1px solid #ffb74d;
+      color: #e65100;
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin-top: 14px;
+      font-size: 0.95rem;
+      display: none;
+    }
+
+    .not-found-warning {
+      background: #fff8e1;
+      border: 1px solid #ffe082;
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+      color: #6d4c00;
+    }
+
+    .not-found-warning strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    /* ---- Market header colors ---- */
+    .color-shufersal  { background: linear-gradient(135deg, #1565c0, #1e88e5); }
+    .color-ramilevi   { background: linear-gradient(135deg, #c62828, #ef5350); }
+    .color-yochananof { background: linear-gradient(135deg, #6a1b9a, #ab47bc); }
+
+    /* ---- Footer ---- */
+    footer {
+      text-align: center;
+      padding: 24px;
+      color: #888;
+      font-size: 0.82rem;
+    }
+
+    /* ---- Responsive ---- */
+    @media (max-width: 640px) {
+      header h1 { font-size: 1.5rem; }
+      .comparison-grid { grid-template-columns: 1fr; }
+      .savings-badge { margin-right: 0; width: 100%; text-align: center; }
+      .card { padding: 20px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🛒 השוואת מחירים בסופרמרקטים</h1>
+  <p>הזינו את רשימת הקניות שלכם וגלו היכן הכי זול</p>
+</header>
+
+<div class="container">
+
+  <!-- Input Card -->
+  <div class="card">
+    <h2><span class="icon">📝</span> רשימת קניות</h2>
+    <textarea id="shoppingInput" placeholder="לדוגמה:&#10;קולה&#10;גבינה צהובה&#10;במבה&#10;עגבניות קילו&#10;לחם&#10;חלב"></textarea>
+    <p class="hint">הזינו כל מוצר בשורה נפרדת (ניתן גם להפריד בפסיקים) — לחצו Ctrl+Enter להשוואה מהירה</p>
+    <div class="error-msg" id="errorMsg">⚠️ אנא הזינו לפחות מוצר אחד לחיפוש.</div>
+    <button class="btn-compare" onclick="compare()">🔍 השווה מחירים</button>
+  </div>
+
+  <!-- Results -->
+  <div id="results">
+
+    <div class="winner-banner">
+      <div class="winner-icon">🏆</div>
+      <div class="winner-text">
+        <h3>הסופרמרקט הזול ביותר עבורכם:</h3>
+        <div class="winner-name" id="winnerName"></div>
+        <div class="winner-price" id="winnerPrice"></div>
+      </div>
+      <div class="savings-badge" id="savingsBadge">
+        <div class="save-amount" id="saveAmount"></div>
+        <div class="save-label">חיסכון לעומת היקר ביותר</div>
+      </div>
+    </div>
+
+    <div id="notFoundWarning" class="not-found-warning" style="display:none">
+      <strong>⚠️ המוצרים הבאים לא נמצאו במסד הנתונים:</strong>
+      <span id="notFoundList"></span>
+    </div>
+
+    <div class="comparison-grid" id="comparisonGrid"></div>
+
+    <div class="breakdown-card">
+      <h2>📊 פירוט מחירים לפי מוצר</h2>
+      <table class="breakdown-table">
+        <thead><tr id="breakdownHeader"></tr></thead>
+        <tbody id="breakdownBody"></tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<footer>* המחירים המוצגים הם לצורך הדגמה בלבד ואינם מחירים אמיתיים</footer>
+
+<script>
+  // ============================================================
+  // DATABASE  (prices in ₪)
+  // ============================================================
+  const MARKETS = [
+    { id: 'shufersal',  name: 'שופרסל',  colorClass: 'color-shufersal',  logo: '🔵' },
+    { id: 'ramilevi',   name: 'רמי לוי', colorClass: 'color-ramilevi',   logo: '🔴' },
+    { id: 'yochananof', name: 'יוחננוף', colorClass: 'color-yochananof', logo: '🟣' },
+  ];
+
+  const DB = [
+    {
+      name: 'קולה',
+      aliases: ['קוקה קולה', 'coca cola', 'cola', 'קולה 1.5', 'קולה 2'],
+      prices: { shufersal: 7.90, ramilevi: 6.50, yochananof: 7.20 },
+    },
+    {
+      name: 'גבינה צהובה',
+      aliases: ['גבינה', 'yellow cheese', 'גבינה 200', 'גבינה צהובה 200'],
+      prices: { shufersal: 18.90, ramilevi: 15.90, yochananof: 17.50 },
+    },
+    {
+      name: 'במבה',
+      aliases: ['bamba', 'במבה 80', 'חטיף במבה'],
+      prices: { shufersal: 5.90, ramilevi: 5.20, yochananof: 5.60 },
+    },
+    {
+      name: 'עגבניות קילו',
+      aliases: ['עגבניות', 'עגבניה', 'tomatoes', 'קילו עגבניות', 'עגבניות 1 קג'],
+      prices: { shufersal: 7.50, ramilevi: 5.90, yochananof: 6.80 },
+    },
+    {
+      name: 'לחם',
+      aliases: ['לחם אחיד', 'לחם לבן', 'bread', 'כיכר לחם', 'לחם שחור'],
+      prices: { shufersal: 6.90, ramilevi: 5.50, yochananof: 6.20 },
+    },
+    {
+      name: 'חלב',
+      aliases: ['חלב 3%', 'חלב 1%', 'milk', 'חלב טרי', 'שקית חלב'],
+      prices: { shufersal: 6.20, ramilevi: 5.80, yochananof: 6.00 },
+    },
+    {
+      name: 'ביצים',
+      aliases: ['ביצה', 'eggs', 'קרטון ביצים', 'ביצים 12', 'ביצים גדולות'],
+      prices: { shufersal: 15.90, ramilevi: 13.50, yochananof: 14.90 },
+    },
+    {
+      name: 'שמן זית',
+      aliases: ['זית שמן', 'olive oil', 'שמן', 'שמן קנולה'],
+      prices: { shufersal: 29.90, ramilevi: 25.50, yochananof: 27.90 },
+    },
+    {
+      name: 'פסטה',
+      aliases: ['מקרוני', 'pasta', 'ספגטי', 'אטריות'],
+      prices: { shufersal: 5.90, ramilevi: 4.80, yochananof: 5.50 },
+    },
+    {
+      name: 'אורז',
+      aliases: ['rice', 'אורז לבן', 'אורז בסמטי', 'גרגרי אורז'],
+      prices: { shufersal: 8.90, ramilevi: 7.20, yochananof: 8.50 },
+    },
+    {
+      name: 'עוף שלם',
+      aliases: ['עוף', 'chicken', 'עוף קפוא', 'חזה עוף', 'שוקיים'],
+      prices: { shufersal: 32.90, ramilevi: 27.50, yochananof: 30.00 },
+    },
+    {
+      name: 'יוגורט',
+      aliases: ['יוגורט 3%', 'yogurt', 'לבן', 'גביע יוגורט'],
+      prices: { shufersal: 4.90, ramilevi: 3.90, yochananof: 4.50 },
+    },
+    {
+      name: 'גזר קילו',
+      aliases: ['גזר', 'carrots', 'קילו גזר', 'גזרים'],
+      prices: { shufersal: 4.90, ramilevi: 3.50, yochananof: 4.20 },
+    },
+    {
+      name: 'תפוחי אדמה',
+      aliases: ['תפוח אדמה', 'potatoes', 'קילו תפוחי אדמה', 'פטייטס'],
+      prices: { shufersal: 5.90, ramilevi: 4.50, yochananof: 5.20 },
+    },
+    {
+      name: 'שוקולד',
+      aliases: ['שוקולד מריר', 'שוקולד חלב', 'chocolate', 'חפיסת שוקולד'],
+      prices: { shufersal: 9.90, ramilevi: 8.20, yochananof: 9.00 },
+    },
+    {
+      name: 'דגני בוקר',
+      aliases: ['קורנפלקס', 'cereal', 'גרנולה', 'שיבולת שועל', 'אוטמיל'],
+      prices: { shufersal: 18.90, ramilevi: 15.50, yochananof: 17.80 },
+    },
+    {
+      name: 'קפה',
+      aliases: ['נס קפה', 'espresso', 'coffee', 'אבקת קפה', 'עלית'],
+      prices: { shufersal: 24.90, ramilevi: 21.00, yochananof: 23.50 },
+    },
+    {
+      name: 'מים מינרלים',
+      aliases: ['מים', 'water', 'בקבוק מים', 'מים 1.5', 'נביעות'],
+      prices: { shufersal: 4.90, ramilevi: 3.80, yochananof: 4.50 },
+    },
+  ];
+
+  // ============================================================
+  // LOOKUP  –  fuzzy Hebrew match
+  // ============================================================
+  function normalise(str) {
+    return str.trim().toLowerCase().replace(/[״׳"']/g, '').replace(/\s+/g, ' ');
+  }
+
+  function findProduct(query) {
+    const q = normalise(query);
+    if (!q) return null;
+    for (const p of DB) {
+      if (normalise(p.name) === q) return p;
+    }
+    for (const p of DB) {
+      for (const alias of p.aliases) {
+        if (normalise(alias) === q) return p;
+      }
+    }
+    // partial match
+    for (const p of DB) {
+      if (normalise(p.name).includes(q) || q.includes(normalise(p.name))) return p;
+      for (const alias of p.aliases) {
+        if (normalise(alias).includes(q) || q.includes(normalise(alias))) return p;
+      }
+    }
+    return null;
+  }
+
+  // ============================================================
+  // COMPARE
+  // ============================================================
+  function compare() {
+    const raw = document.getElementById('shoppingInput').value;
+    const errorMsg = document.getElementById('errorMsg');
+
+    const tokens = raw
+      .split(/[\n,،]+/)
+      .map(t => t.trim())
+      .filter(t => t.length > 0);
+
+    if (tokens.length === 0) {
+      errorMsg.style.display = 'block';
+      document.getElementById('results').style.display = 'none';
+      return;
+    }
+    errorMsg.style.display = 'none';
+
+    const found = [];
+    const notFound = [];
+
+    for (const token of tokens) {
+      const product = findProduct(token);
+      if (product) {
+        if (!found.find(f => f.product.name === product.name)) {
+          found.push({ label: token, product });
+        }
+      } else {
+        notFound.push(token);
+      }
+    }
+
+    if (found.length === 0) {
+      errorMsg.textContent = '⚠️ לא נמצאו מוצרים מוכרים ברשימה. נסו שמות כמו: קולה, לחם, חלב, במבה...';
+      errorMsg.style.display = 'block';
+      document.getElementById('results').style.display = 'none';
+      return;
+    }
+
+    // totals per market
+    const totals = {};
+    for (const m of MARKETS) totals[m.id] = 0;
+    for (const { product } of found) {
+      for (const m of MARKETS) totals[m.id] += product.prices[m.id] || 0;
+    }
+
+    // winner & most expensive
+    let winner = MARKETS[0];
+    let mostExpensive = MARKETS[0];
+    for (const m of MARKETS) {
+      if (totals[m.id] < totals[winner.id]) winner = m;
+      if (totals[m.id] > totals[mostExpensive.id]) mostExpensive = m;
+    }
+    const saving = totals[mostExpensive.id] - totals[winner.id];
+
+    // ---- Winner banner ----
+    document.getElementById('winnerName').textContent = winner.name;
+    document.getElementById('winnerPrice').textContent = `סה"כ: ${totals[winner.id].toFixed(2)} ₪`;
+    const badge = document.getElementById('savingsBadge');
+    if (saving > 0.005) {
+      document.getElementById('saveAmount').textContent = `${saving.toFixed(2)} ₪`;
+      badge.style.display = 'block';
+    } else {
+      badge.style.display = 'none';
+    }
+
+    // ---- Not found ----
+    const nfw = document.getElementById('notFoundWarning');
+    if (notFound.length > 0) {
+      document.getElementById('notFoundList').textContent = notFound.join(' | ');
+      nfw.style.display = 'block';
+    } else {
+      nfw.style.display = 'none';
+    }
+
+    // ---- Market columns ----
+    const grid = document.getElementById('comparisonGrid');
+    grid.innerHTML = '';
+    for (const m of MARKETS) {
+      const isCheapest = m.id === winner.id;
+      const col = document.createElement('div');
+      col.className = 'market-col' + (isCheapest ? ' cheapest' : '');
+
+      let itemsHtml = '';
+      for (const { product } of found) {
+        const price = product.prices[m.id];
+        itemsHtml += `
+          <div class="item-row">
+            <span class="item-name">${escHtml(product.name)}</span>
+            ${price != null
+              ? `<span class="item-price">${price.toFixed(2)} ₪</span>`
+              : `<span class="item-not-found">לא קיים</span>`}
+          </div>`;
+      }
+
+      col.innerHTML = `
+        <div class="market-header ${m.colorClass}">
+          ${isCheapest ? '<span class="cheapest-tag">✓ הזול ביותר</span>' : ''}
+          <span class="market-logo">${m.logo}</span>
+          <div class="market-name">${m.name}</div>
+        </div>
+        <div class="market-items">${itemsHtml}</div>
+        <div class="market-total">
+          <span class="total-label">סה"כ</span>
+          <span class="total-price">${totals[m.id].toFixed(2)} ₪</span>
+        </div>`;
+      grid.appendChild(col);
+    }
+
+    // ---- Breakdown table ----
+    document.getElementById('breakdownHeader').innerHTML =
+      '<th>מוצר</th>' + MARKETS.map(m => `<th>${m.name}</th>`).join('');
+
+    const tbody = document.getElementById('breakdownBody');
+    tbody.innerHTML = '';
+
+    for (const { product } of found) {
+      let cheapestId = MARKETS[0].id;
+      for (const m of MARKETS) {
+        if ((product.prices[m.id] ?? Infinity) < (product.prices[cheapestId] ?? Infinity)) {
+          cheapestId = m.id;
+        }
+      }
+      const row = document.createElement('tr');
+      row.innerHTML = `<td>${escHtml(product.name)}</td>` +
+        MARKETS.map(m => {
+          const price = product.prices[m.id];
+          if (price == null) return `<td><span class="not-available">—</span></td>`;
+          const cls = m.id === cheapestId ? ' class="cheapest-cell"' : '';
+          return `<td${cls}>${price.toFixed(2)} ₪${m.id === cheapestId ? ' ✓' : ''}</td>`;
+        }).join('');
+      tbody.appendChild(row);
+    }
+
+    // totals row
+    const totalsRow = document.createElement('tr');
+    totalsRow.style.cssText = 'font-weight:700;background:#f0f4ff';
+    totalsRow.innerHTML = `<td>סה"כ</td>` +
+      MARKETS.map(m => {
+        const cls = m.id === winner.id ? ' class="cheapest-cell"' : '';
+        return `<td${cls}>${totals[m.id].toFixed(2)} ₪</td>`;
+      }).join('');
+    tbody.appendChild(totalsRow);
+
+    document.getElementById('results').style.display = 'block';
+    document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function escHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  document.getElementById('shoppingInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && e.ctrlKey) compare();
+  });
+</script>
+
+</body>
 </html>
