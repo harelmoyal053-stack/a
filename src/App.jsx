@@ -16,6 +16,10 @@ import ProductDetailPage  from './pages/ProductDetailPage'
 import CheckoutPage       from './pages/CheckoutPage'
 import DashboardPage      from './pages/DashboardPage'
 import BusinessPortalPage from './pages/BusinessPortalPage'
+import RealEstateUrgency  from './components/RealEstateUrgency'
+import LeadForm           from './components/LeadForm'
+import HowItWorks         from './components/HowItWorks'
+import FAQAccordion       from './components/FAQAccordion'
 
 import { useDeals } from './hooks/useDeals'
 import { useJoin  } from './hooks/useJoin'
@@ -145,6 +149,8 @@ export default function App() {
       />
       <StatsBar />
       <HeroSection />
+      <HowItWorks />
+      <RealEstateUrgency />
 
       {/* ── Category filter ──────────────────────────────────────────────── */}
       <div className="max-w-7xl mx-auto px-4 pb-4 pt-6">
@@ -257,23 +263,121 @@ export default function App() {
         </AnimatePresence>
       </main>
 
-      {/* Footer */}
-      <footer style={{ background: 'rgba(2,4,8,0.95)', borderTop: '1px solid rgba(0,255,136,0.1)' }}
-        className="py-10 text-center">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center justify-center gap-0.5 mb-3">
-            <span className="text-2xl font-black" style={{ color: '#00ff88', textShadow: '0 0 14px rgba(0,255,136,0.6)' }}>Drop</span>
-            <span className="text-2xl font-black text-white">Price</span>
-            <span className="w-2 h-2 rounded-full mr-1 inline-block animate-pulse"
-              style={{ background: '#00ff88', boxShadow: '0 0 8px rgba(0,255,136,0.9)' }} />
+      {/* ── FAQ ──────────────────────────────────────────────────────────── */}
+      <FAQAccordion />
+
+      {/* ── Lead form ────────────────────────────────────────────────────── */}
+      <LeadForm />
+
+      {/* ── Footer ───────────────────────────────────────────────────────── */}
+      <footer dir="rtl"
+        style={{ background: 'rgba(2,4,8,0.98)', borderTop: '1px solid rgba(0,255,136,0.12)' }}>
+
+        {/* Main footer grid */}
+        <div className="max-w-7xl mx-auto px-4 py-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+
+            {/* Brand column */}
+            <div>
+              <div className="flex items-center gap-0.5 mb-3">
+                <span className="text-2xl font-black" style={{ color: '#00ff88', textShadow: '0 0 14px rgba(0,255,136,0.6)' }}>Drop</span>
+                <span className="text-2xl font-black text-white">Price</span>
+                <span className="w-2 h-2 rounded-full mr-1 inline-block animate-pulse"
+                  style={{ background: '#00ff88', boxShadow: '0 0 8px rgba(0,255,136,0.9)' }} />
+              </div>
+              <p className="text-slate-500 text-sm leading-relaxed mb-4">
+                הפלטפורמה המובילה לקבוצות רחישה בישראל. מחברים קונים חכמים ויזמים איכותיים.
+              </p>
+              {/* Social icons */}
+              <div className="flex gap-3">
+                {[
+                  { label: 'פייסבוק', icon: '📘', href: '#' },
+                  { label: 'אינסטגרם', icon: '📸', href: '#' },
+                  { label: 'לינקדאין', icon: '💼', href: '#' },
+                  { label: 'טלגרם', icon: '✈️', href: '#' },
+                ].map(({ label, icon, href }) => (
+                  <a key={label} href={href} aria-label={label}
+                    className="w-9 h-9 rounded-xl flex items-center justify-center text-base transition-all hover:scale-110"
+                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                    {icon}
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            {/* Projects column */}
+            <div>
+              <h4 className="font-black text-white mb-4 text-sm tracking-wide uppercase">פרויקטים</h4>
+              <ul className="space-y-2">
+                {['פרויקטים פעילים', 'בית פרטי / וילה', 'דירות 3-4 חדרים', 'נכסים להשקעה', 'פרויקטים בתכנון'].map(l => (
+                  <li key={l}>
+                    <a href="#" className="text-sm text-slate-500 hover:text-neon-green transition-colors">{l}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Company column */}
+            <div>
+              <h4 className="font-black text-white mb-4 text-sm tracking-wide uppercase">החברה</h4>
+              <ul className="space-y-2">
+                {['אודות DropPrice', 'צוות המומחים', 'שאלות נפוצות', 'בלוג נדל"ן', 'צור קשר'].map(l => (
+                  <li key={l}>
+                    <a href="#" className="text-sm text-slate-500 hover:text-neon-green transition-colors">{l}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Contact + trust column */}
+            <div>
+              <h4 className="font-black text-white mb-4 text-sm tracking-wide uppercase">יצירת קשר</h4>
+              <ul className="space-y-3 mb-5">
+                <li className="flex items-center gap-2 text-sm text-slate-500">
+                  <span>📞</span><a href="tel:*1234" className="hover:text-white transition-colors">*1234</a>
+                </li>
+                <li className="flex items-center gap-2 text-sm text-slate-500">
+                  <span>✉️</span><a href="mailto:info@dropprice.co.il" className="hover:text-white transition-colors">info@dropprice.co.il</a>
+                </li>
+                <li className="flex items-center gap-2 text-sm text-slate-500">
+                  <span>📍</span><span>רחוב הברזל 3, תל אביב</span>
+                </li>
+                <li className="flex items-center gap-2 text-sm text-slate-500">
+                  <span>🕘</span><span>א׳–ה׳ 09:00–18:00</span>
+                </li>
+              </ul>
+              {/* Trust badges */}
+              <div className="flex flex-wrap gap-2">
+                {['🔒 SSL מאובטח', '✅ רשום ברשם', '🏅 ISO 27001'].map(b => (
+                  <span key={b} className="text-[10px] font-semibold px-2 py-1 rounded-full text-slate-500"
+                    style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                    {b}
+                  </span>
+                ))}
+              </div>
+            </div>
           </div>
-          <p className="text-slate-500 text-sm mb-1">חסכו יחד, קנו חכם יותר 🛍️</p>
-          <div className="flex items-center justify-center gap-4 mt-4">
-            {['תנאי שימוש', 'פרטיות', 'צור קשר', 'עזרה'].map(l => (
-              <button key={l} className="text-xs text-slate-600 hover:text-neon-green transition-colors">{l}</button>
-            ))}
+        </div>
+
+        {/* Bottom bar */}
+        <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+          <div className="max-w-7xl mx-auto px-4 py-4 flex flex-wrap items-center justify-between gap-3">
+            <p className="text-slate-700 text-xs">© 2026 DropPrice בע"מ. כל הזכויות שמורות.</p>
+            <div className="flex flex-wrap gap-4">
+              {[
+                { label: 'תקנון האתר',          href: '#' },
+                { label: 'מדיניות פרטיות',       href: '#' },
+                { label: 'הצהרת נגישות',          href: '#' },
+                { label: 'תנאי שימוש',            href: '#' },
+                { label: 'מפת האתר',             href: '#' },
+              ].map(({ label, href }) => (
+                <a key={label} href={href}
+                  className="text-xs text-slate-600 hover:text-slate-300 transition-colors">
+                  {label}
+                </a>
+              ))}
+            </div>
           </div>
-          <p className="text-slate-700 text-xs mt-4">© 2026 DropPrice. כל הזכויות שמורות.</p>
         </div>
       </footer>
 
