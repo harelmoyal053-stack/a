@@ -57,6 +57,14 @@ export default function App() {
     try { const r = localStorage.getItem('dropprice_user'); return r ? JSON.parse(r) : null } catch { return null }
   })
 
+  // ── Price-drop handler (SSE + join response) ────────────────────────────────
+  const handlePriceDrop = useCallback((payload) => {
+    setPriceDropToast(payload)
+  }, [])
+
+  // ── Real data from backend ──────────────────────────────────────────────────
+  const { deals, timers, loading, error, updateDeal } = useDeals({ onPriceDrop: handlePriceDrop })
+
   // ── Capture ?ref=&deal= params from invite links on first mount ────────────
   useEffect(() => {
     const { dealId } = capturePendingRef()
@@ -66,14 +74,6 @@ export default function App() {
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [deals.length])
-
-  // ── Price-drop handler (SSE + join response) ────────────────────────────────
-  const handlePriceDrop = useCallback((payload) => {
-    setPriceDropToast(payload)
-  }, [])
-
-  // ── Real data from backend ──────────────────────────────────────────────────
-  const { deals, timers, loading, error, updateDeal } = useDeals({ onPriceDrop: handlePriceDrop })
 
   // ── Join logic ──────────────────────────────────────────────────────────────
   const handleJoinSuccess = useCallback((updatedDeal) => {
