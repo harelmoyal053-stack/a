@@ -133,12 +133,10 @@ export default function App() {
 
   // ── Home page ───────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen" style={{ background: '#050810' }} dir="rtl">
-      {/* Global price-drop toast (above everything) */}
+    <div className="min-h-screen" style={{ background: '#f7f9fc' }} dir="rtl">
       <PriceDropToast toast={priceDropToast} onClose={() => setPriceDropToast(null)} />
 
       <LiveTicker />
-
       <Header
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
@@ -152,205 +150,187 @@ export default function App() {
       <HowItWorks />
       <RealEstateUrgency />
 
-      {/* ── Category filter ──────────────────────────────────────────────── */}
-      <div className="max-w-7xl mx-auto px-4 pb-4 pt-6">
-        <div className="flex gap-2 overflow-x-auto pb-2 flex-row-reverse">
-          {categories.map(cat => (
-            <motion.button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
-              whileTap={{ scale: 0.95 }}
-              className={`px-4 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all ${
-                selectedCategory === cat ? 'text-dark-900' : 'text-slate-400 hover:text-white'
-              }`}
-              style={selectedCategory === cat
-                ? { background: 'linear-gradient(135deg, #00ff88, #00b4ff)', boxShadow: '0 0 18px rgba(0,255,136,0.4)' }
-                : { background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }
-              }
-            >
-              {cat}
-            </motion.button>
-          ))}
-        </div>
-      </div>
-
-      {/* ── Section header ───────────────────────────────────────────────── */}
-      <div className="max-w-7xl mx-auto px-4 pb-5">
-        <div className="flex items-center justify-end gap-3">
-          <div className="text-right">
-            <h2 className="text-2xl font-black text-white">עסקאות פעילות</h2>
-            <p className="text-sm text-slate-500">
-              {loading ? 'טוען עסקאות...' : `${filteredDeals.length} עסקאות זמינות עכשיו`}
-            </p>
-          </div>
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl"
-            style={{ background: 'rgba(0,255,136,0.1)', border: '1px solid rgba(0,255,136,0.25)' }}>
-            <Flame className="w-4 h-4 text-neon-green" />
-            <span className="text-sm font-black text-neon-green">
-              {loading ? '…' : filteredDeals.length}
-            </span>
-            <span className="text-xs text-slate-400">פעילות</span>
+      {/* ── Deals section — dark zone ─────────────────────────────────────── */}
+      <div style={{ background: '#071629' }}>
+        {/* Category filter */}
+        <div className="max-w-7xl mx-auto px-4 pb-4 pt-8">
+          <div className="flex gap-2 overflow-x-auto pb-2 flex-row-reverse">
+            {categories.map(cat => (
+              <motion.button
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                whileTap={{ scale: 0.95 }}
+                className="px-4 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all"
+                style={selectedCategory === cat
+                  ? { background: 'linear-gradient(135deg, #c9a84c, #a8821f)', color: '#fff', boxShadow: '0 4px 14px rgba(201,168,76,0.35)' }
+                  : { background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: '#94a3b8' }
+                }
+              >
+                {cat}
+              </motion.button>
+            ))}
           </div>
         </div>
-      </div>
 
-      {/* ── Main content ─────────────────────────────────────────────────── */}
-      <main className="max-w-7xl mx-auto px-4 pb-14">
-
-        {/* Loading state */}
-        {loading && (
-          <div className="flex flex-col items-center justify-center py-24 gap-4">
-            <div className="w-16 h-16 rounded-2xl flex items-center justify-center"
-              style={{ background: 'rgba(0,255,136,0.08)', border: '1px solid rgba(0,255,136,0.2)' }}>
-              <Loader2 className="w-8 h-8 text-neon-green animate-spin" />
+        {/* Section header */}
+        <div className="max-w-7xl mx-auto px-4 pb-5">
+          <div className="flex items-center justify-end gap-3">
+            <div className="text-right">
+              <h2 className="text-2xl font-black text-white">עסקאות פעילות</h2>
+              <p className="text-sm text-slate-500">
+                {loading ? 'טוען עסקאות...' : `${filteredDeals.length} עסקאות זמינות עכשיו`}
+              </p>
             </div>
-            <p className="text-slate-400 font-semibold">טוען עסקאות מהשרת...</p>
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl"
+              style={{ background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.3)' }}>
+              <Flame className="w-4 h-4" style={{ color: '#c9a84c' }} />
+              <span className="text-sm font-black" style={{ color: '#c9a84c' }}>
+                {loading ? '…' : filteredDeals.length}
+              </span>
+              <span className="text-xs text-slate-400">פעילות</span>
+            </div>
           </div>
-        )}
-
-        {/* Error state */}
-        {!loading && error && (
-          <div className="flex flex-col items-center justify-center py-24 gap-4 text-center">
-            <div className="w-16 h-16 rounded-2xl flex items-center justify-center"
-              style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)' }}>
-              <WifiOff className="w-8 h-8 text-red-400" />
-            </div>
-            <div>
-              <p className="text-red-400 font-bold text-lg">שגיאת חיבור לשרת</p>
-              <p className="text-slate-600 text-sm mt-1">{error}</p>
-            </div>
-            <button onClick={() => window.location.reload()}
-              className="btn-neon px-6 py-2.5 rounded-xl font-bold text-sm">
-              נסה שוב
-            </button>
-          </div>
-        )}
+        </div>
 
         {/* Deals grid */}
-        <AnimatePresence mode="wait">
-          {!loading && !error && (
-            filteredDeals.length === 0 ? (
-              <motion.div key="empty" className="text-center py-24"
-                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                <p className="text-6xl mb-4">🔍</p>
-                <p className="text-xl font-semibold text-slate-400">לא נמצאו עסקאות</p>
-                <p className="text-slate-600 mt-1">נסה חיפוש אחר</p>
-              </motion.div>
-            ) : (
-              <motion.div
-                key={selectedCategory}
-                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-                initial="hidden"
-                animate="show"
-                variants={{ hidden: {}, show: { transition: { staggerChildren: 0.07 } } }}
-              >
-                {filteredDeals.map(d => (
-                  <motion.div key={d.id}
-                    variants={{ hidden: { opacity: 0, y: 40 }, show: { opacity: 1, y: 0, transition: { duration: 0.45, ease: 'easeOut' } } }}>
-                    <DealCard
-                      deal={d}
-                      timeLeft={timers[d.id] || '00:00:00'}
-                      isJoined={joinedDeals.has(d.id)}
-                      isJoining={joining === d.id}
-                      onJoin={handleCardJoin}
-                      onCardClick={() => navigate('product', { deal: d })}
-                    />
-                  </motion.div>
-                ))}
-              </motion.div>
-            )
+        <main className="max-w-7xl mx-auto px-4 pb-14">
+          {loading && (
+            <div className="flex flex-col items-center justify-center py-24 gap-4">
+              <div className="w-16 h-16 rounded-2xl flex items-center justify-center"
+                style={{ background: 'rgba(201,168,76,0.08)', border: '1px solid rgba(201,168,76,0.2)' }}>
+                <Loader2 className="w-8 h-8 animate-spin" style={{ color: '#c9a84c' }} />
+              </div>
+              <p className="text-slate-400 font-semibold">טוען עסקאות מהשרת...</p>
+            </div>
           )}
-        </AnimatePresence>
-      </main>
+          {!loading && error && (
+            <div className="flex flex-col items-center justify-center py-24 gap-4 text-center">
+              <div className="w-16 h-16 rounded-2xl flex items-center justify-center"
+                style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)' }}>
+                <WifiOff className="w-8 h-8 text-red-400" />
+              </div>
+              <p className="text-red-400 font-bold text-lg">שגיאת חיבור לשרת</p>
+              <p className="text-slate-600 text-sm">{error}</p>
+              <button onClick={() => window.location.reload()}
+                className="btn-gold px-6 py-2.5 rounded-xl font-bold text-sm">
+                נסה שוב
+              </button>
+            </div>
+          )}
+          <AnimatePresence mode="wait">
+            {!loading && !error && (
+              filteredDeals.length === 0 ? (
+                <motion.div key="empty" className="text-center py-24"
+                  initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                  <p className="text-6xl mb-4">🔍</p>
+                  <p className="text-xl font-semibold text-slate-400">לא נמצאו עסקאות</p>
+                  <p className="text-slate-600 mt-1">נסה חיפוש אחר</p>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key={selectedCategory}
+                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+                  initial="hidden" animate="show"
+                  variants={{ hidden: {}, show: { transition: { staggerChildren: 0.07 } } }}
+                >
+                  {filteredDeals.map(d => (
+                    <motion.div key={d.id}
+                      variants={{ hidden: { opacity: 0, y: 40 }, show: { opacity: 1, y: 0, transition: { duration: 0.45, ease: 'easeOut' } } }}>
+                      <DealCard
+                        deal={d}
+                        timeLeft={timers[d.id] || '00:00:00'}
+                        isJoined={joinedDeals.has(d.id)}
+                        isJoining={joining === d.id}
+                        onJoin={handleCardJoin}
+                        onCardClick={() => navigate('product', { deal: d })}
+                      />
+                    </motion.div>
+                  ))}
+                </motion.div>
+              )
+            )}
+          </AnimatePresence>
+        </main>
+      </div>
 
-      {/* ── FAQ ──────────────────────────────────────────────────────────── */}
       <FAQAccordion />
-
-      {/* ── Lead form ────────────────────────────────────────────────────── */}
       <LeadForm />
 
       {/* ── Footer ───────────────────────────────────────────────────────── */}
-      <footer dir="rtl"
-        style={{ background: 'rgba(2,4,8,0.98)', borderTop: '1px solid rgba(0,255,136,0.12)' }}>
-
-        {/* Main footer grid */}
+      <footer dir="rtl" style={{ background: '#071629', borderTop: '1px solid rgba(201,168,76,0.15)' }}>
         <div className="max-w-7xl mx-auto px-4 py-12">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
 
-            {/* Brand column */}
+            {/* Brand */}
             <div>
-              <div className="flex items-center gap-0.5 mb-3">
-                <span className="text-2xl font-black" style={{ color: '#00ff88', textShadow: '0 0 14px rgba(0,255,136,0.6)' }}>Drop</span>
-                <span className="text-2xl font-black text-white">Price</span>
-                <span className="w-2 h-2 rounded-full mr-1 inline-block animate-pulse"
-                  style={{ background: '#00ff88', boxShadow: '0 0 8px rgba(0,255,136,0.9)' }} />
+              <div className="flex items-center gap-1 mb-3">
+                <span className="text-2xl font-black" style={{ color: '#fff' }}>Drop</span>
+                <span className="text-2xl font-black" style={{ color: '#c9a84c' }}>Price</span>
+                <span className="w-2 h-2 rounded-full mr-0.5 mb-3 inline-block"
+                  style={{ background: '#c9a84c' }} />
               </div>
-              <p className="text-slate-500 text-sm leading-relaxed mb-4">
+              <p className="text-sm leading-relaxed mb-4" style={{ color: 'rgba(241,245,249,0.5)' }}>
                 הפלטפורמה המובילה לקבוצות רחישה בישראל. מחברים קונים חכמים ויזמים איכותיים.
               </p>
-              {/* Social icons */}
               <div className="flex gap-3">
                 {[
-                  { label: 'פייסבוק', icon: '📘', href: '#' },
-                  { label: 'אינסטגרם', icon: '📸', href: '#' },
-                  { label: 'לינקדאין', icon: '💼', href: '#' },
-                  { label: 'טלגרם', icon: '✈️', href: '#' },
-                ].map(({ label, icon, href }) => (
-                  <a key={label} href={href} aria-label={label}
+                  { label: 'פייסבוק', icon: '📘' },
+                  { label: 'אינסטגרם', icon: '📸' },
+                  { label: 'לינקדאין', icon: '💼' },
+                  { label: 'טלגרם', icon: '✈️' },
+                ].map(({ label, icon }) => (
+                  <a key={label} href="#" aria-label={label}
                     className="w-9 h-9 rounded-xl flex items-center justify-center text-base transition-all hover:scale-110"
-                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                    style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)' }}>
                     {icon}
                   </a>
                 ))}
               </div>
             </div>
 
-            {/* Projects column */}
+            {/* Projects */}
             <div>
               <h4 className="font-black text-white mb-4 text-sm tracking-wide uppercase">פרויקטים</h4>
-              <ul className="space-y-2">
-                {['פרויקטים פעילים', 'בית פרטי / וילה', 'דירות 3-4 חדרים', 'נכסים להשקעה', 'פרויקטים בתכנון'].map(l => (
-                  <li key={l}>
-                    <a href="#" className="text-sm text-slate-500 hover:text-neon-green transition-colors">{l}</a>
-                  </li>
+              <ul className="space-y-2.5">
+                {['פרויקטים פעילים', 'בית פרטי / וילה', 'דירות 3–4 חדרים', 'נכסים להשקעה', 'פרויקטים בתכנון'].map(l => (
+                  <li key={l}><a href="#" className="text-sm transition-colors"
+                    style={{ color: 'rgba(241,245,249,0.5)' }}
+                    onMouseEnter={e => { e.currentTarget.style.color = '#c9a84c' }}
+                    onMouseLeave={e => { e.currentTarget.style.color = 'rgba(241,245,249,0.5)' }}>{l}</a></li>
                 ))}
               </ul>
             </div>
 
-            {/* Company column */}
+            {/* Company */}
             <div>
               <h4 className="font-black text-white mb-4 text-sm tracking-wide uppercase">החברה</h4>
-              <ul className="space-y-2">
+              <ul className="space-y-2.5">
                 {['אודות DropPrice', 'צוות המומחים', 'שאלות נפוצות', 'בלוג נדל"ן', 'צור קשר'].map(l => (
-                  <li key={l}>
-                    <a href="#" className="text-sm text-slate-500 hover:text-neon-green transition-colors">{l}</a>
-                  </li>
+                  <li key={l}><a href="#" className="text-sm transition-colors"
+                    style={{ color: 'rgba(241,245,249,0.5)' }}
+                    onMouseEnter={e => { e.currentTarget.style.color = '#c9a84c' }}
+                    onMouseLeave={e => { e.currentTarget.style.color = 'rgba(241,245,249,0.5)' }}>{l}</a></li>
                 ))}
               </ul>
             </div>
 
-            {/* Contact + trust column */}
+            {/* Contact */}
             <div>
               <h4 className="font-black text-white mb-4 text-sm tracking-wide uppercase">יצירת קשר</h4>
-              <ul className="space-y-3 mb-5">
-                <li className="flex items-center gap-2 text-sm text-slate-500">
-                  <span>📞</span><a href="tel:*1234" className="hover:text-white transition-colors">*1234</a>
-                </li>
-                <li className="flex items-center gap-2 text-sm text-slate-500">
-                  <span>✉️</span><a href="mailto:info@dropprice.co.il" className="hover:text-white transition-colors">info@dropprice.co.il</a>
-                </li>
-                <li className="flex items-center gap-2 text-sm text-slate-500">
-                  <span>📍</span><span>רחוב הברזל 3, תל אביב</span>
-                </li>
-                <li className="flex items-center gap-2 text-sm text-slate-500">
-                  <span>🕘</span><span>א׳–ה׳ 09:00–18:00</span>
-                </li>
+              <ul className="space-y-2.5 mb-5 text-sm" style={{ color: 'rgba(241,245,249,0.5)' }}>
+                <li className="flex items-center gap-2"><span>📞</span><a href="tel:*1234" style={{ color: 'inherit' }}
+                  onMouseEnter={e => { e.currentTarget.style.color = '#fff' }}
+                  onMouseLeave={e => { e.currentTarget.style.color = 'inherit' }}>*1234</a></li>
+                <li className="flex items-center gap-2"><span>✉️</span><a href="mailto:info@dropprice.co.il" style={{ color: 'inherit' }}
+                  onMouseEnter={e => { e.currentTarget.style.color = '#fff' }}
+                  onMouseLeave={e => { e.currentTarget.style.color = 'inherit' }}>info@dropprice.co.il</a></li>
+                <li className="flex items-center gap-2"><span>📍</span><span>רחוב הברזל 3, תל אביב</span></li>
+                <li className="flex items-center gap-2"><span>🕘</span><span>א׳–ה׳ 09:00–18:00</span></li>
               </ul>
-              {/* Trust badges */}
               <div className="flex flex-wrap gap-2">
-                {['🔒 SSL מאובטח', '✅ רשום ברשם', '🏅 ISO 27001'].map(b => (
-                  <span key={b} className="text-[10px] font-semibold px-2 py-1 rounded-full text-slate-500"
-                    style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                {['🔒 SSL', '✅ רשום ברשם', '🏅 ISO 27001'].map(b => (
+                  <span key={b} className="text-[10px] font-semibold px-2 py-1 rounded-full"
+                    style={{ background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.2)', color: '#c9a84c' }}>
                     {b}
                   </span>
                 ))}
@@ -359,21 +339,17 @@ export default function App() {
           </div>
         </div>
 
-        {/* Bottom bar */}
+        {/* Legal bar */}
         <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
           <div className="max-w-7xl mx-auto px-4 py-4 flex flex-wrap items-center justify-between gap-3">
-            <p className="text-slate-700 text-xs">© 2026 DropPrice בע"מ. כל הזכויות שמורות.</p>
+            <p className="text-xs" style={{ color: 'rgba(241,245,249,0.3)' }}>© 2026 DropPrice בע"מ. כל הזכויות שמורות.</p>
             <div className="flex flex-wrap gap-4">
-              {[
-                { label: 'תקנון האתר',          href: '#' },
-                { label: 'מדיניות פרטיות',       href: '#' },
-                { label: 'הצהרת נגישות',          href: '#' },
-                { label: 'תנאי שימוש',            href: '#' },
-                { label: 'מפת האתר',             href: '#' },
-              ].map(({ label, href }) => (
-                <a key={label} href={href}
-                  className="text-xs text-slate-600 hover:text-slate-300 transition-colors">
-                  {label}
+              {['תקנון האתר', 'מדיניות פרטיות', 'הצהרת נגישות', 'תנאי שימוש'].map(l => (
+                <a key={l} href="#" className="text-xs transition-colors"
+                  style={{ color: 'rgba(241,245,249,0.35)' }}
+                  onMouseEnter={e => { e.currentTarget.style.color = '#c9a84c' }}
+                  onMouseLeave={e => { e.currentTarget.style.color = 'rgba(241,245,249,0.35)' }}>
+                  {l}
                 </a>
               ))}
             </div>

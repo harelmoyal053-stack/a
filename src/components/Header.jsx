@@ -1,118 +1,114 @@
-import { Search, Store, User, Bell, LayoutDashboard, Zap, LogIn } from 'lucide-react'
+import { Search, Store, User, Bell, LayoutDashboard, LogIn, Home } from 'lucide-react'
 import { getCachedUser } from '../utils/user'
 
 export default function Header({ searchQuery, setSearchQuery, myGroupsCount = 0, onNavigate, onLogin, user: userProp }) {
-  // Allow parent to pass user (for instant re-render after login), fall back to localStorage
   const user = userProp !== undefined ? userProp : getCachedUser()
+
   return (
     <header className="sticky top-0 z-50"
       style={{
-        background: 'rgba(5,8,16,0.85)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-        borderBottom: '1px solid rgba(0,255,136,0.12)',
-        boxShadow: '0 4px 30px rgba(0,0,0,0.5)',
+        background: 'rgba(255,255,255,0.97)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+        borderBottom: '1px solid #e2e8f0',
+        boxShadow: '0 2px 16px rgba(15,45,94,0.07)',
       }}>
       <div className="max-w-7xl mx-auto px-4 py-3">
         <div className="flex items-center justify-between gap-4" dir="rtl">
 
-          {/* RIGHT: Logo + Search + Create Store */}
+          {/* RIGHT: Logo + Search + Business */}
           <div className="flex items-center gap-3 flex-1 min-w-0">
 
             {/* Logo */}
             <button
               onClick={() => onNavigate('home')}
-              className="flex items-center gap-0.5 shrink-0 select-none hover:opacity-85 transition-opacity"
+              className="flex items-center gap-1 shrink-0 select-none hover:opacity-80 transition-opacity"
             >
-              <span className="text-2xl font-black leading-none"
-                style={{ color: '#00ff88', textShadow: '0 0 14px rgba(0,255,136,0.7)' }}>
-                Drop
-              </span>
-              <span className="text-2xl font-black text-white leading-none">Price</span>
-              <span className="w-2 h-2 rounded-full mb-3 mr-0.5 inline-block animate-pulse"
-                style={{ background: '#00ff88', boxShadow: '0 0 8px rgba(0,255,136,0.9)' }} />
+              <span className="text-2xl font-black leading-none" style={{ color: '#0f2d5e' }}>Drop</span>
+              <span className="text-2xl font-black leading-none" style={{ color: '#c9a84c' }}>Price</span>
+              <span className="w-2 h-2 rounded-full mr-0.5 mb-3 inline-block"
+                style={{ background: '#c9a84c' }} />
             </button>
 
-            {/* Divider */}
-            <div className="w-px h-7 hidden sm:block" style={{ background: 'rgba(0,255,136,0.2)' }} />
+            <div className="w-px h-6 hidden sm:block" style={{ background: '#e2e8f0' }} />
 
             {/* Search */}
             <div className="relative flex-1 max-w-xs hidden sm:block">
-              <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'rgba(0,255,136,0.5)' }} />
+              <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input
                 type="text"
                 placeholder="חיפוש..."
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                className="input-dark w-full pr-10 pl-4 py-2.5 rounded-xl text-sm"
+                className="input-clean w-full pr-10 pl-4 py-2 rounded-xl text-sm"
                 dir="rtl"
               />
             </div>
 
-            {/* Create Store */}
+            {/* Business portal */}
             <button
               onClick={() => onNavigate('business')}
-              className="hidden sm:flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all shrink-0 btn-neon"
+              className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all shrink-0"
+              style={{ background: '#f7f9fc', border: '1.5px solid #e2e8f0', color: '#0f2d5e' }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = '#0f2d5e' }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = '#e2e8f0' }}
             >
               <Store className="w-4 h-4" />
               <span>יצירת חנות</span>
             </button>
           </div>
 
-          {/* LEFT: My Groups + Bell + Avatar */}
+          {/* LEFT: Dashboard + Bell + Login / Avatar */}
           <div className="flex items-center gap-1 shrink-0">
 
-            {/* My Groups */}
+            {/* Dashboard */}
             <button
               onClick={() => onNavigate('dashboard')}
-              className="relative hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all font-semibold text-sm text-slate-400 hover:text-neon-green hover:bg-neon-green/5"
+              className="relative hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-xl font-semibold text-sm transition-colors"
+              style={{ color: '#475569' }}
+              onMouseEnter={e => { e.currentTarget.style.background = '#f1f5f9'; e.currentTarget.style.color = '#0f2d5e' }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#475569' }}
             >
               <LayoutDashboard className="w-4 h-4" />
               <span>הקבוצות שלי</span>
               {myGroupsCount > 0 && (
-                <span className="absolute -top-1 -left-1 w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-black text-dark-900"
-                  style={{ background: '#00ff88', boxShadow: '0 0 8px rgba(0,255,136,0.6)' }}>
+                <span className="absolute -top-1 -left-1 w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-black text-white"
+                  style={{ background: '#c9a84c' }}>
                   {myGroupsCount}
                 </span>
               )}
             </button>
 
             {/* Bell */}
-            <button className="relative p-2 rounded-xl transition-colors text-slate-500 hover:text-neon-green hover:bg-neon-green/5 hidden sm:flex items-center">
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border border-dark-900"
-                style={{ boxShadow: '0 0 6px rgba(239,68,68,0.7)' }} />
-            </button>
-
-            {/* Avatar */}
-            <button
-              onClick={() => onNavigate('dashboard')}
-              className="group flex items-center gap-2.5 p-1.5 rounded-xl transition-all hover:bg-neon-green/5"
+            <button className="relative p-2 rounded-xl transition-colors text-slate-400 hover:text-slate-700 hidden sm:flex items-center"
+              onMouseEnter={e => { e.currentTarget.style.background = '#f1f5f9' }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
             >
-              <div className="relative">
-                <div className="w-9 h-9 rounded-xl flex items-center justify-center shadow-md"
-                  style={{ background: 'linear-gradient(135deg, #00ff88, #00b4ff)', boxShadow: '0 0 14px rgba(0,255,136,0.3)' }}>
-                  <User className="w-5 h-5 text-dark-900" />
-                </div>
-                <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-neon-green rounded-full border-2"
-                  style={{ borderColor: '#050810', boxShadow: '0 0 6px rgba(0,255,136,0.8)' }} />
-              </div>
-              {user && (
-                <div className="hidden md:block text-right leading-tight">
-                  <p className="text-xs font-semibold text-white">{user.name}</p>
-                  <p className="text-xs font-medium" style={{ color: '#00ff88' }}>
-                    <Zap className="w-3 h-3 inline mb-0.5" /> חבר פעיל
-                  </p>
-                </div>
-              )}
+              <Bell className="w-5 h-5" />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white" />
             </button>
 
-            {/* Login button — shown when no user yet */}
-            {!user && (
+            {/* Avatar / login */}
+            {user ? (
+              <button
+                onClick={() => onNavigate('dashboard')}
+                className="flex items-center gap-2.5 px-2 py-1.5 rounded-xl transition-all"
+                onMouseEnter={e => { e.currentTarget.style.background = '#f1f5f9' }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
+              >
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center text-white font-bold text-sm"
+                  style={{ background: 'linear-gradient(135deg, #0f2d5e, #1a4080)' }}>
+                  {user.name?.[0] || <User className="w-4 h-4" />}
+                </div>
+                <div className="hidden md:block text-right leading-tight">
+                  <p className="text-xs font-semibold" style={{ color: '#0f1f3d' }}>{user.name}</p>
+                  <p className="text-xs font-medium" style={{ color: '#c9a84c' }}>חבר פעיל</p>
+                </div>
+              </button>
+            ) : (
               <button
                 onClick={onLogin}
-                className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-bold transition-all text-slate-300 hover:text-white"
-                style={{ background: 'rgba(0,255,136,0.1)', border: '1px solid rgba(0,255,136,0.25)' }}
+                className="btn-gold flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm"
               >
                 <LogIn className="w-4 h-4" />
                 <span>כניסה</span>
@@ -122,33 +118,32 @@ export default function Header({ searchQuery, setSearchQuery, myGroupsCount = 0,
         </div>
 
         {/* Mobile row */}
-        <div className="mt-3 flex gap-2 sm:hidden">
+        <div className="mt-2.5 flex gap-2 sm:hidden">
           <div className="relative flex-1">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'rgba(0,255,136,0.5)' }} />
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <input
               type="text"
               placeholder="חיפוש..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="input-dark w-full pr-10 pl-4 py-2.5 rounded-xl text-sm"
+              className="input-clean w-full pr-10 pl-4 py-2 rounded-xl text-sm"
               dir="rtl"
             />
           </div>
           <button onClick={() => onNavigate('dashboard')}
-            className="relative flex items-center gap-1 px-3 py-2 rounded-xl text-sm font-bold shrink-0 text-slate-400"
-            style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }}>
+            className="relative flex items-center px-3 py-2 rounded-xl text-sm font-bold shrink-0"
+            style={{ background: '#f1f5f9', border: '1px solid #e2e8f0', color: '#0f2d5e' }}>
             <LayoutDashboard className="w-4 h-4" />
             {myGroupsCount > 0 && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-black text-dark-900"
-                style={{ background: '#00ff88' }}>
+              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-black text-white"
+                style={{ background: '#c9a84c' }}>
                 {myGroupsCount}
               </span>
             )}
           </button>
           <button onClick={() => onNavigate('business')}
-            className="btn-neon flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-bold shrink-0">
+            className="btn-navy flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-bold shrink-0">
             <Store className="w-4 h-4" />
-            <span>חנות</span>
           </button>
         </div>
       </div>
