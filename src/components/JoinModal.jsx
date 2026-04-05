@@ -18,11 +18,11 @@ function playSuccess() {
 }
 
 export default function JoinModal({ deal, onConfirm, onClose }) {
-  const [step, setStep]       = useState(1)
-  const [name, setName]       = useState('')
-  const [phone, setPhone]     = useState('')
-  const [agreed, setAgreed]   = useState(false)
-  const [loading, setLoading] = useState(false)
+  const [step,     setStep]     = useState(1)
+  const [name,     setName]     = useState('')
+  const [phone,    setPhone]    = useState('')
+  const [agreed,   setAgreed]   = useState(false)
+  const [loading,  setLoading]  = useState(false)
   const [apiError, setApiError] = useState(null)
 
   const handleSubmit = async (e) => {
@@ -32,21 +32,17 @@ export default function JoinModal({ deal, onConfirm, onClose }) {
     setApiError(null)
 
     try {
-      // Pass the collected details to the parent's join handler
-      // (onConfirm calls useJoin.join which POSTs to /api/join)
       const result = await onConfirm(deal, { name, phone })
-
       if (result?.ok === false) {
         setApiError(result.error ?? 'שגיאה בהצטרפות')
         setLoading(false)
         return
       }
-
       setLoading(false)
       setStep(2)
       playSuccess()
       confetti({ particleCount: 100, spread: 80, origin: { y: 0.5 },
-        colors: ['#00ff88', '#00b4ff', '#7b2ff7', '#ffffff'] })
+        colors: ['#22a855', '#4ade80', '#155c34', '#ffffff', '#d1fae5'] })
     } catch {
       setApiError('בעיית רשת — נסה שנית')
       setLoading(false)
@@ -59,49 +55,51 @@ export default function JoinModal({ deal, onConfirm, onClose }) {
         {/* Backdrop */}
         <motion.div
           className="absolute inset-0"
-          style={{ background: 'rgba(2,4,8,0.85)', backdropFilter: 'blur(8px)' }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
+          style={{ background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(8px)' }}
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
           onClick={onClose}
         />
 
         {/* Modal */}
         <motion.div
-          className="relative w-full max-w-md rounded-3xl overflow-hidden shadow-glass-lg"
-          style={{ background: 'rgba(10,14,26,0.97)', border: '1px solid rgba(0,255,136,0.2)', boxShadow: '0 0 50px rgba(0,255,136,0.1)' }}
+          className="relative w-full max-w-md rounded-3xl overflow-hidden"
+          style={{ background: '#fff', border: '1px solid #e2e8f0', boxShadow: '0 24px 60px rgba(21,92,52,0.14)' }}
           initial={{ opacity: 0, scale: 0.88, y: 30 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.88, y: 30 }}
           transition={{ type: 'spring', damping: 22, stiffness: 300 }}
         >
-          {/* Glow border top */}
-          <div className="h-0.5 w-full" style={{ background: 'linear-gradient(90deg, transparent, #00ff88, #00b4ff, transparent)' }} />
+          {/* Green top strip */}
+          <div className="h-1" style={{ background: 'linear-gradient(90deg, #22a855, #1a7a40)' }} />
 
           {/* Header */}
-          <div className="px-6 py-5" style={{ background: 'linear-gradient(135deg, rgba(0,255,136,0.08), rgba(0,180,255,0.05))' }}>
+          <div className="px-6 py-5" style={{ background: '#f4fbf7', borderBottom: '1px solid #e2e8f0' }}>
             <div className="flex items-start justify-between mb-3">
-              <button onClick={onClose} className="p-1.5 rounded-xl text-slate-500 hover:text-white hover:bg-white/10 transition-all">
+              <button onClick={onClose}
+                className="p-1.5 rounded-xl transition-all"
+                style={{ color: '#94a3b8' }}
+                onMouseEnter={e => { e.currentTarget.style.background = '#f1f5f9'; e.currentTarget.style.color = '#475569' }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#94a3b8' }}>
                 <X className="w-5 h-5" />
               </button>
               <div className="text-right">
-                <h2 className="text-xl font-black text-white">הצטרף לחגיגת הקנייה</h2>
-                <p className="text-slate-400 text-sm mt-0.5">{deal.title}</p>
+                <h2 className="text-xl font-black" style={{ color: '#0d3320' }}>הצטרף לחגיגת הקנייה</h2>
+                <p className="text-sm mt-0.5" style={{ color: '#64748b' }}>{deal.title}</p>
               </div>
             </div>
 
             {/* Deal summary */}
             <div className="rounded-2xl p-3 flex items-center justify-between"
-              style={{ background: 'rgba(0,255,136,0.07)', border: '1px solid rgba(0,255,136,0.2)' }}>
+              style={{ background: '#fff', border: '1.5px solid #bbf7d0' }}>
               <div className="flex items-center gap-2">
-                <TrendingDown className="w-4 h-4 text-neon-green" />
-                <span className="text-sm font-medium text-slate-300">
-                  הבא: <span className="font-black text-neon-green">₪{deal.nextPrice}</span>
+                <TrendingDown className="w-4 h-4" style={{ color: '#22a855' }} />
+                <span className="text-sm font-medium" style={{ color: '#64748b' }}>
+                  הבא: <span className="font-black" style={{ color: '#1a7a40' }}>₪{deal.nextPrice}</span>
                 </span>
               </div>
               <div className="text-right">
-                <div className="text-2xl font-black text-neon-green">₪{deal.currentPrice}</div>
-                <div className="text-xs text-slate-500 line-through">₪{deal.originalPrice}</div>
+                <div className="text-2xl font-black" style={{ color: '#1a7a40' }}>₪{deal.currentPrice}</div>
+                <div className="text-xs line-through" style={{ color: '#cbd5e1' }}>₪{deal.originalPrice}</div>
               </div>
             </div>
           </div>
@@ -111,14 +109,14 @@ export default function JoinModal({ deal, onConfirm, onClose }) {
               {/* Trust row */}
               <div className="flex gap-2 mb-5">
                 {[
-                  { icon: Shield,     label: 'תשלום מאובטח', color: '#00ff88' },
-                  { icon: CreditCard, label: 'ביטול חינם',   color: '#00b4ff' },
-                  { icon: Users,      label: `${deal.currentBuyers} חברים`, color: '#7b2ff7' },
-                ].map(({ icon: Icon, label, color }, i) => (
+                  { icon: Shield,     label: 'תשלום מאובטח', color: '#1a7a40', bg: '#f0fdf4', border: '#bbf7d0' },
+                  { icon: CreditCard, label: 'ביטול חינם',   color: '#0284c7', bg: '#f0f9ff', border: '#bae6fd' },
+                  { icon: Users,      label: `${deal.currentBuyers} חברים`, color: '#7c3aed', bg: '#faf5ff', border: '#e9d5ff' },
+                ].map(({ icon: Icon, label, color, bg, border }, i) => (
                   <div key={i} className="flex items-center gap-1.5 text-xs flex-1 justify-center py-2.5 rounded-xl"
-                    style={{ background: `${color}10`, border: `1px solid ${color}25` }}>
+                    style={{ background: bg, border: `1px solid ${border}` }}>
                     <Icon className="w-3.5 h-3.5" style={{ color }} />
-                    <span className="font-medium text-slate-300">{label}</span>
+                    <span className="font-medium" style={{ color }}>{label}</span>
                   </div>
                 ))}
               </div>
@@ -126,17 +124,17 @@ export default function JoinModal({ deal, onConfirm, onClose }) {
               {/* API error */}
               {apiError && (
                 <div className="flex items-start gap-2.5 rounded-xl p-3 mb-4"
-                  style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)' }}>
+                  style={{ background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.25)' }}>
                   <AlertCircle className="w-4 h-4 text-red-400 mt-0.5 shrink-0" />
-                  <p className="text-xs text-red-300 leading-relaxed font-semibold">{apiError}</p>
+                  <p className="text-xs text-red-500 leading-relaxed font-semibold">{apiError}</p>
                 </div>
               )}
 
               {/* Notice */}
               <div className="flex items-start gap-2.5 rounded-xl p-3 mb-5"
-                style={{ background: 'rgba(255,165,0,0.08)', border: '1px solid rgba(255,165,0,0.25)' }}>
-                <AlertCircle className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" />
-                <p className="text-xs text-amber-300 leading-relaxed">
+                style={{ background: '#fff7ed', border: '1px solid #fed7aa' }}>
+                <AlertCircle className="w-4 h-4 text-orange-400 mt-0.5 shrink-0" />
+                <p className="text-xs text-orange-700 leading-relaxed">
                   <strong>לא יחויב עכשיו.</strong> החיוב יבוצע רק כשהקבוצה תגיע ל-{deal.targetBuyers} קונים.
                 </p>
               </div>
@@ -144,23 +142,23 @@ export default function JoinModal({ deal, onConfirm, onClose }) {
               {/* Fields */}
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-bold text-slate-400 mb-1.5">שם מלא</label>
+                  <label className="block text-sm font-bold mb-1.5" style={{ color: '#475569' }}>שם מלא</label>
                   <input type="text" value={name} onChange={e => setName(e.target.value)}
                     placeholder="ישראל ישראלי"
-                    className="input-dark w-full px-4 py-3 rounded-xl text-sm" required dir="rtl" />
+                    className="input-clean w-full px-4 py-3 rounded-xl text-sm" required dir="rtl" />
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-slate-400 mb-1.5">מספר טלפון</label>
+                  <label className="block text-sm font-bold mb-1.5" style={{ color: '#475569' }}>מספר טלפון</label>
                   <input type="tel" value={phone} onChange={e => setPhone(e.target.value)}
                     placeholder="05X-XXXXXXX"
-                    className="input-dark w-full px-4 py-3 rounded-xl text-sm" required dir="ltr"
+                    className="input-clean w-full px-4 py-3 rounded-xl text-sm" required dir="ltr"
                     style={{ textAlign: 'right' }} />
                 </div>
-                <label className="flex items-start gap-3 cursor-pointer group">
+                <label className="flex items-start gap-3 cursor-pointer">
                   <input type="checkbox" checked={agreed} onChange={e => setAgreed(e.target.checked)}
-                    className="mt-0.5 w-4 h-4 rounded shrink-0 cursor-pointer accent-neon-green" />
-                  <span className="text-xs text-slate-500 text-right leading-relaxed">
-                    אני מסכים/ה ל<span className="text-neon-green/80 underline cursor-pointer">תנאי השימוש</span> של DropPrice
+                    className="mt-0.5 w-4 h-4 rounded shrink-0 cursor-pointer" style={{ accentColor: '#22a855' }} />
+                  <span className="text-xs text-right leading-relaxed" style={{ color: '#94a3b8' }}>
+                    אני מסכים/ה ל<span className="underline cursor-pointer" style={{ color: '#22a855' }}>תנאי השימוש</span> של DropPrice
                   </span>
                 </label>
               </div>
@@ -168,12 +166,12 @@ export default function JoinModal({ deal, onConfirm, onClose }) {
               <motion.button
                 type="submit"
                 disabled={!name || !phone || !agreed || loading}
-                className="w-full mt-6 btn-neon disabled:opacity-40 py-3.5 rounded-xl font-black text-base flex items-center justify-center gap-2"
+                className="w-full mt-6 btn-gold disabled:opacity-40 py-3.5 rounded-xl font-black text-base flex items-center justify-center gap-2"
                 whileTap={{ scale: 0.97 }}
               >
                 {loading ? (
                   <>
-                    <div className="w-5 h-5 border-2 rounded-full animate-spin" style={{ borderColor: 'rgba(2,4,8,0.3)', borderTopColor: '#020408' }} />
+                    <div className="w-5 h-5 border-2 border-white/40 border-t-white rounded-full animate-spin" />
                     <span>מצטרף לחגיגה...</span>
                   </>
                 ) : (
@@ -185,20 +183,19 @@ export default function JoinModal({ deal, onConfirm, onClose }) {
               </motion.button>
             </form>
           ) : (
-            /* Success */
             <div className="p-8 text-center">
-              <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4"
-                style={{ background: 'rgba(0,255,136,0.12)', border: '2px solid rgba(0,255,136,0.4)', boxShadow: '0 0 30px rgba(0,255,136,0.2)' }}>
-                <CheckCircle className="w-10 h-10 text-neon-green" />
+              <div className="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-4"
+                style={{ background: '#f0fdf4', border: '2px solid #bbf7d0' }}>
+                <CheckCircle className="w-10 h-10" style={{ color: '#22a855' }} />
               </div>
-              <h3 className="text-2xl font-black text-white mb-2">הצטרפת לחגיגה! 🎉</h3>
-              <p className="text-slate-400 text-sm mb-6 leading-relaxed">
+              <h3 className="text-2xl font-black mb-2" style={{ color: '#0d3320' }}>הצטרפת לחגיגה! 🎉</h3>
+              <p className="text-sm mb-6 leading-relaxed" style={{ color: '#64748b' }}>
                 נשלח לך SMS כשהמחיר ירד.{' '}
-                <strong className="text-neon-green">{deal.targetBuyers - deal.currentBuyers - 1}</strong> קונים נוספים נדרשים!
+                <strong style={{ color: '#1a7a40' }}>{deal.targetBuyers - deal.currentBuyers - 1}</strong> קונים נוספים נדרשים!
               </p>
               <motion.button
                 onClick={onClose}
-                className="w-full btn-neon py-3.5 rounded-xl font-black text-base"
+                className="w-full btn-gold py-3.5 rounded-xl font-black text-base"
                 whileTap={{ scale: 0.97 }}
               >
                 מעולה, תודה! 🙌
