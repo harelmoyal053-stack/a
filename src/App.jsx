@@ -148,7 +148,6 @@ export default function App() {
       <StatsBar />
       <HeroSection />
       <HowItWorks />
-      <RealEstateUrgency />
 
       {/* ── Deals section — dark zone ─────────────────────────────────────── */}
       <div style={{ background: '#082b18' }}>
