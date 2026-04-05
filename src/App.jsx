@@ -147,7 +147,6 @@ export default function App() {
       />
       <StatsBar />
       <HeroSection />
-      <HowItWorks />
 
       {/* ── Deals section ────────────────────────────────────────────────── */}
       <div style={{ background: '#f4fbf7', borderTop: '1px solid #e2e8f0' }}>
@@ -252,6 +251,7 @@ export default function App() {
         </main>
       </div>
 
+      <HowItWorks />
       <FAQAccordion />
       <LeadForm />
 
