@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowRight, Store, Plus, Minus, CheckCircle, TrendingDown, Zap, Tag, ImagePlus } from 'lucide-react'
 
@@ -39,8 +39,44 @@ export default function BusinessPortalPage({ onBack, onSubmit }) {
   const handleSubmit = (e) => {
     e.preventDefault()
     if (!isValid) return
+
+    // Build a deal object matching the shape expected by DealCard/useDeals
+    const sortedTiers = [...tiers].sort((a, b) => Number(a.buyers) - Number(b.buyers))
+    const origPrice   = Number(form.originalPrice)
+    const firstPrice  = Number(sortedTiers[0]?.price  || origPrice)
+    const secondPrice = Number(sortedTiers[1]?.price  || firstPrice)
+    const lastTier    = sortedTiers[sortedTiers.length - 1]
+
+    const newDeal = {
+      id:            `custom-${Date.now()}`,
+      title:         form.productName,
+      subtitle:      form.description || '',
+      image:         imagePreview,          // base64 or null
+      emoji:         '🛍️',                 // fallback if no image
+      category:      form.category,
+      badge:         'חדש',
+      badgeColor:    'bg-green-500',
+      originalPrice: origPrice,
+      currentPrice:  firstPrice,
+      nextPrice:     secondPrice,
+      savings:       origPrice - firstPrice,
+      targetBuyers:  Number(lastTier?.buyers || 50),
+      currentBuyers: 0,
+      endTime:       new Date(Date.now() + Number(form.duration) * 3_600_000).toISOString(),
+      rating:        5.0,
+      reviews:       0,
+      isActive:      true,
+      priceTiers:    sortedTiers.map(t => ({ buyers: Number(t.buyers), price: Number(t.price) })),
+    }
+
+    // Persist to localStorage
+    try {
+      const existing = JSON.parse(localStorage.getItem('customProducts') || '[]')
+      localStorage.setItem('customProducts', JSON.stringify([newDeal, ...existing]))
+    } catch (_) {}
+
+    onSubmit && onSubmit(newDeal)
     setSubmitted(true)
-    onSubmit && onSubmit({ ...form, tiers })
   }
 
   const NAV = (
@@ -61,6 +97,13 @@ export default function BusinessPortalPage({ onBack, onSubmit }) {
       </div>
     </div>
   )
+
+  // Auto-redirect to home after publish
+  useEffect(() => {
+    if (!submitted) return
+    const t = setTimeout(onBack, 2800)
+    return () => clearTimeout(t)
+  }, [submitted, onBack])
 
   if (submitted) return (
     <div className="min-h-screen" style={{ background: '#f4fbf7' }} dir="rtl">

@@ -177,14 +177,24 @@ export default function DealCard({ deal, timeLeft, isJoined, isJoining, onJoin, 
           </span>
         </div>
 
-        {/* Large emoji */}
-        <motion.div
-          className="relative z-10 text-8xl select-none drop-shadow-sm"
-          whileHover={{ scale: 1.1 }}
-          transition={{ type: 'spring', stiffness: 300 }}
-        >
-          {deal.emoji}
-        </motion.div>
+        {/* Product image or emoji */}
+        {deal.image ? (
+          <motion.img
+            src={deal.image}
+            alt={deal.title}
+            className="relative z-10 w-full h-full object-cover"
+            whileHover={{ scale: 1.04 }}
+            transition={{ type: 'spring', stiffness: 300 }}
+          />
+        ) : (
+          <motion.div
+            className="relative z-10 text-8xl select-none drop-shadow-sm"
+            whileHover={{ scale: 1.1 }}
+            transition={{ type: 'spring', stiffness: 300 }}
+          >
+            {deal.emoji}
+          </motion.div>
+        )}
 
         {/* Join success flash */}
         <AnimatePresence>

@@ -1,6 +1,13 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { STATIC_DEALS } from '../data/staticDeals'
 
+// ── Load user-published deals from localStorage ───────────────────────────────
+function loadCustomDeals() {
+  try {
+    return JSON.parse(localStorage.getItem('customProducts') || '[]')
+  } catch { return [] }
+}
+
 // ── Countdown helpers ─────────────────────────────────────────────────────────
 function secondsUntil(isoString) {
   return Math.max(0, Math.floor((new Date(isoString) - Date.now()) / 1000))
@@ -48,8 +55,9 @@ export function useDeals({ onPriceDrop } = {}) {
        window.location.hostname.includes('github.com'))
 
     if (isGhPages) {
-      setDeals(STATIC_DEALS)
-      initTimers(STATIC_DEALS)
+      const all = [...loadCustomDeals(), ...STATIC_DEALS]
+      setDeals(all)
+      initTimers(all)
       setIsStatic(true)
       setLoading(false)
       return
@@ -62,15 +70,16 @@ export function useDeals({ onPriceDrop } = {}) {
       })
       .then(({ deals }) => {
         if (!mounted) return
-        setDeals(deals)
-        initTimers(deals)
+        const all = [...loadCustomDeals(), ...deals]
+        setDeals(all)
+        initTimers(all)
         setLoading(false)
       })
       .catch(() => {
         if (!mounted) return
-        // API unavailable — use static demo data instead of showing an error
-        setDeals(STATIC_DEALS)
-        initTimers(STATIC_DEALS)
+        const all = [...loadCustomDeals(), ...STATIC_DEALS]
+        setDeals(all)
+        initTimers(all)
         setIsStatic(true)
         setLoading(false)
       })
