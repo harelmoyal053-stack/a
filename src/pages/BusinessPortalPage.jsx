@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowRight, Store, Plus, Minus, CheckCircle, TrendingDown, Zap, Tag } from 'lucide-react'
+import { ArrowRight, Store, Plus, Minus, CheckCircle, TrendingDown, Zap, Tag, ImagePlus } from 'lucide-react'
 
 const CATEGORIES = ['מזון', 'תינוקות', 'תחבורה', 'ספורט', 'אלקטרוניקה', 'בית וגן', 'בריאות', 'אחר']
 const DURATIONS  = [
@@ -9,17 +9,18 @@ const DURATIONS  = [
   { value: '72',  label: '72 שעות'   },
   { value: '168', label: 'שבוע שלם'  },
 ]
-const EMOJI_OPTIONS = ['🛍️','📦','🍕','👶','⛽','🍎','🏋️','☕','🎧','❄️','💊','🌿','🔧','🎁']
-const EMPTY_TIER    = { buyers: '', price: '' }
+const EMPTY_TIER = { buyers: '', price: '' }
 
 const SECTION_CLS = 'card-clean rounded-2xl p-5 space-y-4'
 
 export default function BusinessPortalPage({ onBack, onSubmit }) {
-  const [submitted, setSubmitted] = useState(false)
+  const [submitted,     setSubmitted]     = useState(false)
+  const [imagePreview,  setImagePreview]  = useState(null)
+  const imageInputRef = useRef(null)
   const [form, setForm] = useState({
     businessName: '', contactEmail: '', contactPhone: '',
     productName: '', description: '', category: '',
-    originalPrice: '', duration: '48', emoji: '🛍️',
+    originalPrice: '', duration: '48',
   })
   const [tiers, setTiers] = useState([
     { buyers: '10', price: '' },
@@ -33,7 +34,7 @@ export default function BusinessPortalPage({ onBack, onSubmit }) {
   const setTier    = (i, key, val) => setTiers(t => t.map((tier, idx) => idx === i ? { ...tier, [key]: val } : tier))
 
   const isValid = form.businessName && form.productName && form.originalPrice && form.category &&
-    tiers.every(t => t.buyers && t.price)
+    imagePreview && tiers.every(t => t.buyers && t.price)
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -145,19 +146,41 @@ export default function BusinessPortalPage({ onBack, onSubmit }) {
           </h3>
 
           <div>
-            <label className="block text-sm font-bold mb-2" style={{ color: '#475569' }}>אמוג׳י לעסקה</label>
-            <div className="flex flex-wrap gap-2">
-              {EMOJI_OPTIONS.map(e => (
-                <motion.button key={e} type="button" onClick={() => setField('emoji', e)}
-                  className="w-10 h-10 rounded-xl text-xl flex items-center justify-center transition-all border-2"
-                  style={form.emoji === e
-                    ? { background: '#f0fdf4', borderColor: '#22a855' }
-                    : { background: '#f8fafc', borderColor: '#e2e8f0' }}
-                  whileTap={{ scale: 0.9 }}>
-                  {e}
-                </motion.button>
-              ))}
+            <label className="block text-sm font-bold mb-1.5" style={{ color: '#475569' }}>תמונת המוצר *</label>
+            <div
+              className="rounded-xl border-2 border-dashed cursor-pointer transition-colors flex flex-col items-center justify-center gap-2 py-5"
+              style={{ borderColor: imagePreview ? '#22a855' : '#e2e8f0', background: imagePreview ? '#f0fdf4' : '#f8fafc' }}
+              onClick={() => imageInputRef.current?.click()}
+            >
+              {imagePreview ? (
+                <img src={imagePreview} alt="תצוגה מקדימה" className="max-h-40 rounded-lg object-contain" />
+              ) : (
+                <>
+                  <ImagePlus className="w-8 h-8" style={{ color: '#94a3b8' }} />
+                  <p className="text-sm font-medium" style={{ color: '#94a3b8' }}>לחץ להעלאת תמונה</p>
+                  <p className="text-xs" style={{ color: '#cbd5e1' }}>PNG, JPG, WEBP עד 5MB</p>
+                </>
+              )}
             </div>
+            <input
+              ref={imageInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={e => {
+                const file = e.target.files?.[0]
+                if (!file) return
+                const reader = new FileReader()
+                reader.onload = ev => setImagePreview(ev.target.result)
+                reader.readAsDataURL(file)
+              }}
+            />
+            {imagePreview && (
+              <button type="button" className="mt-1.5 text-xs font-medium" style={{ color: '#94a3b8' }}
+                onClick={() => { setImagePreview(null); if (imageInputRef.current) imageInputRef.current.value = '' }}>
+                הסר תמונה ✕
+              </button>
+            )}
           </div>
 
           <div>
@@ -281,9 +304,11 @@ export default function BusinessPortalPage({ onBack, onSubmit }) {
               <h3 className="font-black" style={{ color: '#0d3320' }}>תצוגה מקדימה</h3>
               <Zap className="w-5 h-5" style={{ color: '#22a855' }} />
             </div>
-            <div className="h-24 rounded-xl flex items-center justify-center text-5xl mb-3"
+            <div className="h-24 rounded-xl flex items-center justify-center mb-3 overflow-hidden"
               style={{ background: '#f0fdf4', border: '1px solid #d1fae5' }}>
-              {form.emoji}
+              {imagePreview
+                ? <img src={imagePreview} alt="תצוגה" className="h-full w-full object-cover rounded-xl" />
+                : <ImagePlus className="w-8 h-8" style={{ color: '#d1fae5' }} />}
             </div>
             <p className="font-black text-sm" style={{ color: '#0d3320' }}>{form.productName}</p>
             <p className="text-xs mt-0.5" style={{ color: '#94a3b8' }}>{form.description || 'תיאור המוצר...'}</p>
