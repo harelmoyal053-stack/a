@@ -133,7 +133,7 @@ export default function App() {
 
   // ── Home page ───────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen" style={{ background: '#f7f9fc' }} dir="rtl">
+    <div className="min-h-screen" style={{ background: '#f4fbf7' }} dir="rtl">
       <PriceDropToast toast={priceDropToast} onClose={() => setPriceDropToast(null)} />
 
       <LiveTicker />
@@ -151,7 +151,7 @@ export default function App() {
       <RealEstateUrgency />
 
       {/* ── Deals section — dark zone ─────────────────────────────────────── */}
-      <div style={{ background: '#071629' }}>
+      <div style={{ background: '#082b18' }}>
         {/* Category filter */}
         <div className="max-w-7xl mx-auto px-4 pb-4 pt-8">
           <div className="flex gap-2 overflow-x-auto pb-2 flex-row-reverse">
@@ -162,7 +162,7 @@ export default function App() {
                 whileTap={{ scale: 0.95 }}
                 className="px-4 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all"
                 style={selectedCategory === cat
-                  ? { background: 'linear-gradient(135deg, #c9a84c, #a8821f)', color: '#fff', boxShadow: '0 4px 14px rgba(201,168,76,0.35)' }
+                  ? { background: 'linear-gradient(135deg, #22a855, #1a7a40)', color: '#fff', boxShadow: '0 4px 14px rgba(34,168,85,0.35)' }
                   : { background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: '#94a3b8' }
                 }
               >
@@ -182,9 +182,9 @@ export default function App() {
               </p>
             </div>
             <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl"
-              style={{ background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.3)' }}>
-              <Flame className="w-4 h-4" style={{ color: '#c9a84c' }} />
-              <span className="text-sm font-black" style={{ color: '#c9a84c' }}>
+              style={{ background: 'rgba(34,168,85,0.1)', border: '1px solid rgba(34,168,85,0.3)' }}>
+              <Flame className="w-4 h-4" style={{ color: '#22a855' }} />
+              <span className="text-sm font-black" style={{ color: '#22a855' }}>
                 {loading ? '…' : filteredDeals.length}
               </span>
               <span className="text-xs text-slate-400">פעילות</span>
@@ -197,8 +197,8 @@ export default function App() {
           {loading && (
             <div className="flex flex-col items-center justify-center py-24 gap-4">
               <div className="w-16 h-16 rounded-2xl flex items-center justify-center"
-                style={{ background: 'rgba(201,168,76,0.08)', border: '1px solid rgba(201,168,76,0.2)' }}>
-                <Loader2 className="w-8 h-8 animate-spin" style={{ color: '#c9a84c' }} />
+                style={{ background: 'rgba(34,168,85,0.08)', border: '1px solid rgba(34,168,85,0.2)' }}>
+                <Loader2 className="w-8 h-8 animate-spin" style={{ color: '#22a855' }} />
               </div>
               <p className="text-slate-400 font-semibold">טוען עסקאות מהשרת...</p>
             </div>
@@ -257,7 +257,7 @@ export default function App() {
       <LeadForm />
 
       {/* ── Footer ───────────────────────────────────────────────────────── */}
-      <footer dir="rtl" style={{ background: '#071629', borderTop: '1px solid rgba(201,168,76,0.15)' }}>
+      <footer dir="rtl" style={{ background: '#082b18', borderTop: '1px solid rgba(34,168,85,0.15)' }}>
         <div className="max-w-7xl mx-auto px-4 py-12">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
 
@@ -265,9 +265,9 @@ export default function App() {
             <div>
               <div className="flex items-center gap-1 mb-3">
                 <span className="text-2xl font-black" style={{ color: '#fff' }}>Drop</span>
-                <span className="text-2xl font-black" style={{ color: '#c9a84c' }}>Price</span>
+                <span className="text-2xl font-black" style={{ color: '#22a855' }}>Price</span>
                 <span className="w-2 h-2 rounded-full mr-0.5 mb-3 inline-block"
-                  style={{ background: '#c9a84c' }} />
+                  style={{ background: '#22a855' }} />
               </div>
               <p className="text-sm leading-relaxed mb-4" style={{ color: 'rgba(241,245,249,0.5)' }}>
                 הפלטפורמה המובילה לקבוצות רחישה בישראל. מחברים קונים חכמים ויזמים איכותיים.
@@ -295,7 +295,7 @@ export default function App() {
                 {['פרויקטים פעילים', 'בית פרטי / וילה', 'דירות 3–4 חדרים', 'נכסים להשקעה', 'פרויקטים בתכנון'].map(l => (
                   <li key={l}><a href="#" className="text-sm transition-colors"
                     style={{ color: 'rgba(241,245,249,0.5)' }}
-                    onMouseEnter={e => { e.currentTarget.style.color = '#c9a84c' }}
+                    onMouseEnter={e => { e.currentTarget.style.color = '#22a855' }}
                     onMouseLeave={e => { e.currentTarget.style.color = 'rgba(241,245,249,0.5)' }}>{l}</a></li>
                 ))}
               </ul>
@@ -308,7 +308,7 @@ export default function App() {
                 {['אודות DropPrice', 'צוות המומחים', 'שאלות נפוצות', 'בלוג נדל"ן', 'צור קשר'].map(l => (
                   <li key={l}><a href="#" className="text-sm transition-colors"
                     style={{ color: 'rgba(241,245,249,0.5)' }}
-                    onMouseEnter={e => { e.currentTarget.style.color = '#c9a84c' }}
+                    onMouseEnter={e => { e.currentTarget.style.color = '#22a855' }}
                     onMouseLeave={e => { e.currentTarget.style.color = 'rgba(241,245,249,0.5)' }}>{l}</a></li>
                 ))}
               </ul>
@@ -330,7 +330,7 @@ export default function App() {
               <div className="flex flex-wrap gap-2">
                 {['🔒 SSL', '✅ רשום ברשם', '🏅 ISO 27001'].map(b => (
                   <span key={b} className="text-[10px] font-semibold px-2 py-1 rounded-full"
-                    style={{ background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.2)', color: '#c9a84c' }}>
+                    style={{ background: 'rgba(34,168,85,0.1)', border: '1px solid rgba(34,168,85,0.2)', color: '#22a855' }}>
                     {b}
                   </span>
                 ))}
@@ -347,7 +347,7 @@ export default function App() {
               {['תקנון האתר', 'מדיניות פרטיות', 'הצהרת נגישות', 'תנאי שימוש'].map(l => (
                 <a key={l} href="#" className="text-xs transition-colors"
                   style={{ color: 'rgba(241,245,249,0.35)' }}
-                  onMouseEnter={e => { e.currentTarget.style.color = '#c9a84c' }}
+                  onMouseEnter={e => { e.currentTarget.style.color = '#22a855' }}
                   onMouseLeave={e => { e.currentTarget.style.color = 'rgba(241,245,249,0.35)' }}>
                   {l}
                 </a>

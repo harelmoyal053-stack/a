@@ -4,18 +4,18 @@
 
 /* ── CSS Variables ─────────────────────────────────────────────────────────── */
 :root {
-  --navy-900:  #071629;
-  --navy-800:  #0f2d5e;
-  --navy-700:  #1a4080;
-  --navy-100:  #e8f0fb;
-  --gold-600:  #a8821f;
-  --gold-500:  #c9a84c;
-  --gold-400:  #d4b96a;
-  --gold-100:  #fdf6e3;
-  --bg:        #f7f9fc;
+  --green-900:  #082b18;
+  --green-800:  #155c34;
+  --green-700:  #1e7a40;
+  --green-100:  #d1fae5;
+  --cta-600:  #1a7a40;
+  --cta-500:  #22a855;
+  --cta-400:  #4ade80;
+  --cta-100:  #f0fdf4;
+  --bg:        #f4fbf7;
   --surface:   #ffffff;
-  --border:    #e2e8f0;
-  --text-900:  #0f1f3d;
+  --border:    #d1fae5;
+  --text-900:  #0d3320;
   --text-600:  #475569;
   --text-400:  #94a3b8;
 }
@@ -35,9 +35,9 @@ body {
 
 /* ── Scrollbar ─────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: var(--navy-100); }
-::-webkit-scrollbar-thumb { background: var(--gold-500); border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: var(--gold-600); }
+::-webkit-scrollbar-track { background: var(--green-100); }
+::-webkit-scrollbar-thumb { background: var(--cta-500); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--cta-600); }
 
 /* ─────────────────────────────────────────────────────────────────────────
    LIGHT THEME UTILITIES
@@ -56,7 +56,7 @@ body {
 }
 
 .btn-gold {
-  background: linear-gradient(135deg, var(--gold-500), var(--gold-600));
+  background: linear-gradient(135deg, var(--cta-500), var(--cta-600));
   color: #fff;
   font-weight: 800;
   box-shadow: 0 4px 16px rgba(201, 168, 76, 0.35);
@@ -69,12 +69,12 @@ body {
 .btn-gold:active { transform: scale(0.97); }
 
 .btn-navy {
-  background: var(--navy-800);
+  background: var(--green-800);
   color: #fff;
   font-weight: 700;
   transition: background 0.18s ease, box-shadow 0.18s ease;
 }
-.btn-navy:hover { background: var(--navy-700); box-shadow: 0 4px 16px rgba(15,45,94,0.3); }
+.btn-navy:hover { background: var(--green-700); box-shadow: 0 4px 16px rgba(21,92,52,0.3); }
 
 .input-clean {
   background: var(--surface);
@@ -85,18 +85,18 @@ body {
 .input-clean::placeholder { color: var(--text-400); }
 .input-clean:focus {
   outline: none;
-  border-color: var(--navy-700);
+  border-color: var(--green-700);
   box-shadow: 0 0 0 3px rgba(26, 64, 128, 0.1);
 }
 
 .progress-gold {
-  background: linear-gradient(90deg, var(--gold-600), var(--gold-500), var(--gold-400));
+  background: linear-gradient(90deg, var(--cta-600), var(--cta-500), var(--cta-400));
 }
 
 .chip-navy {
-  background: var(--navy-100);
+  background: var(--green-100);
   border: 1px solid rgba(15, 45, 94, 0.18);
-  color: var(--navy-800);
+  color: var(--green-800);
   font-weight: 700;
   font-size: 0.75rem;
   padding: 0.25rem 0.85rem;
@@ -106,9 +106,9 @@ body {
   gap: 0.4rem;
 }
 .chip-gold {
-  background: var(--gold-100);
+  background: var(--cta-100);
   border: 1px solid rgba(201, 168, 76, 0.38);
-  color: var(--gold-600);
+  color: var(--cta-600);
   font-weight: 700;
   font-size: 0.75rem;
   padding: 0.25rem 0.85rem;
@@ -119,13 +119,13 @@ body {
 }
 
 .gradient-navy {
-  background: linear-gradient(135deg, var(--navy-900), var(--navy-700));
+  background: linear-gradient(135deg, var(--green-900), var(--green-700));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 .gradient-gold {
-  background: linear-gradient(135deg, var(--gold-600), var(--gold-400));
+  background: linear-gradient(135deg, var(--cta-600), var(--cta-400));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

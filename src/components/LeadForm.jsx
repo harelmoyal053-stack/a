@@ -54,7 +54,7 @@ export default function LeadForm() {
 
   return (
     <section id="lead-form" className="py-16 px-4" dir="rtl"
-      style={{ background: 'linear-gradient(135deg, #071629 0%, #0f2d5e 100%)' }}>
+      style={{ background: 'linear-gradient(135deg, #082b18 0%, #155c34 100%)' }}>
       <div className="max-w-2xl mx-auto">
 
         <motion.div className="text-center mb-10"
@@ -64,7 +64,7 @@ export default function LeadForm() {
             בדיקת התאמה חינמית ומחייבת
           </span>
           <h2 className="text-3xl md:text-4xl font-black mt-4 mb-3 text-white">
-            בדוק אם אתה <span style={{ color: '#c9a84c' }}>מתאים לקבוצה</span>
+            בדוק אם אתה <span style={{ color: '#22a855' }}>מתאים לקבוצה</span>
           </h2>
           <p className="text-lg" style={{ color: 'rgba(241,245,249,0.68)' }}>
             השאר פרטים ונבדוק עבורך את ההתאמה הטובה ביותר —{' '}
@@ -76,16 +76,16 @@ export default function LeadForm() {
           {success ? (
             <motion.div key="success"
               className="rounded-3xl p-10 text-center"
-              style={{ background: '#fff', border: '2px solid rgba(201,168,76,0.4)' }}
+              style={{ background: '#fff', border: '2px solid rgba(34,168,85,0.4)' }}
               initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}>
               <motion.div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-5"
-                style={{ background: 'rgba(201,168,76,0.1)', border: '2px solid rgba(201,168,76,0.4)' }}
+                style={{ background: 'rgba(34,168,85,0.1)', border: '2px solid rgba(34,168,85,0.4)' }}
                 initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 200, delay: 0.15 }}>
-                <CheckCircle className="w-10 h-10" style={{ color: '#c9a84c' }} />
+                <CheckCircle className="w-10 h-10" style={{ color: '#22a855' }} />
               </motion.div>
-              <h3 className="text-2xl font-black mb-2" style={{ color: '#0f1f3d' }}>קיבלנו! נחזור אליך בהקדם 🎉</h3>
+              <h3 className="text-2xl font-black mb-2" style={{ color: '#0d3320' }}>קיבלנו! נחזור אליך בהקדם 🎉</h3>
               <p className="mb-6" style={{ color: '#64748b' }}>
-                נציג שלנו יצור איתך קשר תוך <strong style={{ color: '#0f2d5e' }}>24 שעות</strong>.
+                נציג שלנו יצור איתך קשר תוך <strong style={{ color: '#155c34' }}>24 שעות</strong>.
               </p>
               <div className="grid grid-cols-3 gap-3 text-center">
                 {[
@@ -93,8 +93,8 @@ export default function LeadForm() {
                   { label: 'לקוחות מרוצים', value: '2,400+' },
                   { label: 'פרויקטים פעילים', value: '12' },
                 ].map(({ label, value }) => (
-                  <div key={label} className="rounded-xl p-3" style={{ background: '#f7f9fc', border: '1px solid #e2e8f0' }}>
-                    <p className="text-xl font-black" style={{ color: '#0f2d5e' }}>{value}</p>
+                  <div key={label} className="rounded-xl p-3" style={{ background: '#f4fbf7', border: '1px solid #e2e8f0' }}>
+                    <p className="text-xl font-black" style={{ color: '#155c34' }}>{value}</p>
                     <p className="text-xs" style={{ color: '#94a3b8' }}>{label}</p>
                   </div>
                 ))}
@@ -107,9 +107,9 @@ export default function LeadForm() {
               initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
 
               <div className="px-6 py-4 flex items-center justify-between"
-                style={{ background: '#f7f9fc', borderBottom: '1px solid #e2e8f0' }}>
+                style={{ background: '#f4fbf7', borderBottom: '1px solid #e2e8f0' }}>
                 <p className="text-xs" style={{ color: '#94a3b8' }}>ממוצע זמן מילוי: <strong style={{ color: '#475569' }}>90 שניות</strong></p>
-                <p className="text-sm font-bold" style={{ color: '#0f1f3d' }}>הצטרפות לקבוצת רחישה</p>
+                <p className="text-sm font-bold" style={{ color: '#0d3320' }}>הצטרפות לקבוצת רחישה</p>
               </div>
 
               <div className="p-6 space-y-5">

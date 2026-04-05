@@ -58,14 +58,14 @@ export default function FAQAccordion() {
             <HelpCircle className="w-3.5 h-3.5" />
             שאלות נפוצות
           </span>
-          <h2 className="text-3xl md:text-4xl font-black mt-4 mb-3" style={{ color: '#0f1f3d' }}>
-            כל מה ש<span style={{ color: '#0f2d5e' }}>רצית לדעת</span>
+          <h2 className="text-3xl md:text-4xl font-black mt-4 mb-3" style={{ color: '#0d3320' }}>
+            כל מה ש<span style={{ color: '#155c34' }}>רצית לדעת</span>
           </h2>
           <p className="text-lg" style={{ color: '#64748b' }}>
             יש לך שאלה נוספת?{' '}
             <button
               className="font-bold underline underline-offset-2"
-              style={{ color: '#0f2d5e' }}
+              style={{ color: '#155c34' }}
               onClick={() => document.getElementById('lead-form')?.scrollIntoView({ behavior: 'smooth' })}>
               השאר פרטים
             </button>{' '}
@@ -79,7 +79,7 @@ export default function FAQAccordion() {
             return (
               <motion.div key={i}
                 className="rounded-2xl overflow-hidden"
-                style={{ border: isOpen ? '1.5px solid #0f2d5e' : '1px solid #e2e8f0' }}
+                style={{ border: isOpen ? '1.5px solid #155c34' : '1px solid #e2e8f0' }}
                 initial={{ opacity: 0, y: 8 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -88,19 +88,19 @@ export default function FAQAccordion() {
 
                 <button
                   className="w-full flex items-center gap-4 px-5 py-4 text-right transition-colors"
-                  style={{ background: isOpen ? '#f7f9fc' : '#fff' }}
+                  style={{ background: isOpen ? '#f4fbf7' : '#fff' }}
                   onClick={() => setOpen(isOpen ? null : i)}>
 
                   <motion.div animate={{ rotate: isOpen ? 180 : 0 }} transition={{ duration: 0.22 }}>
                     <ChevronDown className="w-5 h-5 shrink-0"
-                      style={{ color: isOpen ? '#0f2d5e' : '#94a3b8' }} />
+                      style={{ color: isOpen ? '#155c34' : '#94a3b8' }} />
                   </motion.div>
 
                   <span className="text-[11px] font-bold px-2 py-0.5 rounded-full shrink-0 hidden sm:inline chip-navy">
                     {faq.cat}
                   </span>
 
-                  <span className="flex-1 font-bold text-base" style={{ color: '#0f1f3d' }}>{faq.q}</span>
+                  <span className="flex-1 font-bold text-base" style={{ color: '#0d3320' }}>{faq.q}</span>
                 </button>
 
                 <AnimatePresence>
@@ -112,7 +112,7 @@ export default function FAQAccordion() {
                       transition={{ duration: 0.28, ease: 'easeInOut' }}
                       style={{ overflow: 'hidden' }}>
                       <div className="px-5 pb-5 pt-1"
-                        style={{ background: '#f7f9fc', borderTop: '1px solid #e2e8f0' }}>
+                        style={{ background: '#f4fbf7', borderTop: '1px solid #e2e8f0' }}>
                         <p className="text-sm leading-relaxed" style={{ color: '#475569' }}>{faq.a}</p>
                       </div>
                     </motion.div>
@@ -124,7 +124,7 @@ export default function FAQAccordion() {
         </div>
 
         <motion.div className="mt-8 text-center rounded-2xl p-6"
-          style={{ background: '#f7f9fc', border: '1px solid #e2e8f0' }}
+          style={{ background: '#f4fbf7', border: '1px solid #e2e8f0' }}
           initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}>
           <p className="font-semibold mb-3" style={{ color: '#475569' }}>עדיין יש לך שאלה?</p>
           <div className="flex flex-wrap justify-center gap-3">
@@ -136,7 +136,7 @@ export default function FAQAccordion() {
             </motion.button>
             <a href="tel:*1234"
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all"
-              style={{ background: '#fff', border: '1.5px solid #e2e8f0', color: '#0f2d5e' }}>
+              style={{ background: '#fff', border: '1.5px solid #e2e8f0', color: '#155c34' }}>
               📞 *1234 — שירות לקוחות
             </a>
           </div>

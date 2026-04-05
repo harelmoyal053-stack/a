@@ -55,15 +55,15 @@ function ProjectTab({ project, active, onClick }) {
     <button onClick={onClick}
       className="w-full text-right px-4 py-3 rounded-xl transition-all"
       style={active
-        ? { background: '#0f2d5e', color: '#fff' }
-        : { background: '#f7f9fc', color: '#475569', border: '1px solid #e2e8f0' }
+        ? { background: '#155c34', color: '#fff' }
+        : { background: '#f4fbf7', color: '#475569', border: '1px solid #e2e8f0' }
       }
     >
       <div className="flex items-center justify-between mb-1.5">
         <span className="text-[11px] font-bold px-2 py-0.5 rounded-full"
           style={active
-            ? { background: 'rgba(201,168,76,0.2)', color: '#c9a84c' }
-            : { background: '#e8f0fb', color: '#0f2d5e' }
+            ? { background: 'rgba(34,168,85,0.2)', color: '#22a855' }
+            : { background: '#d1fae5', color: '#155c34' }
           }>
           {project.badge}
         </span>
@@ -76,7 +76,7 @@ function ProjectTab({ project, active, onClick }) {
         <span style={{ color: active ? 'rgba(255,255,255,0.6)' : '#94a3b8' }}>
           {project.total - project.joined} מקומות פנויים
         </span>
-        <span style={{ color: active ? '#c9a84c' : '#0f2d5e', fontWeight: 700 }}>{project.filled}%</span>
+        <span style={{ color: active ? '#22a855' : '#155c34', fontWeight: 700 }}>{project.filled}%</span>
       </div>
     </button>
   )
@@ -94,7 +94,7 @@ export default function RealEstateUrgency() {
   }, [])
 
   return (
-    <section className="py-16 px-4" style={{ background: '#f7f9fc' }} dir="rtl">
+    <section className="py-16 px-4" style={{ background: '#f4fbf7' }} dir="rtl">
       <div className="max-w-6xl mx-auto">
 
         {/* Header */}
@@ -104,8 +104,8 @@ export default function RealEstateUrgency() {
             <AlertTriangle className="w-3.5 h-3.5" />
             פרויקטים עם מקומות אחרונים
           </span>
-          <h2 className="text-3xl md:text-4xl font-black mt-4 mb-3" style={{ color: '#0f1f3d' }}>
-            קבוצות <span style={{ color: '#c9a84c' }}>פעילות עכשיו</span> — אל תפספס
+          <h2 className="text-3xl md:text-4xl font-black mt-4 mb-3" style={{ color: '#0d3320' }}>
+            קבוצות <span style={{ color: '#22a855' }}>פעילות עכשיו</span> — אל תפספס
           </h2>
           <p className="text-lg max-w-xl mx-auto" style={{ color: '#64748b' }}>
             כשהקבוצה מתמלאת — המחיר נעול. הצטרף לפני שייגמר המקום שלך.
@@ -126,17 +126,17 @@ export default function RealEstateUrgency() {
 
             {/* Card header */}
             <div className="px-6 py-4 flex items-center justify-between"
-              style={{ background: 'linear-gradient(135deg, #071629, #0f2d5e)', color: '#fff' }}>
+              style={{ background: 'linear-gradient(135deg, #082b18, #155c34)', color: '#fff' }}>
               <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: '#c9a84c' }} />
+                <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: '#22a855' }} />
                 <span className="text-xs font-semibold" style={{ color: 'rgba(255,255,255,0.6)' }}>עדכון חי</span>
               </div>
-              <span className="text-sm font-bold" style={{ color: '#c9a84c' }}>{project.badge}</span>
+              <span className="text-sm font-bold" style={{ color: '#22a855' }}>{project.badge}</span>
             </div>
 
             <div className="p-6">
               <div className="mb-5 text-right">
-                <h3 className="text-2xl font-black mb-1" style={{ color: '#0f1f3d' }}>{project.name}</h3>
+                <h3 className="text-2xl font-black mb-1" style={{ color: '#0d3320' }}>{project.name}</h3>
                 <div className="flex items-center justify-end gap-2 text-sm" style={{ color: '#64748b' }}>
                   <span>{project.type}</span>
                   <span className="w-1 h-1 rounded-full bg-slate-300" />
@@ -159,20 +159,20 @@ export default function RealEstateUrgency() {
 
               {/* Savings */}
               <div className="rounded-xl p-3 mb-5 flex items-center justify-between"
-                style={{ background: 'rgba(201,168,76,0.08)', border: '1px solid rgba(201,168,76,0.25)' }}>
-                <span className="font-black text-lg" style={{ color: '#a8821f' }}>
+                style={{ background: 'rgba(34,168,85,0.08)', border: '1px solid rgba(34,168,85,0.25)' }}>
+                <span className="font-black text-lg" style={{ color: '#1a7a40' }}>
                   חיסכון {project.savings} ({project.saved})
                 </span>
                 <div className="flex items-center gap-1.5">
-                  <TrendingDown className="w-4 h-4" style={{ color: '#c9a84c' }} />
-                  <span className="text-sm font-semibold" style={{ color: '#a8821f' }}>הנחה קבוצתית</span>
+                  <TrendingDown className="w-4 h-4" style={{ color: '#22a855' }} />
+                  <span className="text-sm font-semibold" style={{ color: '#1a7a40' }}>הנחה קבוצתית</span>
                 </div>
               </div>
 
               {/* Progress */}
               <div className="flex items-center justify-between text-sm mb-1.5">
                 <span className={`font-bold ${project.urgent ? 'text-red-500' : ''}`}
-                  style={project.urgent ? {} : { color: '#0f2d5e' }}>
+                  style={project.urgent ? {} : { color: '#155c34' }}>
                   {project.urgent ? `⚠️ נותרו ${remaining} מקומות אחרונים!` : `נותרו ${remaining} מקומות פנויים`}
                 </span>
                 <span style={{ color: '#64748b' }}>{project.joined}/{project.total} הצטרפו</span>
@@ -184,7 +184,7 @@ export default function RealEstateUrgency() {
               </div>
               <div className="flex justify-between text-xs mb-5" style={{ color: '#94a3b8' }}>
                 <span>0%</span>
-                <span className="font-bold" style={{ color: '#c9a84c' }}>{project.filled}% הושלם</span>
+                <span className="font-bold" style={{ color: '#22a855' }}>{project.filled}% הושלם</span>
                 <span>100%</span>
               </div>
 
@@ -194,13 +194,13 @@ export default function RealEstateUrgency() {
                   <div className="flex -space-x-2 space-x-reverse">
                     {['👨‍💼','👩‍💼','👨‍👩‍👧','👩','👨'].slice(0, Math.min(5, project.joined)).map((e, i) => (
                       <span key={i} className="w-8 h-8 rounded-full flex items-center justify-center text-sm border-2 border-white"
-                        style={{ background: '#e8f0fb' }}>{e}</span>
+                        style={{ background: '#d1fae5' }}>{e}</span>
                     ))}
                   </div>
                   <span className="text-xs font-semibold" style={{ color: '#64748b' }}>+{project.joined} משפחות</span>
                 </div>
                 <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold"
-                  style={{ background: '#e8f0fb', color: '#0f2d5e' }}>
+                  style={{ background: '#d1fae5', color: '#155c34' }}>
                   <Users className="w-3.5 h-3.5" />
                   {ticker % 2 === 0 ? `${project.joined} ממתינים לאישור` : `${project.joined + 1} עקבו אחרי פרויקט זה`}
                 </div>

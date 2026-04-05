@@ -21,17 +21,17 @@ export default function LiveTicker() {
   }, [])
 
   return (
-    <div className="relative overflow-hidden" style={{ height: 36, background: '#0f2d5e', borderBottom: '1px solid rgba(201,168,76,0.2)' }}>
+    <div className="relative overflow-hidden" style={{ height: 36, background: '#155c34', borderBottom: '1px solid rgba(34,168,85,0.2)' }}>
       <div className="absolute left-0 top-0 bottom-0 w-16 z-10 pointer-events-none"
-        style={{ background: 'linear-gradient(to right, #0f2d5e, transparent)' }} />
+        style={{ background: 'linear-gradient(to right, #155c34, transparent)' }} />
       <div className="absolute right-0 top-0 bottom-0 w-16 z-10 pointer-events-none"
-        style={{ background: 'linear-gradient(to left, #0f2d5e, transparent)' }} />
+        style={{ background: 'linear-gradient(to left, #155c34, transparent)' }} />
 
       <div className="absolute right-3 top-0 bottom-0 z-20 flex items-center gap-1.5 pl-3"
-        style={{ borderLeft: '1px solid rgba(201,168,76,0.25)' }}>
-        <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: '#c9a84c' }} />
-        <Activity className="w-3 h-3" style={{ color: '#c9a84c' }} />
-        <span className="text-[10px] font-black tracking-wider uppercase" style={{ color: '#c9a84c' }}>LIVE</span>
+        style={{ borderLeft: '1px solid rgba(34,168,85,0.25)' }}>
+        <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: '#22a855' }} />
+        <Activity className="w-3 h-3" style={{ color: '#22a855' }} />
+        <span className="text-[10px] font-black tracking-wider uppercase" style={{ color: '#22a855' }}>LIVE</span>
       </div>
 
       <div className="absolute inset-0 flex items-center pr-28 overflow-hidden">
