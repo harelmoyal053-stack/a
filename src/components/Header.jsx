@@ -101,8 +101,8 @@ export default function Header({ searchQuery, setSearchQuery, myGroupsCount = 0,
                   {user.name?.[0] || <User className="w-4 h-4" />}
                 </div>
                 <div className="hidden md:block text-right leading-tight">
-                  <p className="text-xs font-semibold" style={{ color: '#0d3320' }}>{user.name}</p>
-                  <p className="text-xs font-medium" style={{ color: '#22a855' }}>חבר פעיל</p>
+                  <p className="text-xs font-semibold" style={{ color: '#0d3320' }}>היי, {user.name?.split(' ')[0]}</p>
+                  <p className="text-xs font-medium" style={{ color: '#22a855' }}>{user.userType === 'business' ? 'חשבון עסקי' : 'חבר פעיל'}</p>
                 </div>
               </button>
             ) : (
