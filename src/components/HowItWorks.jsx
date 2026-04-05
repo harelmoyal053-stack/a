@@ -83,11 +83,11 @@ export default function HowItWorks() {
         </div>
 
         <motion.div className="mt-10 rounded-2xl p-6 text-center"
-          style={{ background: 'linear-gradient(135deg, #082b18, #155c34)', color: '#fff' }}
+          style={{ background: '#f0fdf4', border: '1.5px solid #bbf7d0' }}
           initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}>
-          <p className="font-bold text-lg mb-4">
+          <p className="font-bold text-lg mb-4" style={{ color: '#0d3320' }}>
             מוכן להצטרף? מאות משפחות כבר חסכו בממוצע{' '}
-            <span style={{ color: '#22a855' }}>₪350,000</span> על דירתן.
+            <span style={{ color: '#1a7a40' }}>₪350,000</span> על דירתן.
           </p>
           <motion.button
             className="btn-gold px-8 py-3.5 rounded-2xl font-black text-base"

@@ -54,7 +54,7 @@ export default function LeadForm() {
 
   return (
     <section id="lead-form" className="py-16 px-4" dir="rtl"
-      style={{ background: 'linear-gradient(135deg, #082b18 0%, #155c34 100%)' }}>
+      style={{ background: '#f4fbf7', borderTop: '1px solid #e2e8f0' }}>
       <div className="max-w-2xl mx-auto">
 
         <motion.div className="text-center mb-10"
@@ -63,12 +63,12 @@ export default function LeadForm() {
             <Shield className="w-3.5 h-3.5" />
             בדיקת התאמה חינמית ומחייבת
           </span>
-          <h2 className="text-3xl md:text-4xl font-black mt-4 mb-3 text-white">
+          <h2 className="text-3xl md:text-4xl font-black mt-4 mb-3" style={{ color: '#0d3320' }}>
             בדוק אם אתה <span style={{ color: '#22a855' }}>מתאים לקבוצה</span>
           </h2>
-          <p className="text-lg" style={{ color: 'rgba(241,245,249,0.68)' }}>
+          <p className="text-lg" style={{ color: '#64748b' }}>
             השאר פרטים ונבדוק עבורך את ההתאמה הטובה ביותר —{' '}
-            <strong className="text-white">ללא עלות ובלי התחייבות</strong>.
+            <strong style={{ color: '#0d3320' }}>ללא עלות ובלי התחייבות</strong>.
           </p>
         </motion.div>
 
