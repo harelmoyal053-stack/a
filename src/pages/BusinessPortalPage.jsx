@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowRight, Store, Plus, Minus, CheckCircle, TrendingDown, Zap, Tag, ImagePlus } from 'lucide-react'
+import { getCachedUser } from '../utils/user'
 
 const CATEGORIES = ['מזון', 'תינוקות', 'תחבורה', 'ספורט', 'אלקטרוניקה', 'בית וגן', 'בריאות', 'אחר']
 const DURATIONS  = [
@@ -47,8 +48,12 @@ export default function BusinessPortalPage({ onBack, onSubmit }) {
     const secondPrice = Number(sortedTiers[1]?.price  || firstPrice)
     const lastTier    = sortedTiers[sortedTiers.length - 1]
 
+    const creator = getCachedUser()
+
     const newDeal = {
       id:            `custom-${Date.now()}`,
+      creatorId:     creator?.id || 'unknown',
+      businessName:  creator?.businessName || form.businessName || '',
       title:         form.productName,
       subtitle:      form.description || '',
       image:         imagePreview,          // base64 or null

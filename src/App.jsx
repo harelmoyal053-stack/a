@@ -15,7 +15,8 @@ import LoginModal     from './components/LoginModal'
 import ProductDetailPage  from './pages/ProductDetailPage'
 import CheckoutPage       from './pages/CheckoutPage'
 import DashboardPage      from './pages/DashboardPage'
-import BusinessPortalPage from './pages/BusinessPortalPage'
+import BusinessPortalPage   from './pages/BusinessPortalPage'
+import BusinessDashboardPage from './pages/BusinessDashboardPage'
 import RealEstateUrgency  from './components/RealEstateUrgency'
 import LeadForm           from './components/LeadForm'
 import HowItWorks         from './components/HowItWorks'
@@ -129,7 +130,8 @@ export default function App() {
   if (page === 'product'  && deal) return <ProductDetailPage deal={deal} timeLeft={timers[deal.id] || '00:00:00'} isJoined={joinedDeals.has(deal.id)} onJoin={handleDetailJoin} onBack={goBack} />
   if (page === 'checkout' && deal) return <CheckoutPage deal={deal} onSuccess={handleCheckoutSuccess} onBack={goBack} />
   if (page === 'dashboard')        return <DashboardPage myGroups={myGroups} onBack={goBack} />
-  if (page === 'business')         return <BusinessPortalPage onBack={goBack} onSubmit={() => {}} />
+  if (page === 'business')         return <BusinessPortalPage onBack={goBack} onSubmit={() => navigate('businessDash')} />
+  if (page === 'businessDash')     return <BusinessDashboardPage onBack={goBack} onNewDeal={() => navigate('business')} />
 
   // ── Home page ───────────────────────────────────────────────────────────────
   return (

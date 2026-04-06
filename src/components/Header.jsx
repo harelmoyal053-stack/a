@@ -1,4 +1,4 @@
-import { Search, Store, User, Bell, LayoutDashboard, LogIn, Home } from 'lucide-react'
+import { Search, Store, User, Bell, LayoutDashboard, LogIn, BarChart2 } from 'lucide-react'
 import { getCachedUser } from '../utils/user'
 
 export default function Header({ searchQuery, setSearchQuery, myGroupsCount = 0, onNavigate, onLogin, user: userProp }) {
@@ -60,6 +60,20 @@ export default function Header({ searchQuery, setSearchQuery, myGroupsCount = 0,
 
           {/* LEFT: Dashboard + Bell + Login / Avatar */}
           <div className="flex items-center gap-1 shrink-0">
+
+            {/* Business dashboard — only for business users */}
+            {user?.userType === 'business' && (
+              <button
+                onClick={() => onNavigate('businessDash')}
+                className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-xl font-semibold text-sm transition-colors"
+                style={{ color: '#475569' }}
+                onMouseEnter={e => { e.currentTarget.style.background = '#f1f5f9'; e.currentTarget.style.color = '#155c34' }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#475569' }}
+              >
+                <BarChart2 className="w-4 h-4" />
+                <span>ניהול עסקאות</span>
+              </button>
+            )}
 
             {/* Dashboard */}
             <button
