@@ -44,66 +44,94 @@ export default function BusinessPortalPage({ onBack, onSubmit }) {
 
   const [publishing, setPublishing] = useState(false)
 
+  // ── Compress image via Canvas before storage ────────────────────────────────
+  function compressImage(dataUrl, maxWidth = 600, quality = 0.7) {
+    return new Promise((resolve) => {
+      const img = new Image()
+      img.onload = () => {
+        const scale  = Math.min(1, maxWidth / img.width)
+        const canvas = document.createElement('canvas')
+        canvas.width  = Math.round(img.width  * scale)
+        canvas.height = Math.round(img.height * scale)
+        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height)
+        resolve(canvas.toDataURL('image/jpeg', quality))
+      }
+      img.onerror = () => resolve(dataUrl)   // fallback: use original
+      img.src = dataUrl
+    })
+  }
+
   const handleSubmit = async (e) => {
-    console.log('[BusinessPortal] submit — isValid:', isValid, 'isFirebaseReady:', isFirebaseReady)
     e.preventDefault()
+    console.log('[BusinessPortal] submit — isValid:', isValid, 'isFirebaseReady:', isFirebaseReady)
     if (!isValid || publishing) return
     setPublishing(true)
 
-    // Build a deal object matching the shape expected by DealCard/useDeals
-    const sortedTiers = [...tiers].sort((a, b) => Number(a.buyers) - Number(b.buyers))
-    const origPrice   = Number(form.originalPrice)
-    const firstPrice  = Number(sortedTiers[0]?.price  || origPrice)
-    const secondPrice = Number(sortedTiers[1]?.price  || firstPrice)
-    const lastTier    = sortedTiers[sortedTiers.length - 1]
-
-    const creator = getCachedUser()
-
-    const newDeal = {
-      id:            `custom-${Date.now()}`,
-      creatorId:     creator?.id || 'unknown',
-      businessName:  creator?.businessName || form.businessName || '',
-      title:         form.productName,
-      subtitle:      form.description || '',
-      image:         imagePreview,
-      emoji:         '🛍️',
-      category:      form.category,
-      badge:         'חדש',
-      badgeColor:    'bg-green-500',
-      originalPrice: origPrice,
-      currentPrice:  firstPrice,
-      nextPrice:     secondPrice,
-      savings:       origPrice - firstPrice,
-      targetBuyers:  Number(lastTier?.buyers || 50),
-      currentBuyers: 0,
-      endTime:       new Date(Date.now() + Number(form.duration) * 3_600_000).toISOString(),
-      rating:        5.0,
-      reviews:       0,
-      isActive:      true,
-      priceTiers:    sortedTiers.map(t => ({ buyers: Number(t.buyers), price: Number(t.price) })),
-    }
-
     try {
-      if (isFirebaseReady) {
-        // Save to Firestore — visible to ALL users in real-time
-        await publishDeal(newDeal)
-      } else {
-        // Fallback: save to localStorage (single-device only)
-        const existing = JSON.parse(localStorage.getItem('customProducts') || '[]')
-        localStorage.setItem('customProducts', JSON.stringify([newDeal, ...existing]))
-      }
-    } catch (err) {
-      console.error('[DropPrice] publish failed:', err)
-      // Even on error, fall back to localStorage so the form isn't lost
-      try {
-        const existing = JSON.parse(localStorage.getItem('customProducts') || '[]')
-        localStorage.setItem('customProducts', JSON.stringify([newDeal, ...existing]))
-      } catch (_) {}
-    }
+      // 1. Compress image
+      const compressedImage = imagePreview
+        ? await compressImage(imagePreview)
+        : null
+      console.log('[BusinessPortal] image size — original:', Math.round((imagePreview?.length || 0) / 1024), 'KB  compressed:', Math.round((compressedImage?.length || 0) / 1024), 'KB')
 
-    setPublishing(false)
-    setSubmitted(true)
-    onSubmit && onSubmit(newDeal)
+      // 2. Build deal object
+      const sortedTiers = [...tiers].sort((a, b) => Number(a.buyers) - Number(b.buyers))
+      const origPrice   = Number(form.originalPrice)
+      const firstPrice  = Number(sortedTiers[0]?.price  || origPrice)
+      const secondPrice = Number(sortedTiers[1]?.price  || firstPrice)
+      const lastTier    = sortedTiers[sortedTiers.length - 1]
+      const creator     = getCachedUser()
+
+      const newDeal = {
+        id:            `custom-${Date.now()}`,
+        creatorId:     creator?.id || 'unknown',
+        businessName:  creator?.businessName || form.businessName || '',
+        title:         form.productName,
+        subtitle:      form.description || '',
+        image:         compressedImage,
+        emoji:         '🛍️',
+        category:      form.category,
+        badge:         'חדש',
+        badgeColor:    'bg-green-500',
+        originalPrice: origPrice,
+        currentPrice:  firstPrice,
+        nextPrice:     secondPrice,
+        savings:       origPrice - firstPrice,
+        targetBuyers:  Number(lastTier?.buyers || 50),
+        currentBuyers: 0,
+        endTime:       new Date(Date.now() + Number(form.duration) * 3_600_000).toISOString(),
+        rating:        5.0,
+        reviews:       0,
+        isActive:      true,
+        priceTiers:    sortedTiers.map(t => ({ buyers: Number(t.buyers), price: Number(t.price) })),
+      }
+
+      // 3. Save — Firestore first, localStorage fallback
+      if (isFirebaseReady) {
+        await publishDeal(newDeal)
+        console.log('[BusinessPortal] saved to Firestore:', newDeal.id)
+      } else {
+        const existing = JSON.parse(localStorage.getItem('customProducts') || '[]')
+        const updated  = [newDeal, ...existing]
+        localStorage.setItem('customProducts', JSON.stringify(updated))
+        // Verify the write succeeded
+        const check = JSON.parse(localStorage.getItem('customProducts') || '[]')
+        if (!check.find(p => p.id === newDeal.id)) {
+          throw new Error('localStorage verification failed — item not found after write')
+        }
+        console.log('[BusinessPortal] saved to localStorage — total deals:', check.length)
+      }
+
+      alert('העסקה פורסמה בהצלחה! ✓')
+      setPublishing(false)
+      setSubmitted(true)
+      onSubmit && onSubmit(newDeal)
+
+    } catch (err) {
+      console.error('[BusinessPortal] publish failed:', err)
+      alert('שגיאה בשמירה: ' + err.message)
+      setPublishing(false)
+    }
   }
 
   const NAV = (
