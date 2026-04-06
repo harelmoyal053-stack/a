@@ -8,6 +8,18 @@ function loadCustomDeals() {
   } catch { return [] }
 }
 
+// ── Apply persisted join counts to a deal list ────────────────────────────────
+function applyPersistedCounts(dealList) {
+  try {
+    const counts = JSON.parse(localStorage.getItem('dropprice_deal_counts') || '{}')
+    if (Object.keys(counts).length === 0) return dealList
+    return dealList.map(d => {
+      const saved = counts[d.id]
+      return (saved !== undefined && saved > d.currentBuyers) ? { ...d, currentBuyers: saved } : d
+    })
+  } catch { return dealList }
+}
+
 // ── Countdown helpers ─────────────────────────────────────────────────────────
 function secondsUntil(isoString) {
   return Math.max(0, Math.floor((new Date(isoString) - Date.now()) / 1000))
@@ -38,6 +50,23 @@ export function useDeals({ onPriceDrop } = {}) {
   const onPriceDropRef = useRef(onPriceDrop)
   useEffect(() => { onPriceDropRef.current = onPriceDrop }, [onPriceDrop])
 
+  // ── Merge fresh custom deals into current state ───────────────────────────
+  const refreshCustomDeals = useCallback(() => {
+    setDeals(prev => {
+      const custom = loadCustomDeals()
+      // Remove stale custom entries, keep static/API deals, prepend fresh custom
+      const nonCustom = prev.filter(d => !String(d.id).startsWith('custom-'))
+      const merged = [...custom, ...nonCustom]
+      // Add timers for any new custom deals
+      setTimers(t => {
+        const next = { ...t }
+        custom.forEach(d => { if (!next[d.id]) next[d.id] = formatSeconds(secondsUntil(d.endTime)) })
+        return next
+      })
+      return merged
+    })
+  }, [])
+
   // ── Initialise timers from deals ─────────────────────────────────────────
   const initTimers = useCallback((dealList) => {
     const t = {}
@@ -55,7 +84,7 @@ export function useDeals({ onPriceDrop } = {}) {
        window.location.hostname.includes('github.com'))
 
     if (isGhPages) {
-      const all = [...loadCustomDeals(), ...STATIC_DEALS]
+      const all = applyPersistedCounts([...loadCustomDeals(), ...STATIC_DEALS])
       setDeals(all)
       initTimers(all)
       setIsStatic(true)
@@ -70,14 +99,14 @@ export function useDeals({ onPriceDrop } = {}) {
       })
       .then(({ deals }) => {
         if (!mounted) return
-        const all = [...loadCustomDeals(), ...deals]
+        const all = applyPersistedCounts([...loadCustomDeals(), ...deals])
         setDeals(all)
         initTimers(all)
         setLoading(false)
       })
       .catch(() => {
         if (!mounted) return
-        const all = [...loadCustomDeals(), ...STATIC_DEALS]
+        const all = applyPersistedCounts([...loadCustomDeals(), ...STATIC_DEALS])
         setDeals(all)
         initTimers(all)
         setIsStatic(true)
@@ -105,6 +134,15 @@ export function useDeals({ onPriceDrop } = {}) {
     }, 1000)
     return () => clearInterval(iv)
   }, [deals])
+
+  // ── Listen for customProducts changes (e.g. after business publishes a deal)
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.key === 'customProducts') refreshCustomDeals()
+    }
+    window.addEventListener('storage', handler)
+    return () => window.removeEventListener('storage', handler)
+  }, [refreshCustomDeals])
 
   // ── SSE subscription (skip in static/demo mode) ───────────────────────────
   useEffect(() => {
@@ -152,5 +190,5 @@ export function useDeals({ onPriceDrop } = {}) {
     }
   }, [])
 
-  return { deals, timers, loading, error, isStatic, updateDeal }
+  return { deals, timers, loading, error, isStatic, updateDeal, refreshCustomDeals }
 }

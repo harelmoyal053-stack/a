@@ -64,7 +64,7 @@ export default function App() {
   }, [])
 
   // ── Real data from backend ──────────────────────────────────────────────────
-  const { deals, timers, loading, error, updateDeal } = useDeals({ onPriceDrop: handlePriceDrop })
+  const { deals, timers, loading, error, updateDeal, refreshCustomDeals } = useDeals({ onPriceDrop: handlePriceDrop })
 
   // ── Capture ?ref=&deal= params from invite links on first mount ────────────
   useEffect(() => {
@@ -130,8 +130,8 @@ export default function App() {
   if (page === 'product'  && deal) return <ProductDetailPage deal={deal} timeLeft={timers[deal.id] || '00:00:00'} isJoined={joinedDeals.has(deal.id)} onJoin={handleDetailJoin} onBack={goBack} />
   if (page === 'checkout' && deal) return <CheckoutPage deal={deal} onSuccess={handleCheckoutSuccess} onBack={goBack} />
   if (page === 'dashboard')        return <DashboardPage myGroups={myGroups} onBack={goBack} />
-  if (page === 'business')         return <BusinessPortalPage onBack={goBack} onSubmit={() => navigate('businessDash')} />
-  if (page === 'businessDash')     return <BusinessDashboardPage onBack={goBack} onNewDeal={() => navigate('business')} />
+  if (page === 'business')         return <BusinessPortalPage onBack={goBack} onSubmit={() => { refreshCustomDeals(); navigate('businessDash') }} />
+  if (page === 'businessDash')     return <BusinessDashboardPage onBack={() => { refreshCustomDeals(); goBack() }} onNewDeal={() => navigate('business')} />
 
   // ── Home page ───────────────────────────────────────────────────────────────
   return (

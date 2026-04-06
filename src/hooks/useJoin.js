@@ -102,7 +102,7 @@ export function useJoin({ onSuccess, onPriceDrop } = {}) {
       return { ok: true, ...data }
 
     } catch {
-      // API unavailable — simulate join (for static/demo API products)
+      // API unavailable — simulate join and persist count to localStorage
       await new Promise(r => setTimeout(r, 900))
 
       let user = null
@@ -115,7 +115,15 @@ export function useJoin({ onSuccess, onPriceDrop } = {}) {
         try { cacheUser(user) } catch {}
       }
 
-      const mockDeal = { ...deal, currentBuyers: deal.currentBuyers + 1 }
+      // Persist static deal join counts so they survive navigation
+      const newCount = deal.currentBuyers + 1
+      try {
+        const counts = JSON.parse(localStorage.getItem('dropprice_deal_counts') || '{}')
+        counts[deal.id] = newCount
+        localStorage.setItem('dropprice_deal_counts', JSON.stringify(counts))
+      } catch (_) {}
+
+      const mockDeal = { ...deal, currentBuyers: newCount }
       onSuccess?.(mockDeal, { ok: true, deal: mockDeal })
       return { ok: true, deal: mockDeal }
     } finally {
