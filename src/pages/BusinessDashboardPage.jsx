@@ -1,12 +1,14 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowRight, TrendingDown, Users, Target, XCircle, Plus, BarChart2, Package, RefreshCw } from 'lucide-react'
 import { getCachedUser } from '../utils/user'
+import { subscribeToMyDeals, endFirestoreDeal } from '../services/dealsService'
+import { isFirebaseReady } from '../firebase'
 
+// ── localStorage helpers (fallback) ───────────────────────────────────────────
 function loadCustomProducts() {
   try { return JSON.parse(localStorage.getItem('customProducts') || '[]') } catch { return [] }
 }
-
 function saveCustomProducts(products) {
   try { localStorage.setItem('customProducts', JSON.stringify(products)) } catch (_) {}
 }
@@ -27,33 +29,47 @@ function getNextTier(deal) {
 
 export default function BusinessDashboardPage({ onBack, onNewDeal }) {
   const user = getCachedUser()
-  const loadMyProducts = () =>
+
+  const loadFromLocalStorage = useCallback(() =>
     loadCustomProducts().filter(p =>
       p.creatorId === user?.id || p.businessName === user?.businessName
-    )
+    ), [user?.id, user?.businessName])
 
-  const [products, setProducts] = useState(loadMyProducts)
+  const [products, setProducts] = useState(loadFromLocalStorage)
 
-  // Refresh when window regains focus (user navigates back from home)
+  // ── Subscribe to Firestore or fall back to localStorage ────────────────────
   useEffect(() => {
-    const refresh = () => setProducts(loadMyProducts())
-    window.addEventListener('focus', refresh)
-    return () => window.removeEventListener('focus', refresh)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+    if (isFirebaseReady) {
+      // Real-time Firestore subscription
+      const unsub = subscribeToMyDeals(user?.id, user?.businessName, (myDeals) => {
+        setProducts(myDeals)
+      })
+      return unsub
+    } else {
+      // localStorage fallback — refresh on focus
+      const refresh = () => setProducts(loadFromLocalStorage())
+      window.addEventListener('focus', refresh)
+      return () => window.removeEventListener('focus', refresh)
+    }
+  }, [user?.id, user?.businessName, loadFromLocalStorage])
   const [endingId, setEndingId] = useState(null)
 
   const totalParticipants = products.reduce((s, p) => s + (p.currentBuyers || 0), 0)
   const activeCount       = products.filter(p => !p.ended).length
 
-  function handleEnd(id) {
-    const updated = loadCustomProducts().map(p =>
-      p.id === id ? { ...p, ended: true, isActive: false } : p
-    )
-    saveCustomProducts(updated)
-    setProducts(updated.filter(p =>
-      p.creatorId === user?.id || p.businessName === user?.businessName
-    ))
+  async function handleEnd(id) {
+    if (isFirebaseReady) {
+      await endFirestoreDeal(id)
+      // Firestore listener will update products automatically
+    } else {
+      const updated = loadCustomProducts().map(p =>
+        p.id === id ? { ...p, ended: true, isActive: false } : p
+      )
+      saveCustomProducts(updated)
+      setProducts(updated.filter(p =>
+        p.creatorId === user?.id || p.businessName === user?.businessName
+      ))
+    }
     setEndingId(null)
   }
 
@@ -64,7 +80,9 @@ export default function BusinessDashboardPage({ onBack, onNewDeal }) {
         style={{ background: 'rgba(255,255,255,0.97)', backdropFilter: 'blur(20px)', borderBottom: '1px solid #e2e8f0' }}>
         <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <button onClick={() => setProducts(loadMyProducts())}
+            {/* Manual refresh only needed in localStorage fallback mode */}
+            {!isFirebaseReady && (
+            <button onClick={() => setProducts(loadFromLocalStorage())}
               className="p-2 rounded-xl transition-colors"
               style={{ background: '#f4fbf7', border: '1px solid #e2e8f0', color: '#94a3b8' }}
               title="רענן נתונים"
@@ -72,6 +90,7 @@ export default function BusinessDashboardPage({ onBack, onNewDeal }) {
               onMouseLeave={e => e.currentTarget.style.color = '#94a3b8'}>
               <RefreshCw className="w-4 h-4" />
             </button>
+            )}
             <button onClick={onNewDeal}
               className="btn-gold flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold">
               <Plus className="w-4 h-4" />עסקה חדשה

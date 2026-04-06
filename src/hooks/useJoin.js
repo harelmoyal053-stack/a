@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react'
 import { ensureUser, cacheUser } from '../utils/user'
 import { getPendingRef, clearPendingRef } from '../utils/invite'
+import { joinFirestoreDeal } from '../services/dealsService'
 
 // ── Helpers for localStorage-backed custom products ───────────────────────────
 function loadCustomProducts() {
@@ -51,6 +52,24 @@ export function useJoin({ onSuccess, onPriceDrop } = {}) {
     setJoining(deal.id)
 
     try {
+      // Firestore-backed deals — atomic transaction on the server
+      if (deal.source === 'firestore') {
+        const updatedDeal = await joinFirestoreDeal(deal.id)
+        const dropped = updatedDeal.currentPrice < deal.currentPrice
+        onSuccess?.(updatedDeal, { ok: true, deal: updatedDeal })
+        if (dropped) {
+          onPriceDrop?.({
+            productId:    updatedDeal.id,
+            productTitle: updatedDeal.title,
+            oldPrice:     deal.currentPrice,
+            newPrice:     updatedDeal.currentPrice,
+            newCount:     updatedDeal.currentBuyers,
+            message:      `המחיר ירד ל-₪${updatedDeal.currentPrice}!`,
+          })
+        }
+        return { ok: true, deal: updatedDeal }
+      }
+
       // Custom (localStorage) products — handle entirely locally
       if (String(deal.id).startsWith('custom-')) {
         await new Promise(r => setTimeout(r, 700))

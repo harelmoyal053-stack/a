@@ -1,7 +1,9 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowRight, Store, Plus, Minus, CheckCircle, TrendingDown, Zap, Tag, ImagePlus } from 'lucide-react'
 import { getCachedUser } from '../utils/user'
+import { publishDeal } from '../services/dealsService'
+import { isFirebaseReady } from '../firebase'
 
 const CATEGORIES = ['מזון', 'תינוקות', 'תחבורה', 'ספורט', 'אלקטרוניקה', 'בית וגן', 'בריאות', 'אחר']
 const DURATIONS  = [
@@ -37,9 +39,12 @@ export default function BusinessPortalPage({ onBack, onSubmit }) {
   const isValid = form.businessName && form.productName && form.originalPrice && form.category &&
     imagePreview && tiers.every(t => t.buyers && t.price)
 
-  const handleSubmit = (e) => {
+  const [publishing, setPublishing] = useState(false)
+
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!isValid) return
+    if (!isValid || publishing) return
+    setPublishing(true)
 
     // Build a deal object matching the shape expected by DealCard/useDeals
     const sortedTiers = [...tiers].sort((a, b) => Number(a.buyers) - Number(b.buyers))
@@ -56,8 +61,8 @@ export default function BusinessPortalPage({ onBack, onSubmit }) {
       businessName:  creator?.businessName || form.businessName || '',
       title:         form.productName,
       subtitle:      form.description || '',
-      image:         imagePreview,          // base64 or null
-      emoji:         '🛍️',                 // fallback if no image
+      image:         imagePreview,
+      emoji:         '🛍️',
       category:      form.category,
       badge:         'חדש',
       badgeColor:    'bg-green-500',
@@ -74,14 +79,27 @@ export default function BusinessPortalPage({ onBack, onSubmit }) {
       priceTiers:    sortedTiers.map(t => ({ buyers: Number(t.buyers), price: Number(t.price) })),
     }
 
-    // Persist to localStorage
     try {
-      const existing = JSON.parse(localStorage.getItem('customProducts') || '[]')
-      localStorage.setItem('customProducts', JSON.stringify([newDeal, ...existing]))
-    } catch (_) {}
+      if (isFirebaseReady) {
+        // Save to Firestore — visible to ALL users in real-time
+        await publishDeal(newDeal)
+      } else {
+        // Fallback: save to localStorage (single-device only)
+        const existing = JSON.parse(localStorage.getItem('customProducts') || '[]')
+        localStorage.setItem('customProducts', JSON.stringify([newDeal, ...existing]))
+      }
+    } catch (err) {
+      console.error('[DropPrice] publish failed:', err)
+      // Even on error, fall back to localStorage so the form isn't lost
+      try {
+        const existing = JSON.parse(localStorage.getItem('customProducts') || '[]')
+        localStorage.setItem('customProducts', JSON.stringify([newDeal, ...existing]))
+      } catch (_) {}
+    }
 
-    onSubmit && onSubmit(newDeal)
+    setPublishing(false)
     setSubmitted(true)
+    onSubmit && onSubmit(newDeal)
   }
 
   const NAV = (
@@ -373,11 +391,18 @@ export default function BusinessPortalPage({ onBack, onSubmit }) {
           </motion.div>
         )}
 
-        <motion.button type="submit" disabled={!isValid}
+        <motion.button type="submit" disabled={!isValid || publishing}
           className="w-full btn-gold disabled:opacity-30 py-4 rounded-xl font-black text-base flex items-center justify-center gap-2"
           whileTap={{ scale: 0.97 }}>
-          <Store className="w-5 h-5" />
-          פרסם עסקה עכשיו
+          {publishing ? (
+            <>
+              <div className="w-5 h-5 border-2 rounded-full animate-spin"
+                style={{ borderColor: 'rgba(255,255,255,0.3)', borderTopColor: '#fff' }} />
+              שומר...
+            </>
+          ) : (
+            <><Store className="w-5 h-5" />פרסם עסקה עכשיו</>
+          )}
         </motion.button>
         <p className="text-center text-xs pb-2" style={{ color: '#cbd5e1' }}>
           בלחיצה על "פרסם", אתה מסכים לתנאי השימוש של DropPrice לעסקים
