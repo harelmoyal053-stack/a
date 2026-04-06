@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { ArrowRight, Store, Plus, Minus, CheckCircle, TrendingDown, Zap, Tag, ImagePlus } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { ArrowRight, Store, Plus, Minus, CheckCircle, TrendingDown, Zap, Tag, ImagePlus, XCircle } from 'lucide-react'
 import { getCachedUser } from '../utils/user'
 import { publishDeal } from '../services/dealsService'
 import { isFirebaseReady } from '../firebase'
@@ -16,11 +16,11 @@ const EMPTY_TIER = { buyers: '', price: '' }
 
 const SECTION_CLS = 'card-clean rounded-2xl p-5 space-y-4'
 
-export default function BusinessPortalPage({ onBack, onSubmit }) {
-  // Guard: Firebase import may throw during init if config is wrong
+export default function BusinessPortalPage({ onBack, onPublished }) {
   console.log('[BusinessPortal] mount — isFirebaseReady:', isFirebaseReady)
 
   const [submitted,     setSubmitted]     = useState(false)
+  const [saveError,     setSaveError]     = useState(null)   // shown in inline error toast
   const [imagePreview,  setImagePreview]  = useState(null)
   const imageInputRef = useRef(null)
   const [form, setForm] = useState({
@@ -67,12 +67,11 @@ export default function BusinessPortalPage({ onBack, onSubmit }) {
     if (!isValid || publishing) return
     setPublishing(true)
 
+    setSaveError(null)
     try {
       // 1. Compress image
-      const compressedImage = imagePreview
-        ? await compressImage(imagePreview)
-        : null
-      console.log('[BusinessPortal] image size — original:', Math.round((imagePreview?.length || 0) / 1024), 'KB  compressed:', Math.round((compressedImage?.length || 0) / 1024), 'KB')
+      const compressedImage = imagePreview ? await compressImage(imagePreview) : null
+      console.log('[BusinessPortal] image — original:', Math.round((imagePreview?.length || 0) / 1024), 'KB → compressed:', Math.round((compressedImage?.length || 0) / 1024), 'KB')
 
       // 2. Build deal object
       const sortedTiers = [...tiers].sort((a, b) => Number(a.buyers) - Number(b.buyers))
@@ -106,30 +105,28 @@ export default function BusinessPortalPage({ onBack, onSubmit }) {
         priceTiers:    sortedTiers.map(t => ({ buyers: Number(t.buyers), price: Number(t.price) })),
       }
 
-      // 3. Save — Firestore first, localStorage fallback
+      // 3. Save — Firestore if ready, otherwise localStorage
       if (isFirebaseReady) {
         await publishDeal(newDeal)
         console.log('[BusinessPortal] saved to Firestore:', newDeal.id)
       } else {
         const existing = JSON.parse(localStorage.getItem('customProducts') || '[]')
-        const updated  = [newDeal, ...existing]
-        localStorage.setItem('customProducts', JSON.stringify(updated))
-        // Verify the write succeeded
+        localStorage.setItem('customProducts', JSON.stringify([newDeal, ...existing]))
+        // Verify the write actually landed
         const check = JSON.parse(localStorage.getItem('customProducts') || '[]')
         if (!check.find(p => p.id === newDeal.id)) {
-          throw new Error('localStorage verification failed — item not found after write')
+          throw new Error('localStorage verification failed — item missing after write')
         }
-        console.log('[BusinessPortal] saved to localStorage — total deals:', check.length)
+        console.log('[BusinessPortal] saved to localStorage — total:', check.length)
       }
 
-      alert('העסקה פורסמה בהצלחה! ✓')
-      setPublishing(false)
+      // 4. Show success screen; onPublished fires when auto-redirect runs (see useEffect below)
       setSubmitted(true)
-      onSubmit && onSubmit(newDeal)
 
     } catch (err) {
       console.error('[BusinessPortal] publish failed:', err)
-      alert('שגיאה בשמירה: ' + err.message)
+      setSaveError(err.message)
+    } finally {
       setPublishing(false)
     }
   }
@@ -153,52 +150,73 @@ export default function BusinessPortalPage({ onBack, onSubmit }) {
     </div>
   )
 
-  // Auto-redirect to home after publish
+  // After success screen: refresh home feed + navigate back after 2 s
   useEffect(() => {
     if (!submitted) return
-    const t = setTimeout(onBack, 2800)
+    const t = setTimeout(() => {
+      if (onPublished) onPublished()
+      else onBack()
+    }, 2000)
     return () => clearTimeout(t)
-  }, [submitted, onBack])
+  }, [submitted, onPublished, onBack])
 
   if (submitted) return (
-    <div className="min-h-screen" style={{ background: '#f4fbf7' }} dir="rtl">
-      {NAV}
-      <div className="max-w-2xl mx-auto px-4 py-10 text-center space-y-6">
-        <motion.div className="rounded-3xl p-10 relative overflow-hidden"
-          style={{ background: '#fff', border: '1.5px solid #bbf7d0', boxShadow: '0 8px 30px rgba(21,92,52,0.1)' }}
-          initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
-          <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4"
-            style={{ background: '#f0fdf4', border: '2px solid #bbf7d0' }}>
-            <CheckCircle className="w-10 h-10" style={{ color: '#22a855' }} />
-          </div>
-          <h2 className="text-3xl font-black mb-2" style={{ color: '#0d3320' }}>העסקה עלתה לאוויר! 🎉</h2>
-          <p className="text-base" style={{ color: '#64748b' }}>"{form.productName}" פורסם בהצלחה</p>
+    <div className="min-h-screen flex items-center justify-center px-6" style={{ background: '#f4fbf7' }} dir="rtl">
+      <motion.div
+        className="w-full max-w-sm text-center rounded-3xl p-10"
+        style={{ background: '#fff', border: '1.5px solid #bbf7d0', boxShadow: '0 20px 60px rgba(21,92,52,0.12)' }}
+        initial={{ scale: 0.85, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ type: 'spring', stiffness: 320, damping: 22 }}
+      >
+        {/* Animated checkmark */}
+        <motion.div
+          className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-5"
+          style={{ background: 'linear-gradient(135deg, #22a855, #1a7a40)' }}
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: 'spring', stiffness: 400, damping: 18, delay: 0.1 }}
+        >
+          <CheckCircle className="w-10 h-10 text-white" />
         </motion.div>
 
-        <div className="card-clean rounded-2xl p-6 text-right space-y-3">
-          <h3 className="font-black text-lg" style={{ color: '#0d3320' }}>מה קורה עכשיו?</h3>
-          {[
-            'העסקה שלך תוצג לאלפי קונים בפלטפורמה',
-            'תקבל SMS + מייל לכל קונה שמצטרף לקבוצה',
-            'כשמספר הקונים מגיע ליעד — עסקה מופעלת אוטומטית',
-            'תשלום מועבר אליך תוך 3 ימי עסקים',
-          ].map((text, n) => (
-            <div key={n} className="flex items-start gap-3 justify-end">
-              <p className="text-sm" style={{ color: '#64748b' }}>{text}</p>
-              <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-black shrink-0 mt-0.5"
-                style={{ background: 'linear-gradient(135deg, #22a855, #1a7a40)', color: '#fff' }}>
-                {n + 1}
-              </div>
-            </div>
-          ))}
+        <motion.h2
+          className="text-2xl font-black mb-2"
+          style={{ color: '#0d3320' }}
+          initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+        >
+          העסקה עלתה לאוויר! 🎉
+        </motion.h2>
+        <motion.p
+          className="text-sm mb-6"
+          style={{ color: '#94a3b8' }}
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}
+        >
+          "{form.productName}" פורסמה בהצלחה ותוצג לכל המשתמשים
+        </motion.p>
+
+        {/* Countdown bar */}
+        <div className="rounded-xl overflow-hidden mb-5" style={{ background: '#f0fdf4', height: 6 }}>
+          <motion.div
+            className="h-full rounded-xl"
+            style={{ background: 'linear-gradient(90deg, #22a855, #1a7a40)', transformOrigin: 'right' }}
+            initial={{ scaleX: 1 }}
+            animate={{ scaleX: 0 }}
+            transition={{ duration: 2, ease: 'linear' }}
+          />
         </div>
 
-        <motion.button onClick={onBack}
-          className="w-full btn-gold py-3.5 rounded-xl font-black text-base"
-          whileTap={{ scale: 0.97 }}>
-          חזרה לדף הבית
+        <p className="text-xs" style={{ color: '#cbd5e1' }}>מועבר לדף הבית תוך שנייה...</p>
+
+        <motion.button
+          onClick={() => { if (onPublished) onPublished(); else onBack() }}
+          className="mt-5 w-full btn-gold py-3 rounded-xl font-black text-sm"
+          whileTap={{ scale: 0.97 }}
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}
+        >
+          לדף הבית עכשיו
         </motion.button>
-      </div>
+      </motion.div>
     </div>
   )
 
@@ -422,6 +440,25 @@ export default function BusinessPortalPage({ onBack, onSubmit }) {
             </div>
           </motion.div>
         )}
+
+        {/* Error toast */}
+        <AnimatePresence>
+          {saveError && (
+            <motion.div
+              className="flex items-start gap-3 rounded-xl p-4 text-right"
+              style={{ background: '#fff1f2', border: '1px solid #fecdd3' }}
+              initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
+            >
+              <button onClick={() => setSaveError(null)} className="shrink-0 mt-0.5">
+                <XCircle className="w-4 h-4" style={{ color: '#e11d48' }} />
+              </button>
+              <div>
+                <p className="text-sm font-bold" style={{ color: '#e11d48' }}>שגיאה בשמירה</p>
+                <p className="text-xs mt-0.5" style={{ color: '#9f1239' }}>{saveError}</p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <motion.button type="submit" disabled={!isValid || publishing}
           className="w-full btn-gold disabled:opacity-30 py-4 rounded-xl font-black text-base flex items-center justify-center gap-2"

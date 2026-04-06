@@ -130,7 +130,7 @@ export default function App() {
   if (page === 'product'  && deal) return <ProductDetailPage deal={deal} timeLeft={timers[deal.id] || '00:00:00'} isJoined={joinedDeals.has(deal.id)} onJoin={handleDetailJoin} onBack={goBack} />
   if (page === 'checkout' && deal) return <CheckoutPage deal={deal} onSuccess={handleCheckoutSuccess} onBack={goBack} />
   if (page === 'dashboard')        return <DashboardPage myGroups={myGroups} onBack={goBack} />
-  if (page === 'business')         return <BusinessPortalPage onBack={goBack} onSubmit={() => { refreshCustomDeals(); navigate('businessDash') }} />
+  if (page === 'business')         return <BusinessPortalPage onBack={goBack} onPublished={() => { refreshCustomDeals(); goBack() }} />
   if (page === 'businessDash')     return <BusinessDashboardPage onBack={() => { refreshCustomDeals(); goBack() }} onNewDeal={() => navigate('business')} />
 
   // ── Home page ───────────────────────────────────────────────────────────────
