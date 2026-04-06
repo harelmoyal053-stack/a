@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowRight, TrendingDown, Users, Target, Edit3, XCircle, Plus, BarChart2, Package } from 'lucide-react'
+import { ArrowRight, TrendingDown, Users, Target, XCircle, Plus, BarChart2, Package, RefreshCw } from 'lucide-react'
 import { getCachedUser } from '../utils/user'
 
 function loadCustomProducts() {
@@ -27,11 +27,20 @@ function getNextTier(deal) {
 
 export default function BusinessDashboardPage({ onBack, onNewDeal }) {
   const user = getCachedUser()
-  const [products, setProducts] = useState(() =>
+  const loadMyProducts = () =>
     loadCustomProducts().filter(p =>
       p.creatorId === user?.id || p.businessName === user?.businessName
     )
-  )
+
+  const [products, setProducts] = useState(loadMyProducts)
+
+  // Refresh when window regains focus (user navigates back from home)
+  useEffect(() => {
+    const refresh = () => setProducts(loadMyProducts())
+    window.addEventListener('focus', refresh)
+    return () => window.removeEventListener('focus', refresh)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   const [endingId, setEndingId] = useState(null)
 
   const totalParticipants = products.reduce((s, p) => s + (p.currentBuyers || 0), 0)
@@ -54,10 +63,20 @@ export default function BusinessDashboardPage({ onBack, onNewDeal }) {
       <div className="sticky top-0 z-40"
         style={{ background: 'rgba(255,255,255,0.97)', backdropFilter: 'blur(20px)', borderBottom: '1px solid #e2e8f0' }}>
         <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
-          <button onClick={onNewDeal}
-            className="btn-gold flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold">
-            <Plus className="w-4 h-4" />עסקה חדשה
-          </button>
+          <div className="flex items-center gap-2">
+            <button onClick={() => setProducts(loadMyProducts())}
+              className="p-2 rounded-xl transition-colors"
+              style={{ background: '#f4fbf7', border: '1px solid #e2e8f0', color: '#94a3b8' }}
+              title="רענן נתונים"
+              onMouseEnter={e => e.currentTarget.style.color = '#1a7a40'}
+              onMouseLeave={e => e.currentTarget.style.color = '#94a3b8'}>
+              <RefreshCw className="w-4 h-4" />
+            </button>
+            <button onClick={onNewDeal}
+              className="btn-gold flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold">
+              <Plus className="w-4 h-4" />עסקה חדשה
+            </button>
+          </div>
           <span className="font-black" style={{ color: '#0d3320' }}>ניהול עסקאות</span>
           <button onClick={onBack}
             className="flex items-center gap-1.5 font-semibold text-sm transition-colors"

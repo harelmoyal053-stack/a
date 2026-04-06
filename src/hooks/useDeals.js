@@ -142,6 +142,14 @@ export function useDeals({ onPriceDrop } = {}) {
 
   const updateDeal = useCallback((updatedDeal) => {
     setDeals((prev) => prev.map((d) => (d.id === updatedDeal.id ? updatedDeal : d)))
+    // Persist custom product changes to localStorage so business dashboard stays in sync
+    if (String(updatedDeal.id).startsWith('custom-')) {
+      try {
+        const all = JSON.parse(localStorage.getItem('customProducts') || '[]')
+        const updated = all.map(p => p.id === updatedDeal.id ? updatedDeal : p)
+        localStorage.setItem('customProducts', JSON.stringify(updated))
+      } catch (_) {}
+    }
   }, [])
 
   return { deals, timers, loading, error, isStatic, updateDeal }
