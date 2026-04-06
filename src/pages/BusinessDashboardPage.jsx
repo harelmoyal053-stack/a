@@ -29,19 +29,25 @@ function getNextTier(deal) {
 
 export default function BusinessDashboardPage({ onBack, onNewDeal }) {
   const user = getCachedUser()
+  console.log('[BusinessDashboard] mount — user:', user, 'isFirebaseReady:', isFirebaseReady)
 
-  const loadFromLocalStorage = useCallback(() =>
-    loadCustomProducts().filter(p =>
+  const loadFromLocalStorage = useCallback(() => {
+    const all  = loadCustomProducts()
+    const mine = all.filter(p =>
       p.creatorId === user?.id || p.businessName === user?.businessName
-    ), [user?.id, user?.businessName])
+    )
+    console.log('[BusinessDashboard] localStorage — total:', all.length, 'mine:', mine.length)
+    return mine
+  }, [user?.id, user?.businessName])
 
-  const [products, setProducts] = useState(loadFromLocalStorage)
+  const [products, setProducts] = useState(() => loadFromLocalStorage())
 
   // ── Subscribe to Firestore or fall back to localStorage ────────────────────
   useEffect(() => {
     if (isFirebaseReady) {
-      // Real-time Firestore subscription
+      console.log('[BusinessDashboard] subscribing to Firestore for', user?.id, user?.businessName)
       const unsub = subscribeToMyDeals(user?.id, user?.businessName, (myDeals) => {
+        console.log('[BusinessDashboard] Firestore update — deals:', myDeals.length)
         setProducts(myDeals)
       })
       return unsub
@@ -54,8 +60,27 @@ export default function BusinessDashboardPage({ onBack, onNewDeal }) {
   }, [user?.id, user?.businessName, loadFromLocalStorage])
   const [endingId, setEndingId] = useState(null)
 
-  const totalParticipants = products.reduce((s, p) => s + (p.currentBuyers || 0), 0)
-  const activeCount       = products.filter(p => !p.ended).length
+  // ── Guard: show friendly message if not logged in as business ──────────────
+  if (!user || user.userType !== 'business') {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center gap-5 px-6 text-center"
+        style={{ background: '#f4fbf7' }} dir="rtl">
+        <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl"
+          style={{ background: '#f0fdf4', border: '1px solid #bbf7d0' }}>🔒</div>
+        <h2 className="text-xl font-black" style={{ color: '#0d3320' }}>הדף זמין לעסקים בלבד</h2>
+        <p className="text-sm" style={{ color: '#64748b' }}>
+          יש להתחבר עם חשבון עסקי כדי לגשת לניהול עסקאות.
+        </p>
+        <button onClick={onBack} className="btn-gold px-6 py-2.5 rounded-xl font-bold text-sm">
+          חזרה לדף הבית
+        </button>
+      </div>
+    )
+  }
+
+  const safeProducts      = products || []
+  const totalParticipants = safeProducts.reduce((s, p) => s + (p.currentBuyers || 0), 0)
+  const activeCount       = safeProducts.filter(p => !p.ended).length
 
   async function handleEnd(id) {
     if (isFirebaseReady) {
@@ -131,7 +156,7 @@ export default function BusinessDashboardPage({ onBack, onNewDeal }) {
           {[
             { icon: Package,   label: 'עסקאות פעילות',   value: activeCount,        color: '#1a7a40', bg: '#f0fdf4', border: '#bbf7d0' },
             { icon: Users,     label: 'סה"כ משתתפים',    value: totalParticipants,  color: '#0284c7', bg: '#f0f9ff', border: '#bae6fd' },
-            { icon: BarChart2, label: 'סה"כ עסקאות',     value: products.length,    color: '#7c3aed', bg: '#faf5ff', border: '#e9d5ff' },
+            { icon: BarChart2, label: 'סה"כ עסקאות',     value: safeProducts.length,    color: '#7c3aed', bg: '#faf5ff', border: '#e9d5ff' },
           ].map(({ icon: Icon, label, value, color, bg, border }, i) => (
             <motion.div key={i} className="card-clean rounded-2xl p-4 text-center"
               initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}>
@@ -146,7 +171,7 @@ export default function BusinessDashboardPage({ onBack, onNewDeal }) {
         </div>
 
         {/* Products list */}
-        {products.length === 0 ? (
+        {safeProducts.length === 0 ? (
           <div className="card-clean rounded-2xl p-14 text-center">
             <p className="text-5xl mb-3">📦</p>
             <p className="font-bold text-lg" style={{ color: '#475569' }}>עדיין לא פרסמת עסקאות</p>
@@ -157,7 +182,7 @@ export default function BusinessDashboardPage({ onBack, onNewDeal }) {
           </div>
         ) : (
           <div className="space-y-4">
-            {products.map((deal, i) => {
+            {safeProducts.map((deal, i) => {
               const currentTier = getCurrentTier(deal)
               const nextTier    = getNextTier(deal)
               const progress    = Math.min(100, Math.round((deal.currentBuyers / deal.targetBuyers) * 100))

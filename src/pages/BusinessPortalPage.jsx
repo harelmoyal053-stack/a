@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowRight, Store, Plus, Minus, CheckCircle, TrendingDown, Zap, Tag, ImagePlus } from 'lucide-react'
 import { getCachedUser } from '../utils/user'
@@ -17,6 +17,9 @@ const EMPTY_TIER = { buyers: '', price: '' }
 const SECTION_CLS = 'card-clean rounded-2xl p-5 space-y-4'
 
 export default function BusinessPortalPage({ onBack, onSubmit }) {
+  // Guard: Firebase import may throw during init if config is wrong
+  console.log('[BusinessPortal] mount — isFirebaseReady:', isFirebaseReady)
+
   const [submitted,     setSubmitted]     = useState(false)
   const [imagePreview,  setImagePreview]  = useState(null)
   const imageInputRef = useRef(null)
@@ -42,6 +45,7 @@ export default function BusinessPortalPage({ onBack, onSubmit }) {
   const [publishing, setPublishing] = useState(false)
 
   const handleSubmit = async (e) => {
+    console.log('[BusinessPortal] submit — isValid:', isValid, 'isFirebaseReady:', isFirebaseReady)
     e.preventDefault()
     if (!isValid || publishing) return
     setPublishing(true)
