@@ -1,147 +1,318 @@
-import { useEffect, useRef, useState } from 'react'
-import { ArrowRight, LogOut, Send } from 'lucide-react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { ArrowRight, Pin, Search, X } from 'lucide-react'
 import { useChat, useGroupMeta } from '../chat/ChatContext'
-import { clockTime, dayLabel, membersLabel } from '../utils'
+import { replyRef } from '../chat/messages'
+import { compressImage, currentLocation } from '../chat/media'
+import { dayLabel, membersLabel } from '../utils'
 import GroupIcon from './GroupIcon'
+import Composer from './chat/Composer'
+import GroupInfo from './chat/GroupInfo'
+import ImageComposer from './chat/ImageComposer'
+import ImageViewer from './chat/ImageViewer'
+import MessageBubble from './chat/MessageBubble'
+import MessageMenu from './chat/MessageMenu'
+import PollComposer from './chat/PollComposer'
 
 export default function ChatScreen({ festival, group, onClose }) {
-  const { service, user, myGroups, withUser, join, leave, send } = useChat()
-  const { memberCount } = useGroupMeta(group.id)
+  const chat = useChat()
+  const { service, user, myGroups, withUser } = chat
+  const { memberCount, pinned } = useGroupMeta(group.id)
   const [messages, setMessages] = useState([])
-  const [text, setText] = useState('')
   const [error, setError] = useState('')
+  const [toast, setToast] = useState('')
+  const [menuFor, setMenuFor] = useState(null)
+  const [replyTo, setReplyTo] = useState(null)
+  const [editing, setEditing] = useState(null)
+  const [pendingImage, setPendingImage] = useState(null)
+  const [viewing, setViewing] = useState(null)
+  const [pollOpen, setPollOpen] = useState(false)
+  const [infoOpen, setInfoOpen] = useState(false)
+  const [searchOpen, setSearchOpen] = useState(false)
+  const [search, setSearch] = useState('')
+  const [flashId, setFlashId] = useState(null)
   const bottomRef = useRef(null)
   const isMember = Boolean(myGroups[group.id])
+  const overlayOpen = Boolean(menuFor || pendingImage || viewing || pollOpen || infoOpen)
 
   useEffect(() => (service ? service.onMessages(group.id, setMessages) : undefined), [service, group.id])
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ block: 'end' })
-  }, [messages.length])
+    if (!searchOpen) bottomRef.current?.scrollIntoView({ block: 'end' })
+  }, [messages.length, searchOpen])
 
   useEffect(() => {
-    const onKey = (e) => e.key === 'Escape' && onClose()
+    const onKey = (e) => e.key === 'Escape' && !overlayOpen && onClose()
     document.addEventListener('keydown', onKey)
     document.body.style.overflow = 'hidden'
     return () => {
       document.removeEventListener('keydown', onKey)
       document.body.style.overflow = ''
     }
-  }, [onClose])
+  }, [onClose, overlayOpen])
+
+  const flash = (message) => {
+    setToast(message)
+    setTimeout(() => setToast(''), 2000)
+  }
 
   const run = async (action) => {
     setError('')
     try {
       await action()
-    } catch {
-      setError('הפעולה נכשלה. בדקו את החיבור ונסו שוב.')
+    } catch (e) {
+      setError(e?.message === 'storage-full'
+        ? 'אין מספיק מקום במכשיר לשמור את זה במצב תצוגה.'
+        : 'הפעולה נכשלה. בדקו את החיבור ונסו שוב.')
     }
   }
 
-  const submit = (e) => {
-    e.preventDefault()
-    const body = text.trim()
-    if (!body) return
-    setText('')
-    run(() => send(group.id, body))
+  const send = (payload) =>
+    run(async () => {
+      await chat.send(group.id, { ...payload, replyTo: replyTo ? replyRef(replyTo) : undefined })
+      setReplyTo(null)
+    })
+
+  const sendText = (text) => {
+    if (editing) {
+      const id = editing.id
+      setEditing(null)
+      return run(() => chat.edit(group.id, id, text))
+    }
+    return send({ type: 'text', text })
+  }
+
+  const pickImage = (file) =>
+    run(async () => {
+      try {
+        setPendingImage(await compressImage(file))
+      } catch {
+        setError('לא הצלחנו לטעון את התמונה. נסו תמונה אחרת.')
+      }
+    })
+
+  const shareLocation = () =>
+    run(async () => {
+      try {
+        const location = await currentLocation()
+        await send({ type: 'location', location })
+      } catch {
+        setError('לא הצלחנו לקבל מיקום. בדקו שאישרתם גישה למיקום.')
+      }
+    })
+
+  const jumpTo = useCallback((id) => {
+    setInfoOpen(false)
+    setSearchOpen(false)
+    setSearch('')
+    requestAnimationFrame(() => {
+      const el = document.getElementById(`msg-${id}`)
+      if (!el) return
+      el.scrollIntoView({ block: 'center', behavior: 'smooth' })
+      setFlashId(id)
+      setTimeout(() => setFlashId(null), 1500)
+    })
+  }, [])
+
+  const menuAction = (action) => {
+    const m = menuFor
+    setMenuFor(null)
+    if (action === 'reply') {
+      setEditing(null)
+      setReplyTo(m)
+    }
+    if (action === 'copy') {
+      navigator.clipboard?.writeText(m.text || m.caption || '').then(() => flash('הועתק'), () => {})
+    }
+    if (action === 'pin') run(() => chat.pin(group.id, pinned?.id === m.id ? null : m))
+    if (action === 'edit') {
+      setReplyTo(null)
+      setEditing(m)
+    }
+    if (action === 'delete' && window.confirm('למחוק את ההודעה לכולם?')) run(() => chat.remove(group.id, m.id))
   }
 
   const leaveGroup = () => {
-    if (window.confirm(`לצאת מהקבוצה "${group.title}"?`)) run(() => leave(group.id))
+    if (window.confirm(`לצאת מהקבוצה "${group.title}"?`)) {
+      setInfoOpen(false)
+      run(() => chat.leave(group.id))
+    }
   }
 
+  const visible = useMemo(() => {
+    const q = search.trim().toLowerCase()
+    if (!q) return messages
+    return messages.filter((m) => !m.deleted && [m.text, m.caption, m.poll?.question, m.name].some((t) => t?.toLowerCase().includes(q)))
+  }, [messages, search])
+
+  const pinnedMessage = pinned && messages.find((m) => m.id === pinned.id && !m.deleted) ? pinned : null
   const [from, to] = festival.colors
 
   return (
     <div className="fixed inset-0 z-[55] bg-ink-900 flex flex-col animate-slide-up" role="dialog" aria-modal="true" aria-label={`צ'אט ${group.title}`}>
-      <header className="flex items-center gap-3 px-3 h-16 bg-ink-800 border-b border-white/5 shrink-0">
+      <header className="flex items-center gap-2 px-2 h-16 bg-ink-800 border-b border-white/5 shrink-0">
         <button type="button" onClick={onClose} className="w-10 h-10 flex items-center justify-center" aria-label="חזרה">
           <ArrowRight size={22} />
         </button>
-        <span className="w-10 h-10 shrink-0 rounded-full flex items-center justify-center text-xl" style={{ background: `linear-gradient(135deg, ${from}, ${to})` }}>
-          {festival.emoji}
-        </span>
-        <div className="flex-1 min-w-0">
-          <p className="font-bold truncate"><span dir="auto">{festival.name}</span> · {group.title}</p>
-          <p className="text-xs text-white/50">{membersLabel(memberCount)}</p>
-        </div>
-        {isMember && (
-          <button type="button" onClick={leaveGroup} className="w-10 h-10 flex items-center justify-center text-white/60 hover:text-rose-400" aria-label="יציאה מהקבוצה" title="יציאה מהקבוצה">
-            <LogOut size={20} />
+        {searchOpen ? (
+          <input
+            autoFocus
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="חיפוש בצ׳אט…"
+            className="flex-1 bg-ink-700 rounded-full px-4 py-2 outline-none"
+            aria-label="חיפוש בצ׳אט"
+          />
+        ) : (
+          <button type="button" onClick={() => setInfoOpen(true)} className="flex items-center gap-3 flex-1 min-w-0 text-right">
+            <span className="w-10 h-10 shrink-0 rounded-full flex items-center justify-center text-xl" style={{ background: `linear-gradient(135deg, ${from}, ${to})` }}>
+              {festival.emoji}
+            </span>
+            <span className="min-w-0">
+              <span className="block font-bold truncate"><span dir="auto">{festival.name}</span> · {group.title}</span>
+              <span className="block text-xs text-white/50">{membersLabel(memberCount)} · לחצו לפרטי הקבוצה</span>
+            </span>
           </button>
         )}
+        <button
+          type="button"
+          onClick={() => { setSearchOpen(!searchOpen); setSearch('') }}
+          className="w-10 h-10 flex items-center justify-center text-white/70"
+          aria-label={searchOpen ? 'סגירת חיפוש' : 'חיפוש בצ׳אט'}
+        >
+          {searchOpen ? <X size={20} /> : <Search size={20} />}
+        </button>
       </header>
 
       {service?.mode === 'local' && (
-        <p className="bg-accent/15 text-accent text-xs text-center px-4 py-2 shrink-0">
+        <p className="bg-accent/15 text-accent text-xs text-center px-4 py-1.5 shrink-0">
           מצב תצוגה: הצ׳אט עוד לא מחובר לשרת, וההודעות נשמרות רק במכשיר הזה.
         </p>
       )}
 
+      {pinnedMessage && !searchOpen && (
+        <button type="button" onClick={() => jumpTo(pinnedMessage.id)} className="flex items-center gap-2 px-4 py-2 bg-ink-800/90 border-b border-white/5 text-right shrink-0">
+          <Pin size={16} className="text-accent shrink-0" />
+          <span className="min-w-0 flex-1">
+            <span className="block text-xs text-accent font-bold">הודעה נעוצה · {pinnedMessage.name}</span>
+            <span className="block text-sm truncate" dir="auto">{pinnedMessage.text}</span>
+          </span>
+        </button>
+      )}
+
       <div className="flex-1 overflow-y-auto px-3 py-4 chat-wallpaper">
-        <div className="max-w-2xl mx-auto flex flex-col gap-1.5">
-          <div className="self-center text-center bg-ink-800/90 text-white/70 text-xs rounded-xl px-4 py-2 mb-3 max-w-xs">
-            <GroupIcon name={group.icon} size={18} className="mx-auto mb-1 text-whatsapp" />
-            {group.description}
-          </div>
-          {messages.map((m, i) => {
-            const mine = m.uid === user?.uid
+        <div className="max-w-2xl mx-auto flex flex-col gap-2">
+          {!search && (
+            <div className="self-center text-center bg-ink-800/90 text-white/70 text-xs rounded-xl px-4 py-2 mb-3 max-w-xs">
+              <GroupIcon name={group.icon} size={18} className="mx-auto mb-1 text-whatsapp" />
+              {group.description}
+              <span className="block mt-1 text-white/40">לחיצה ארוכה על הודעה: תגובה, תשובה, נעיצה ועוד · לחיצה כפולה: ❤️</span>
+            </div>
+          )}
+          {visible.map((m, i) => {
+            const prev = visible[i - 1]
             const day = dayLabel(m.createdAt)
-            const showDay = i === 0 || day !== dayLabel(messages[i - 1].createdAt)
+            const showDay = !prev || day !== dayLabel(prev.createdAt)
             return (
               <div key={m.id} className="flex flex-col">
-                {showDay && (
-                  <span className="self-center bg-ink-800 text-white/60 text-xs rounded-lg px-3 py-1 my-2">{day}</span>
-                )}
-                <div className={`max-w-[80%] rounded-2xl px-3 py-1.5 shadow ${mine ? 'self-end bg-[#005c4b] rounded-bl-sm' : 'self-start bg-ink-700 rounded-br-sm'}`}>
-                  {!mine && <p className="text-xs font-bold text-whatsapp mb-0.5">{m.name}</p>}
-                  <p className="whitespace-pre-wrap break-words leading-snug" dir="auto">{m.text}</p>
-                  <p className="text-[10px] text-white/50 text-left mt-0.5">{clockTime(m.createdAt)}</p>
-                </div>
+                {showDay && <span className="self-center bg-ink-800 text-white/60 text-xs rounded-lg px-3 py-1 my-2">{day}</span>}
+                <MessageBubble
+                  message={m}
+                  mine={m.uid === user?.uid}
+                  myUid={user?.uid}
+                  canInteract={isMember}
+                  highlight={search.trim()}
+                  flash={flashId === m.id}
+                  showName={showDay || prev?.uid !== m.uid}
+                  onMenu={(msg) => !msg.deleted && setMenuFor(msg)}
+                  onReact={(msg, emoji) => run(() => chat.react(group.id, msg.id, emoji))}
+                  onVote={(msg, ids) => run(() => chat.vote(group.id, msg.id, ids))}
+                  onOpenImage={setViewing}
+                  onJumpTo={jumpTo}
+                />
               </div>
             )
           })}
-          {messages.length === 0 && (
-            <p className="self-center text-white/40 text-sm mt-10">עוד אין הודעות. תגידו שלום 👋</p>
-          )}
+          {messages.length === 0 && <p className="self-center text-white/40 text-sm mt-10">עוד אין הודעות. תגידו שלום 👋</p>}
+          {search && visible.length === 0 && <p className="self-center text-white/40 text-sm mt-10">לא נמצאו הודעות</p>}
           <div ref={bottomRef} />
         </div>
       </div>
 
       {error && <p className="text-rose-400 text-sm text-center py-1 shrink-0">{error}</p>}
+      {toast && <p className="fixed bottom-24 inset-x-0 mx-auto w-fit bg-white text-black text-sm rounded-full px-4 py-2 z-[90]">{toast}</p>}
 
       <footer className="shrink-0 bg-ink-800 border-t border-white/5 px-3 py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
         {isMember ? (
-          <form onSubmit={submit} className="max-w-2xl mx-auto flex items-end gap-2">
-            <textarea
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) submit(e)
-              }}
-              rows={1}
-              maxLength={1000}
-              placeholder="הודעה"
-              className="flex-1 resize-none bg-ink-700 rounded-3xl px-4 py-2.5 outline-none max-h-32"
-              aria-label="הודעה"
-            />
-            <button type="submit" disabled={!text.trim()} className="w-11 h-11 shrink-0 rounded-full bg-whatsapp text-black flex items-center justify-center disabled:opacity-40" aria-label="שליחה">
-              <Send size={20} className="-scale-x-100" />
-            </button>
-          </form>
+          <Composer
+            key={editing?.id ?? 'compose'}
+            replyTo={replyTo}
+            editing={editing}
+            onCancel={() => { setReplyTo(null); setEditing(null) }}
+            onSend={sendText}
+            onPickImage={pickImage}
+            onPoll={() => setPollOpen(true)}
+            onLocation={shareLocation}
+          />
         ) : (
           <div className="max-w-2xl mx-auto flex flex-col items-center gap-2 py-1">
-            <p className="text-xs text-white/50">רק חברי הקבוצה יכולים לכתוב</p>
-            <button
-              type="button"
-              onClick={() => withUser(() => run(() => join(group.id)))}
-              className="w-full bg-whatsapp text-black font-bold py-3 rounded-full"
-            >
+            <p className="text-xs text-white/50">רק חברי הקבוצה יכולים לכתוב, להגיב ולהצביע</p>
+            <button type="button" onClick={() => withUser(() => run(() => chat.join(group.id)))} className="w-full bg-whatsapp text-black font-bold py-3 rounded-full">
               הצטרפות לקבוצה
             </button>
           </div>
         )}
       </footer>
+
+      {menuFor && (
+        <MessageMenu
+          message={menuFor}
+          mine={menuFor.uid === user?.uid}
+          myReaction={menuFor.reactions?.[user?.uid]}
+          canInteract={isMember}
+          isPinned={pinned?.id === menuFor.id}
+          onReact={(emoji) => {
+            const m = menuFor
+            setMenuFor(null)
+            run(() => chat.react(group.id, m.id, emoji))
+          }}
+          onAction={menuAction}
+          onClose={() => setMenuFor(null)}
+        />
+      )}
+      {pendingImage && (
+        <ImageComposer
+          image={pendingImage}
+          onClose={() => setPendingImage(null)}
+          onSend={(caption) => {
+            const image = pendingImage
+            setPendingImage(null)
+            send({ type: 'image', image, caption })
+          }}
+        />
+      )}
+      {pollOpen && (
+        <PollComposer
+          onClose={() => setPollOpen(false)}
+          onSend={(poll) => {
+            setPollOpen(false)
+            send({ type: 'poll', poll })
+          }}
+        />
+      )}
+      {viewing && <ImageViewer message={viewing} onClose={() => setViewing(null)} />}
+      {infoOpen && (
+        <GroupInfo
+          festival={festival}
+          group={group}
+          messages={messages}
+          memberCount={memberCount}
+          isMember={isMember}
+          onOpenImage={setViewing}
+          onJumpTo={jumpTo}
+          onLeave={leaveGroup}
+          onClose={() => setInfoOpen(false)}
+        />
+      )}
     </div>
   )
 }

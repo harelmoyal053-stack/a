@@ -10,6 +10,17 @@ service cloud.firestore {
     function isMember(groupId) {
       return exists(/databases/$(database)/documents/groups/$(groupId)/members/$(request.auth.uid));
     }
+    function changed() {
+      return request.resource.data.diff(resource.data).affectedKeys();
+    }
+    // True when, inside the map `field`, only the caller's own entry changed.
+    function onlyOwnEntry(field) {
+      return request.resource.data.get(field, {}).diff(resource.data.get(field, {})).affectedKeys()
+        .hasOnly([request.auth.uid]);
+    }
+    function optionalString(data, key, max) {
+      return !(key in data) || (data[key] is string && data[key].size() <= max);
+    }
 
     match /users/{uid} {
       allow read: if signedIn() && request.auth.uid == uid;
@@ -24,15 +35,14 @@ service cloud.firestore {
     }
 
     match /groups/{groupId} {
-      // Group summary: member count and last message preview.
+      // Group summary: member count, last message preview, pinned message.
       allow read: if true;
-      // Anyone signed in may change the member count; only members may set the last message.
       allow create: if signedIn()
-        && request.resource.data.keys().hasOnly(['memberCount', 'lastMessage'])
-        && (!('lastMessage' in request.resource.data) || isMember(groupId));
+        && request.resource.data.keys().hasOnly(['memberCount', 'lastMessage', 'pinned'])
+        && (request.resource.data.keys().hasOnly(['memberCount']) || isMember(groupId));
       allow update: if signedIn()
-        && request.resource.data.keys().hasOnly(['memberCount', 'lastMessage'])
-        && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['lastMessage']) || isMember(groupId));
+        && request.resource.data.keys().hasOnly(['memberCount', 'lastMessage', 'pinned'])
+        && (changed().hasOnly(['memberCount']) || isMember(groupId));
 
       match /members/{uid} {
         allow read: if true;
@@ -43,13 +53,30 @@ service cloud.firestore {
       // Anyone can read; only members can write, as themselves.
       match /messages/{messageId} {
         allow read: if true;
+
         allow create: if signedIn() && isMember(groupId)
-          && request.resource.data.keys().hasOnly(['uid', 'name', 'text', 'createdAt'])
+          && request.resource.data.keys().hasOnly(
+            ['uid', 'name', 'type', 'text', 'image', 'caption', 'poll', 'location', 'replyTo', 'reactions', 'votes', 'createdAt'])
           && request.resource.data.uid == request.auth.uid
-          && request.resource.data.text is string
-          && request.resource.data.text.size() > 0 && request.resource.data.text.size() <= 1000
+          && request.resource.data.type in ['text', 'image', 'poll', 'location']
+          && optionalString(request.resource.data, 'text', 1000)
+          && optionalString(request.resource.data, 'caption', 1000)
+          && optionalString(request.resource.data, 'image', 700000)
+          && request.resource.data.reactions == {}
+          && request.resource.data.votes == {}
           && request.resource.data.createdAt == request.time;
-        allow update, delete: if false;
+
+        allow update: if signedIn() && isMember(groupId) && (
+          // The author may edit the text or delete the message.
+          (resource.data.uid == request.auth.uid
+            && changed().hasOnly(['text', 'edited', 'deleted', 'image', 'caption', 'poll', 'location'])
+            && optionalString(request.resource.data, 'text', 1000))
+          ||
+          // Any member may set their own reaction or poll vote.
+          (changed().hasOnly(['reactions', 'votes']) && onlyOwnEntry('reactions') && onlyOwnEntry('votes'))
+        );
+
+        allow delete: if false;
       }
     }
   }

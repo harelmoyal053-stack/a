@@ -1,10 +1,12 @@
 import { initializeApp } from 'firebase/app'
 import { getAuth, onAuthStateChanged, signInAnonymously } from 'firebase/auth'
 import {
-  collection, doc, getDoc, getFirestore, increment, limitToLast, onSnapshot, orderBy, query, serverTimestamp, setDoc, writeBatch,
+  collection, deleteField, doc, getDoc, getFirestore, increment, limitToLast, onSnapshot, orderBy, query,
+  serverTimestamp, setDoc, updateDoc, writeBatch,
 } from 'firebase/firestore'
+import { buildMessage, preview, replyRef } from './messages'
 
-const MESSAGE_LIMIT = 200
+const MESSAGE_LIMIT = 150
 
 const millis = (ts) => ts?.toMillis?.() ?? Date.now()
 
@@ -18,6 +20,7 @@ export function createFirebaseService(config) {
   const groupRef = (id) => doc(db, 'groups', id)
   const memberRef = (id, uid) => doc(db, 'groups', id, 'members', uid)
   const myGroupRef = (uid, id) => doc(db, 'users', uid, 'groups', id)
+  const messageRef = (id, messageId) => doc(db, 'groups', id, 'messages', messageId)
 
   return {
     mode: 'live',
@@ -54,13 +57,19 @@ export function createFirebaseService(config) {
         cb({
           memberCount: data.memberCount ?? 0,
           lastMessage: data.lastMessage ? { ...data.lastMessage, createdAt: millis(data.lastMessage.createdAt) } : null,
+          pinned: data.pinned ?? null,
         })
       })
+    },
+    onMembers(id, cb) {
+      return onSnapshot(collection(db, 'groups', id, 'members'), (snap) =>
+        cb(snap.docs.map((d) => ({ uid: d.id, name: d.data().name, joinedAt: millis(d.data().joinedAt) }))),
+      )
     },
     onMessages(id, cb) {
       const q = query(collection(db, 'groups', id, 'messages'), orderBy('createdAt'), limitToLast(MESSAGE_LIMIT))
       return onSnapshot(q, (snap) =>
-        cb(snap.docs.map((d) => ({ id: d.id, ...d.data(), createdAt: millis(d.data().createdAt) }))),
+        cb(snap.docs.map((d) => ({ ...d.data(), id: d.id, createdAt: millis(d.data().createdAt) }))),
       )
     },
     async join(id) {
@@ -77,12 +86,30 @@ export function createFirebaseService(config) {
       batch.set(groupRef(id), { memberCount: increment(-1) }, { merge: true })
       await batch.commit()
     },
-    async send(id, text) {
+    async send(id, payload) {
       const batch = writeBatch(db)
       const createdAt = serverTimestamp()
-      batch.set(doc(collection(db, 'groups', id, 'messages')), { uid: current.uid, name: current.name, text, createdAt })
-      batch.set(groupRef(id), { lastMessage: { text, name: current.name, createdAt } }, { merge: true })
+      const message = buildMessage(current, payload)
+      batch.set(doc(collection(db, 'groups', id, 'messages')), { ...message, createdAt })
+      batch.set(groupRef(id), { lastMessage: { text: preview(message), name: current.name, createdAt } }, { merge: true })
       await batch.commit()
+    },
+    react(id, messageId, emoji) {
+      return updateDoc(messageRef(id, messageId), { [`reactions.${current.uid}`]: emoji ?? deleteField() })
+    },
+    vote(id, messageId, optionIds) {
+      return updateDoc(messageRef(id, messageId), { [`votes.${current.uid}`]: optionIds.length ? optionIds : deleteField() })
+    },
+    edit(id, messageId, text) {
+      return updateDoc(messageRef(id, messageId), { text, edited: true })
+    },
+    remove(id, messageId) {
+      return updateDoc(messageRef(id, messageId), {
+        deleted: true, text: deleteField(), image: deleteField(), caption: deleteField(), poll: deleteField(), location: deleteField(),
+      })
+    },
+    pin(id, message) {
+      return setDoc(groupRef(id), { pinned: message ? replyRef(message) : null }, { merge: true })
     },
   }
 }

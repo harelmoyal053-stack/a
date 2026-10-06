@@ -54,7 +54,12 @@ export function ChatProvider({ children }) {
     withUser,
     join: (id) => service.join(id),
     leave: (id) => service.leave(id),
-    send: (id, text) => service.send(id, text),
+    send: (id, payload) => service.send(id, payload),
+    react: (id, messageId, emoji) => service.react(id, messageId, emoji),
+    vote: (id, messageId, optionIds) => service.vote(id, messageId, optionIds),
+    edit: (id, messageId, text) => service.edit(id, messageId, text),
+    remove: (id, messageId) => service.remove(id, messageId),
+    pin: (id, message) => service.pin(id, message),
   }
 
   return (
@@ -70,11 +75,11 @@ export function useChat() {
   return useContext(ChatContext)
 }
 
-// Live { memberCount, lastMessage } for a group.
+// Live { memberCount, lastMessage, pinned } for a group.
 // eslint-disable-next-line react-refresh/only-export-components
 export function useGroupMeta(id) {
   const { service } = useChat()
-  const [meta, setMeta] = useState({ memberCount: 0, lastMessage: null })
+  const [meta, setMeta] = useState({ memberCount: 0, lastMessage: null, pinned: null })
   useEffect(() => (service && id ? service.onGroup(id, setMeta) : undefined), [service, id])
   return meta
 }
