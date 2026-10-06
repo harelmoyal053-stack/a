@@ -3,6 +3,47 @@ export function monthsAway(month) {
   return (month - 1 - new Date().getMonth() + 12) % 12
 }
 
+const DAY_MS = 86400000
+
+function daysUntil(isoDate) {
+  const [y, m, d] = isoDate.split('-').map(Number)
+  const now = new Date()
+  return Math.round((Date.UTC(y, m - 1, d) - Date.UTC(now.getFullYear(), now.getMonth(), now.getDate())) / DAY_MS)
+}
+
+// Countdown badge: real days for dated events, months for curated ones.
+export function countdownFor(item) {
+  if (!item.startDate) return countdownLabel(item.month)
+  const days = daysUntil(item.startDate)
+  if (days <= 0) return daysUntil(item.endDate ?? item.startDate) >= 0 ? 'עכשיו!' : 'הסתיים'
+  if (days === 1) return 'מחר'
+  if (days <= 45) return `בעוד ${days} ימים`
+  return countdownLabel(Number(item.startDate.slice(5, 7)))
+}
+
+function shortDate(isoDate) {
+  const [, m, d] = isoDate.split('-')
+  return `${d}.${m}`
+}
+
+// "חמישי · 12.11", "09.04–16.04", or the usual month for undated festivals.
+export function dateChip(item, months) {
+  if (!item.startDate) return months[item.month - 1]
+  if (item.endDate && item.endDate !== item.startDate) return `${shortDate(item.startDate)}–${shortDate(item.endDate)}`
+  const weekday = new Date(`${item.startDate}T12:00:00`).toLocaleDateString('he-IL', { weekday: 'long' }).replace(/^יום /, '')
+  return `${weekday} · ${shortDate(item.startDate)}`
+}
+
+export function priceLabel(item) {
+  if (item.priceFrom == null) return null
+  try {
+    const price = new Intl.NumberFormat('he-IL', { style: 'currency', currency: item.currency || 'USD', maximumFractionDigits: 0 }).format(item.priceFrom)
+    return `החל מ-${price}`
+  } catch {
+    return null
+  }
+}
+
 export function countdownLabel(month) {
   const n = monthsAway(month)
   if (n === 0) return 'החודש'

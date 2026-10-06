@@ -1,14 +1,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Globe, Heart, Home, Menu, MessageCircle, Search, X } from 'lucide-react'
-import FestivalCard from './components/FestivalCard'
+import FestivalGrid from './components/FestivalGrid'
 import FestivalModal from './components/FestivalModal'
 import ChatScreen from './components/ChatScreen'
 import MyGroups from './components/MyGroups'
 import { useChat } from './chat/ChatContext'
-import { CONTINENTS, FESTIVALS, GENRES, MONTHS } from './data/festivals'
+import { CONTINENTS, GENRES, MONTHS } from './data/festivals'
 import { findGroup, groupsFor } from './data/groups'
+import { useCatalog } from './data/CatalogContext'
 import { REPO_URL, suggestFestivalUrl } from './config'
-import { monthsAway } from './utils'
 
 const FAVORITES_KEY = 'festival-groups:favorites'
 const TABS = [
@@ -19,8 +19,11 @@ const TABS = [
   { id: 'favorites', label: 'מועדפים', icon: Heart },
 ]
 
-const GROUPS = Object.fromEntries(FESTIVALS.map((f) => [f.id, groupsFor(f.id)]))
-const BY_UPCOMING = [...FESTIVALS].sort((a, b) => monthsAway(a.month) - monthsAway(b.month))
+const KINDS = [
+  { id: 'all', label: 'הכול' },
+  { id: 'festival', label: 'פסטיבלים' },
+  { id: 'party', label: 'מסיבות' },
+]
 
 function loadFavorites() {
   try {
@@ -69,10 +72,12 @@ export default function App() {
   const [query, setQuery] = useState('')
   const [continent, setContinent] = useState('all')
   const [genre, setGenre] = useState('all')
+  const [kind, setKind] = useState('all')
   const [month, setMonth] = useState('all')
   const [favorites, setFavorites] = useState(loadFavorites)
   const [route, setRoute] = useState(routeFromHash)
   const { myGroups } = useChat()
+  const catalog = useCatalog()
   const [menuOpen, setMenuOpen] = useState(false)
   const searchRef = useRef(null)
 
@@ -124,35 +129,33 @@ export default function App() {
   }, [])
 
   const homeResults = useMemo(
-    () => BY_UPCOMING.filter((f) => genre === 'all' || f.genres.includes(genre)),
-    [genre],
+    () => catalog.items.filter((f) => (genre === 'all' || f.genres.includes(genre)) && (kind === 'all' || f.kind === kind)),
+    [catalog.items, genre, kind],
   )
 
   const searchResults = useMemo(() => {
     const q = query.trim().toLowerCase()
-    return BY_UPCOMING.filter((f) => {
+    return catalog.items.filter((f) => {
+      if (kind !== 'all' && f.kind !== kind) return false
       if (continent !== 'all' && f.continent !== continent) return false
       if (genre !== 'all' && !f.genres.includes(genre)) return false
       if (month !== 'all' && f.month !== Number(month)) return false
       if (!q) return true
-      return [f.name, f.city, f.country, CONTINENTS[f.continent], ...f.genres.map((g) => GENRES[g])]
-        .some((text) => text.toLowerCase().includes(q))
+      return [f.name, f.city, f.country, f.venue, CONTINENTS[f.continent], ...f.genres.map((g) => GENRES[g])]
+        .some((text) => text?.toLowerCase().includes(q))
     })
-  }, [query, continent, genre, month])
+  }, [catalog.items, query, continent, genre, month, kind])
 
-  const renderGrid = (list) => (
-    <div className="grid gap-3 sm:gap-5 grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      {list.map((festival) => (
-        <FestivalCard
-          key={festival.id}
-          festival={festival}
-          groups={GROUPS[festival.id]}
-          isFavorite={favorites.has(festival.id)}
-          onToggleFavorite={() => toggleFavorite(festival.id)}
-          onOpen={() => openFestival(festival.id)}
-        />
+  const renderGrid = (list, key) => (
+    <FestivalGrid key={key} items={list} favorites={favorites} onToggleFavorite={toggleFavorite} onOpen={openFestival} />
+  )
+
+  const kindChips = (
+    <ChipRow>
+      {KINDS.map((k) => (
+        <Chip key={k.id} active={kind === k.id} onClick={() => setKind(k.id)}>{k.label}</Chip>
       ))}
-    </div>
+    </ChipRow>
   )
 
   const genreChips = (
@@ -164,10 +167,10 @@ export default function App() {
     </ChipRow>
   )
 
-  const openFestivalData = route?.type === 'festival' ? FESTIVALS.find((f) => f.id === route.id) : null
-  const openChatData = route?.type === 'chat' ? findGroup(route.id) : null
+  const openFestivalData = route?.type === 'festival' ? catalog.byId.get(route.id) : null
+  const openChatData = route?.type === 'chat' ? findGroup(route.id, catalog.byId) : null
   const hasGroups = Object.keys(myGroups).length > 0
-  const favoriteList = BY_UPCOMING.filter((f) => favorites.has(f.id))
+  const favoriteList = catalog.items.filter((f) => favorites.has(f.id))
 
   return (
     <div className="min-h-screen bg-ink-900 text-white pb-24">
@@ -191,7 +194,7 @@ export default function App() {
         {tab === 'home' && (
           <>
             <section className="mb-6">
-              <p className="text-white/50 text-sm">קבוצות צ׳אט לפסטיבלים בכל העולם</p>
+              <p className="text-white/50 text-sm">קבוצות צ׳אט לפסטיבלים ומסיבות בכל העולם</p>
               <h1 className="font-black text-3xl sm:text-5xl leading-tight mt-1">
                 מוצאים את החבר׳ה <span className="text-accent">לפסטיבל הבא</span>
               </h1>
@@ -205,9 +208,17 @@ export default function App() {
                 <MyGroups onOpen={openChat} limit={3} />
               </section>
             )}
-            <div className="mb-5">{genreChips}</div>
-            <SectionTitle count={homeResults.length}>הפסטיבלים הקרובים</SectionTitle>
-            {renderGrid(homeResults)}
+            <div className="mb-5 flex flex-col gap-2.5">
+              {kindChips}
+              {genreChips}
+            </div>
+            <SectionTitle count={homeResults.length}>{kind === 'party' ? 'המסיבות הקרובות' : 'האירועים הקרובים'}</SectionTitle>
+            {renderGrid(homeResults, `home-${kind}-${genre}`)}
+            {catalog.updatedAt && (
+              <p className="text-xs text-white/30 mt-4 text-center">
+                האירועים מתעדכנים אוטומטית מ-Ticketmaster · עודכן {new Date(catalog.updatedAt).toLocaleDateString('he-IL')}
+              </p>
+            )}
           </>
         )}
 
@@ -229,6 +240,7 @@ export default function App() {
               )}
             </label>
             <div className="flex flex-col gap-2.5 mb-6">
+              {kindChips}
               <ChipRow>
                 <Chip active={continent === 'all'} onClick={() => setContinent('all')}>כל העולם</Chip>
                 {Object.entries(CONTINENTS).map(([key, label]) => (
@@ -244,7 +256,7 @@ export default function App() {
               </ChipRow>
             </div>
             <SectionTitle count={searchResults.length}>תוצאות</SectionTitle>
-            {searchResults.length > 0 ? renderGrid(searchResults) : (
+            {searchResults.length > 0 ? renderGrid(searchResults, `search-${query}-${continent}-${genre}-${month}-${kind}`) : (
               <div className="text-center py-16 text-white/50">
                 <p className="text-5xl mb-3">🔍</p>
                 <p className="font-bold text-white">לא מצאנו פסטיבל כזה</p>
@@ -262,12 +274,12 @@ export default function App() {
         )}
 
         {tab === 'world' && Object.entries(CONTINENTS).map(([key, label]) => {
-          const list = BY_UPCOMING.filter((f) => f.continent === key)
+          const list = catalog.items.filter((f) => f.continent === key)
           if (list.length === 0) return null
           return (
             <section key={key} className="mb-10">
               <SectionTitle count={list.length}>{label}</SectionTitle>
-              {renderGrid(list)}
+              {renderGrid(list, `world-${key}`)}
             </section>
           )
         })}
@@ -275,7 +287,7 @@ export default function App() {
         {tab === 'favorites' && (
           <>
             <SectionTitle count={favoriteList.length}>המועדפים שלי</SectionTitle>
-            {favoriteList.length > 0 ? renderGrid(favoriteList) : (
+            {favoriteList.length > 0 ? renderGrid(favoriteList, 'favorites') : (
               <div className="text-center py-16 text-white/50">
                 <Heart size={40} className="mx-auto mb-3 text-white/30" />
                 <p className="font-bold text-white">עוד אין מועדפים</p>
@@ -327,7 +339,7 @@ export default function App() {
       {openFestivalData && (
         <FestivalModal
           festival={openFestivalData}
-          groups={GROUPS[openFestivalData.id]}
+          groups={groupsFor(openFestivalData)}
           isFavorite={favorites.has(openFestivalData.id)}
           onToggleFavorite={() => toggleFavorite(openFestivalData.id)}
           onClose={closeScreen}

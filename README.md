@@ -23,6 +23,14 @@ Until `src/festivals/chat/firebaseConfig.js` holds a config, the chat runs in pr
 
 The web config is not a secret; access is controlled by `firestore.rules`.
 
+### Automatic event updates
+
+`.github/workflows/update-events.yml` runs daily (and on demand from the Actions tab). It calls the Ticketmaster Discovery API through `scripts/fetch-events.mjs`, collecting music festivals and dance/electronic parties for the next 12 months across ~25 countries, and writes `festivals/events.json` to the `gh-pages` branch. The site loads that file at startup. Every event gets its own group chats automatically. When an event matches a curated festival, it fills in the festival's real dates, photo, and ticket link instead of being listed twice.
+
+Setup: create a free key at https://developer-acct.ticketmaster.com, add it as the repository secret `TICKETMASTER_API_KEY` (Settings → Secrets and variables → Actions), then run the workflow once from the Actions tab.
+
+Event ids are derived from the event's name, venue, country, and year (festivals) or date (parties), so a group keeps its chat across daily refreshes.
+
 ### Adding a festival
 
 Append an entry to `FESTIVALS` in `src/festivals/data/festivals.js`. Each festival gets the group chats listed in `src/festivals/data/groups.js`.

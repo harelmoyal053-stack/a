@@ -1,0 +1,60 @@
+name: Update FestiChat events
+
+# Refreshes festivals/events.json on the gh-pages branch (the live site) from
+# the Ticketmaster Discovery API. Needs the TICKETMASTER_API_KEY repo secret.
+on:
+  schedule:
+    - cron: '17 3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+
+concurrency:
+  group: update-events
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: site
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Fetch events
+        env:
+          TICKETMASTER_API_KEY: ${{ secrets.TICKETMASTER_API_KEY }}
+        run: |
+          if [ -z "$TICKETMASTER_API_KEY" ]; then
+            echo "::error::Add a TICKETMASTER_API_KEY repository secret (Settings → Secrets and variables → Actions)."
+            exit 1
+          fi
+          mkdir -p site/festivals
+          node scripts/fetch-events.mjs site/festivals/events.json
+
+      - name: Publish to gh-pages
+        working-directory: site
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add festivals/events.json
+          if git diff --cached --quiet; then
+            echo "No changes"
+            exit 0
+          fi
+          git commit -m "Update FestiChat events"
+          git push
+
+      - name: Request a Pages build
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X POST "repos/${{ github.repository }}/pages/builds" || echo "Pages build request skipped"

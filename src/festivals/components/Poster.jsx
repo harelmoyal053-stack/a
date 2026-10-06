@@ -1,12 +1,21 @@
+import { useState } from 'react'
 import { MONTHS } from '../data/festivals'
 
 // Festival artwork: the festival's photo when one is set, otherwise a
 // generated poster in the festival's colors.
 export default function Poster({ festival, large = false }) {
-  if (festival.image) {
+  const [failedSrc, setFailedSrc] = useState(null)
+  if (festival.image && festival.image.src !== failedSrc) {
     return (
       <div className="absolute inset-0">
-        <img src={festival.image.src} alt={festival.name} loading="lazy" className="w-full h-full object-cover" />
+        <img
+          src={festival.image.src}
+          alt={festival.name}
+          loading="lazy"
+          referrerPolicy="no-referrer"
+          onError={() => setFailedSrc(festival.image.src)}
+          className="w-full h-full object-cover"
+        />
         {festival.image.credit && (
           <span className="absolute bottom-1 left-2 text-[9px] text-white/60" dir="ltr">{festival.image.credit}</span>
         )}

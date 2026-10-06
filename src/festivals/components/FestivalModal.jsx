@@ -1,9 +1,9 @@
 import { useEffect } from 'react'
-import { ArrowRight, Calendar, ExternalLink, Heart, MapPin, Share2 } from 'lucide-react'
+import { ArrowRight, Calendar, ExternalLink, Heart, MapPin, Share2, Ticket } from 'lucide-react'
 import { GENRES, MONTHS } from '../data/festivals'
 import { whatsappShareUrl } from '../config'
 import { useChat, useGroupMeta } from '../chat/ChatContext'
-import { countdownLabel, membersLabel } from '../utils'
+import { countdownFor, dateChip, membersLabel, priceLabel } from '../utils'
 import GroupIcon from './GroupIcon'
 import Poster from './Poster'
 
@@ -85,21 +85,38 @@ export default function FestivalModal({ festival, groups, isFavorite, onToggleFa
 
         <div className="px-5 pb-8 -mt-10 relative">
           <span className="inline-block text-sm text-white/80 border border-white/15 bg-white/5 rounded-full px-3 py-1">
-            {countdownLabel(festival.month)}
+            {countdownFor(festival)}
           </span>
           <h2 id="festival-title" className="text-4xl font-black mt-3 leading-none" dir="auto">{festival.name}</h2>
           <div className="mt-3 flex flex-col gap-1.5 text-white/60 text-sm">
-            <span className="flex items-center gap-1.5"><MapPin size={15} className="text-rose-500" /> {festival.flag} {festival.city}, {festival.country}</span>
-            <span className="flex items-center gap-1.5"><Calendar size={15} /> בדרך כלל ב{MONTHS[festival.month - 1]}</span>
+            <span className="flex items-center gap-1.5">
+              <MapPin size={15} className="text-rose-500" /> {festival.flag} {festival.venue ? `${festival.venue}, ` : ''}{festival.city}, {festival.country}
+            </span>
+            <span className="flex items-center gap-1.5">
+              <Calendar size={15} />
+              {festival.startDate ? `${dateChip(festival, MONTHS)}${festival.time ? ` · ${festival.time}` : ''}` : `בדרך כלל ב${MONTHS[festival.month - 1]}`}
+            </span>
           </div>
           <div className="flex flex-wrap gap-1.5 mt-4">
             {festival.genres.map((genre) => (
               <span key={genre} className="text-xs bg-white/5 border border-white/10 px-3 py-1 rounded-full">{GENRES[genre]}</span>
             ))}
-            <a href={festival.website} target="_blank" rel="noopener noreferrer" className="text-xs bg-white/5 border border-white/10 px-3 py-1 rounded-full flex items-center gap-1 hover:bg-white/10">
-              <ExternalLink size={12} /> אתר רשמי
-            </a>
+            {festival.website && (
+              <a href={festival.website} target="_blank" rel="noopener noreferrer" className="text-xs bg-white/5 border border-white/10 px-3 py-1 rounded-full flex items-center gap-1 hover:bg-white/10">
+                <ExternalLink size={12} /> אתר רשמי
+              </a>
+            )}
           </div>
+          {festival.ticketUrl && (
+            <a
+              href={festival.ticketUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-5 flex items-center justify-center gap-2 bg-accent text-black font-bold py-3 rounded-2xl"
+            >
+              <Ticket size={18} /> כרטיסים{priceLabel(festival) ? ` · ${priceLabel(festival)}` : ''}
+            </a>
+          )}
 
           <h3 className="font-black text-xl mt-8 mb-3">קבוצות</h3>
           <ul className="flex flex-col gap-2.5">

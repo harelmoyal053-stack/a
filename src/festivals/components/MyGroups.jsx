@@ -1,10 +1,12 @@
 import { MessageCircle } from 'lucide-react'
 import { findGroup } from '../data/groups'
 import { useChat, useGroupMeta } from '../chat/ChatContext'
+import { useCatalog } from '../data/CatalogContext'
 import { shortTime } from '../utils'
 
 function GroupRow({ id, onOpen }) {
-  const found = findGroup(id)
+  const { byId } = useCatalog()
+  const found = findGroup(id, byId)
   const { lastMessage } = useGroupMeta(id)
   if (!found) return null
   const { festival, group } = found
