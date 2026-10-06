@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { ArrowRight, Calendar, ExternalLink, Heart, MapPin, Share2, Ticket } from 'lucide-react'
 import { GENRES, MONTHS } from '../data/festivals'
+import { sourceLabel } from '../data/catalog'
 import { whatsappShareUrl } from '../config'
 import { useChat, useGroupMeta } from '../chat/ChatContext'
 import { countdownFor, dateChip, membersLabel, priceLabel } from '../utils'
@@ -107,15 +108,24 @@ export default function FestivalModal({ festival, groups, isFavorite, onToggleFa
               </a>
             )}
           </div>
-          {festival.ticketUrl && (
-            <a
-              href={festival.ticketUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-5 flex items-center justify-center gap-2 bg-accent text-black font-bold py-3 rounded-2xl"
-            >
-              <Ticket size={18} /> כרטיסים{priceLabel(festival) ? ` · ${priceLabel(festival)}` : ''}
-            </a>
+          {festival.tickets?.length > 0 && (
+            <div className="mt-5 flex flex-col gap-2">
+              {festival.tickets.map((ticket, i) => (
+                <a
+                  key={ticket.source}
+                  href={ticket.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`flex items-center justify-between gap-2 font-bold py-3 px-4 rounded-2xl ${i === 0 ? 'bg-accent text-black' : 'bg-white/5 border border-white/15'}`}
+                >
+                  <span className="flex items-center gap-2"><Ticket size={18} /> כרטיסים ב-{sourceLabel(ticket.source)}</span>
+                  {priceLabel(ticket) && <span className="text-sm">{priceLabel(ticket)}</span>}
+                </a>
+              ))}
+            </div>
+          )}
+          {festival.sources?.length > 0 && (
+            <p className="text-xs text-white/40 mt-3">מקורות המידע: {festival.sources.map(sourceLabel).join(' · ')}</p>
           )}
 
           <h3 className="font-black text-xl mt-8 mb-3">קבוצות</h3>

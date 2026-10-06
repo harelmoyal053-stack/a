@@ -29,13 +29,15 @@ function shortDate(isoDate) {
 // "חמישי · 12.11", "09.04–16.04", or the usual month for undated festivals.
 export function dateChip(item, months) {
   if (!item.startDate) return months[item.month - 1]
-  if (item.endDate && item.endDate !== item.startDate) return `${shortDate(item.startDate)}–${shortDate(item.endDate)}`
+  // Isolated as left-to-right, or the range reads backwards inside Hebrew text.
+  if (item.endDate && item.endDate !== item.startDate) return `\u2066${shortDate(item.startDate)}–${shortDate(item.endDate)}\u2069`
   const weekday = new Date(`${item.startDate}T12:00:00`).toLocaleDateString('he-IL', { weekday: 'long' }).replace(/^יום /, '')
   return `${weekday} · ${shortDate(item.startDate)}`
 }
 
 export function priceLabel(item) {
   if (item.priceFrom == null) return null
+  if (item.priceFrom === 0) return 'כניסה חופשית'
   try {
     const price = new Intl.NumberFormat('he-IL', { style: 'currency', currency: item.currency || 'USD', maximumFractionDigits: 0 }).format(item.priceFrom)
     return `החל מ-${price}`

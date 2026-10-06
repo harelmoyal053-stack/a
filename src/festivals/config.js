@@ -15,3 +15,7 @@ export function suggestFestivalUrl() {
 export function whatsappShareUrl(text) {
   return `https://wa.me/?text=${encodeURIComponent(text)}`
 }
+
+export function addEventUrl() {
+  return `${REPO_URL}/issues/new?template=event.yml`
+}

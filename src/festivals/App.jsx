@@ -8,7 +8,8 @@ import { useChat } from './chat/ChatContext'
 import { CONTINENTS, GENRES, MONTHS } from './data/festivals'
 import { findGroup, groupsFor } from './data/groups'
 import { useCatalog } from './data/CatalogContext'
-import { REPO_URL, suggestFestivalUrl } from './config'
+import { REPO_URL, addEventUrl, suggestFestivalUrl } from './config'
+import { sourceLabel } from './data/catalog'
 
 const FAVORITES_KEY = 'festival-groups:favorites'
 const TABS = [
@@ -216,7 +217,7 @@ export default function App() {
             {renderGrid(homeResults, `home-${kind}-${genre}`)}
             {catalog.updatedAt && (
               <p className="text-xs text-white/30 mt-4 text-center">
-                האירועים מתעדכנים אוטומטית מ-Ticketmaster · עודכן {new Date(catalog.updatedAt).toLocaleDateString('he-IL')}
+                האירועים מתעדכנים אוטומטית מ: {catalog.sources.map(sourceLabel).join(', ')} · עודכן {new Date(catalog.updatedAt).toLocaleDateString('he-IL')}
               </p>
             )}
           </>
@@ -260,7 +261,7 @@ export default function App() {
               <div className="text-center py-16 text-white/50">
                 <p className="text-5xl mb-3">🔍</p>
                 <p className="font-bold text-white">לא מצאנו פסטיבל כזה</p>
-                <a href={suggestFestivalUrl()} target="_blank" rel="noopener noreferrer" className="inline-block mt-3 text-accent underline">הציעו פסטיבל חדש</a>
+                <a href={addEventUrl()} target="_blank" rel="noopener noreferrer" className="inline-block mt-3 text-accent underline">מפיקים? הוסיפו את האירוע שלכם</a>
               </div>
             )}
           </>
@@ -327,6 +328,7 @@ export default function App() {
         <div className="fixed inset-0 z-50 bg-black/70" onClick={() => setMenuOpen(false)}>
           <div className="absolute top-0 left-0 h-full w-72 max-w-[85%] bg-ink-800 p-6 flex flex-col gap-1 animate-slide-up" onClick={(e) => e.stopPropagation()}>
             <button type="button" onClick={() => setMenuOpen(false)} className="self-end mb-4" aria-label="סגירת תפריט"><X size={24} /></button>
+            <a href={addEventUrl()} target="_blank" rel="noopener noreferrer" className="py-3 font-bold border-b border-white/10">מפיקים? הוסיפו אירוע</a>
             <a href={suggestFestivalUrl()} target="_blank" rel="noopener noreferrer" className="py-3 font-bold border-b border-white/10">הצעת פסטיבל חדש</a>
             <a href={`${REPO_URL}/issues`} target="_blank" rel="noopener noreferrer" className="py-3 font-bold border-b border-white/10">דיווח על בעיה</a>
             <p className="text-sm text-white/50 mt-4 leading-relaxed">

@@ -30,6 +30,14 @@ function flagEmoji(code) {
   return [...code.toUpperCase()].map((c) => String.fromCodePoint(0x1f1e6 + c.charCodeAt(0) - 65)).join('')
 }
 
+export function sourceLabel(source) {
+  if (source === 'ticketmaster') return 'Ticketmaster'
+  if (source === 'seatgeek') return 'SeatGeek'
+  if (source === 'community') return 'מפיקים ב-FestiChat'
+  if (source.startsWith('partner:')) return source.slice('partner:'.length)
+  return source
+}
+
 const normalize = (name) => name.toLowerCase().replace(/[^a-z0-9א-ת]+/g, ' ').trim()
 const today = () => new Date().toISOString().slice(0, 10)
 
@@ -42,12 +50,14 @@ function approximateDate(month) {
 
 function fromEvent(e) {
   const style = GENRE_STYLE[e.genres[0]] ?? DEFAULT_STYLE
+  const tickets = (e.tickets ?? []).filter((t) => t.url)
+  const cheapest = (e.tickets ?? []).find((t) => t.priceFrom != null)
   return {
     id: e.id,
     name: e.name,
     kind: e.kind,
     city: e.city,
-    country: regionNames.of(e.countryCode) ?? e.country,
+    country: regionNames.of(e.countryCode) ?? e.countryCode,
     flag: flagEmoji(e.countryCode),
     continent: CONTINENT_BY_COUNTRY[e.countryCode] ?? 'europe',
     month: Number(e.startDate.slice(5, 7)),
@@ -60,10 +70,11 @@ function fromEvent(e) {
     colors: style.colors,
     image: e.image ? { src: e.image } : null,
     website: null,
-    ticketUrl: e.url,
-    priceFrom: e.priceFrom,
-    currency: e.currency,
-    source: 'ticketmaster',
+    tickets,
+    priceFrom: cheapest?.priceFrom ?? null,
+    currency: cheapest?.currency ?? null,
+    sources: e.sources ?? [],
+    source: 'feed',
   }
 }
 
@@ -84,9 +95,10 @@ export function buildCatalog(feed) {
       endDate: match.endDate,
       month: match.month,
       image: festival.image ?? match.image,
-      ticketUrl: match.ticketUrl,
+      tickets: match.tickets,
       priceFrom: match.priceFrom,
       currency: match.currency,
+      sources: match.sources,
     })
   }
 

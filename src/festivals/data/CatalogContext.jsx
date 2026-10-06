@@ -16,7 +16,7 @@ export function CatalogProvider({ children }) {
 
   const value = useMemo(() => {
     const items = buildCatalog(feed)
-    return { items, byId: new Map(items.map((item) => [item.id, item])), loaded, updatedAt: feed?.updatedAt ?? null }
+    return { items, byId: new Map(items.map((item) => [item.id, item])), loaded, updatedAt: feed?.updatedAt ?? null, sources: feed?.sources ?? [] }
   }, [feed, loaded])
 
   return <CatalogContext.Provider value={value}>{children}</CatalogContext.Provider>

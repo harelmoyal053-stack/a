@@ -1,15 +1,20 @@
 name: Update FestiChat events
 
-# Refreshes festivals/events.json on the gh-pages branch (the live site) from
-# the Ticketmaster Discovery API. Needs the TICKETMASTER_API_KEY repo secret.
+# Rebuilds festivals/events.json on the gh-pages branch (the live site) from
+# every configured source, de-duplicated across sources. Optional secrets:
+# TICKETMASTER_API_KEY, SEATGEEK_CLIENT_ID. Approved event submissions (issues
+# labelled `event-approved`) and scripts/partner-feeds.json are always read.
 on:
   schedule:
     - cron: '17 3 * * *'
   workflow_dispatch:
+  issues:
+    types: [labeled, edited]
 
 permissions:
   contents: write
   pages: write
+  issues: read
 
 concurrency:
   group: update-events
@@ -17,6 +22,7 @@ concurrency:
 
 jobs:
   update:
+    if: github.event_name != 'issues' || contains(github.event.issue.labels.*.name, 'event-approved')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -30,14 +36,12 @@ jobs:
         with:
           node-version: 20
 
-      - name: Fetch events
+      - name: Fetch and merge events
         env:
           TICKETMASTER_API_KEY: ${{ secrets.TICKETMASTER_API_KEY }}
+          SEATGEEK_CLIENT_ID: ${{ secrets.SEATGEEK_CLIENT_ID }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
-          if [ -z "$TICKETMASTER_API_KEY" ]; then
-            echo "::error::Add a TICKETMASTER_API_KEY repository secret (Settings → Secrets and variables → Actions)."
-            exit 1
-          fi
           mkdir -p site/festivals
           node scripts/fetch-events.mjs site/festivals/events.json
 

@@ -1,0 +1,92 @@
+name: הוספת אירוע ל-FestiChat
+description: מפיקים ומארגנים – הוסיפו מסיבה או פסטיבל. האירוע יעלה לאתר אחרי אישור.
+title: "אירוע חדש: "
+labels: ["event-submission"]
+body:
+  - type: markdown
+    attributes:
+      value: אחרי שנאשר את האירוע הוא יופיע ב-FestiChat תוך כמה דקות, עם קבוצות צ׳אט משלו.
+  - type: input
+    id: name
+    attributes:
+      label: שם האירוע
+      placeholder: Thursday Shalvata
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: סוג
+      options:
+        - מסיבה
+        - פסטיבל
+    validations:
+      required: true
+  - type: input
+    id: start
+    attributes:
+      label: תאריך התחלה
+      description: בפורמט YYYY-MM-DD
+      placeholder: "2026-10-15"
+    validations:
+      required: true
+  - type: input
+    id: end
+    attributes:
+      label: תאריך סיום
+      description: רק לאירוע של כמה ימים. בפורמט YYYY-MM-DD
+  - type: input
+    id: time
+    attributes:
+      label: שעת פתיחה
+      placeholder: "23:00"
+  - type: input
+    id: venue
+    attributes:
+      label: מקום
+      placeholder: שלוותה
+  - type: input
+    id: city
+    attributes:
+      label: עיר
+      placeholder: תל אביב
+    validations:
+      required: true
+  - type: input
+    id: country
+    attributes:
+      label: קוד מדינה
+      description: שתי אותיות באנגלית, למשל IL, GR, ES
+      placeholder: IL
+    validations:
+      required: true
+  - type: input
+    id: genre
+    attributes:
+      label: סגנון מוזיקה
+      placeholder: טכנו, האוס
+  - type: input
+    id: tickets
+    attributes:
+      label: קישור לכרטיסים
+      placeholder: https://
+  - type: input
+    id: image
+    attributes:
+      label: קישור לתמונה
+      description: קישור ישיר לפוסטר (https). העלו רק תמונה שיש לכם זכות לפרסם.
+      placeholder: https://
+  - type: input
+    id: price
+    attributes:
+      label: מחיר החל מ
+      placeholder: "90"
+  - type: dropdown
+    id: currency
+    attributes:
+      label: מטבע
+      options:
+        - ILS
+        - EUR
+        - USD
+        - GBP
