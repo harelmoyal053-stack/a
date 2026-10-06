@@ -1,5 +1,6 @@
-// Every festival gets these group types. A group becomes joinable once its
-// WhatsApp invite link is added to INVITES below.
+import { FESTIVALS } from './festivals'
+
+// Every festival gets these group chats.
 export const GROUP_TYPES = [
   { type: 'general', title: 'קבוצה כללית', description: 'עדכונים, ליינאפ ושאלות לפני ובמהלך הפסטיבל', icon: 'MessageCircle' },
   { type: 'israelis', title: 'ישראלים בפסטיבל', description: 'מכירים את החבר׳ה מהארץ שמגיעים', icon: 'Flag' },
@@ -9,17 +10,16 @@ export const GROUP_TYPES = [
   { type: 'solo', title: 'מגיעים לבד', description: 'מוצאים חברים לפני שנוחתים', icon: 'UserRound' },
 ]
 
-// Key: "<festival id>:<group type>", value: a https://chat.whatsapp.com/... invite link.
-// Example:
-//   'tomorrowland:general': 'https://chat.whatsapp.com/AbCdEfGhIjKlMnOpQrStUv',
-export const INVITES = {
-}
-
-const INVITE_PATTERN = /^https:\/\/chat\.whatsapp\.com\/[A-Za-z0-9]{10,40}$/
+const SEPARATOR = '__'
 
 export function groupsFor(festivalId) {
-  return GROUP_TYPES.map((group) => {
-    const link = INVITES[`${festivalId}:${group.type}`]
-    return { ...group, invite: INVITE_PATTERN.test(link ?? '') ? link : null }
-  })
+  return GROUP_TYPES.map((group) => ({ ...group, id: `${festivalId}${SEPARATOR}${group.type}` }))
+}
+
+// Resolves a group id back to its festival and group, or null if unknown.
+export function findGroup(id) {
+  const [festivalId, type] = id.split(SEPARATOR)
+  const festival = FESTIVALS.find((f) => f.id === festivalId)
+  const group = GROUP_TYPES.find((g) => g.type === type)
+  return festival && group ? { festival, group: { ...group, id } } : null
 }

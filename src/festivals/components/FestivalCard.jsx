@@ -1,11 +1,9 @@
-import { Heart, MapPin, Star } from 'lucide-react'
+import { Heart, MapPin } from 'lucide-react'
 import { MONTHS } from '../data/festivals'
 import { countdownLabel } from '../utils'
 import Poster from './Poster'
 
 export default function FestivalCard({ festival, groups, isFavorite, onToggleFavorite, onOpen }) {
-  const openCount = groups.filter((g) => g.invite).length
-
   return (
     <article className="relative bg-ink-800 rounded-2xl overflow-hidden flex flex-col">
       <button type="button" onClick={onOpen} className="relative aspect-square text-right group" aria-label={`פתח את ${festival.name}`}>
@@ -15,14 +13,7 @@ export default function FestivalCard({ festival, groups, isFavorite, onToggleFav
           {countdownLabel(festival.month)}
         </span>
         <span className="absolute bottom-2.5 right-3 flex items-center gap-1 font-black text-lg sm:text-2xl drop-shadow-lg">
-          {openCount > 0 ? (
-            <>
-              <Star size={16} className="fill-accent text-accent" />
-              <span className="text-accent">{openCount} קבוצות פעילות</span>
-            </>
-          ) : (
-            <span className="text-white">{groups.length} קבוצות</span>
-          )}
+          <span className="text-white">{groups.length} קבוצות</span>
         </span>
       </button>
 

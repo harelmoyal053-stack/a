@@ -1,15 +1,49 @@
 import { useEffect } from 'react'
-import {
-  ArrowRight, Calendar, Car, ExternalLink, Flag, Heart, MapPin, MessageCircle, Plus, Share2, Tent, Ticket, UserRound,
-} from 'lucide-react'
+import { ArrowRight, Calendar, ExternalLink, Heart, MapPin, Share2 } from 'lucide-react'
 import { GENRES, MONTHS } from '../data/festivals'
-import { addGroupLinkUrl, whatsappShareUrl } from '../config'
-import { countdownLabel } from '../utils'
+import { whatsappShareUrl } from '../config'
+import { useChat, useGroupMeta } from '../chat/ChatContext'
+import { countdownLabel, membersLabel } from '../utils'
+import GroupIcon from './GroupIcon'
 import Poster from './Poster'
 
-const ICONS = { MessageCircle, Flag, Car, Tent, Ticket, UserRound }
+function GroupRow({ group, onOpenChat }) {
+  const { myGroups, withUser, join } = useChat()
+  const { memberCount } = useGroupMeta(group.id)
+  const isMember = Boolean(myGroups[group.id])
 
-export default function FestivalModal({ festival, groups, isFavorite, onToggleFavorite, onClose }) {
+  const joinAndOpen = () =>
+    withUser(async () => {
+      await join(group.id)
+      onOpenChat(group.id)
+    })
+
+  return (
+    <li className="flex items-center gap-3 p-3 rounded-2xl bg-ink-800">
+      <button type="button" onClick={() => onOpenChat(group.id)} className="flex items-center gap-3 flex-1 min-w-0 text-right">
+        <span className={`w-11 h-11 shrink-0 rounded-xl flex items-center justify-center ${isMember ? 'bg-whatsapp/15 text-whatsapp' : 'bg-white/5 text-white/60'}`}>
+          <GroupIcon name={group.icon} />
+        </span>
+        <div className="flex-1 min-w-0">
+          <p className="font-bold">{group.title}</p>
+          <p className="text-xs text-white/50 truncate">{group.description}</p>
+          <p className="text-xs text-white/40 mt-0.5">{membersLabel(memberCount)}</p>
+        </div>
+      </button>
+      {isMember ? (
+        <button type="button" onClick={() => onOpenChat(group.id)} className="shrink-0 border border-whatsapp text-whatsapp text-sm font-bold px-4 py-2 rounded-full">
+          לצ׳אט
+        </button>
+      ) : (
+        <button type="button" onClick={joinAndOpen} className="shrink-0 bg-whatsapp hover:brightness-110 text-black text-sm font-bold px-4 py-2 rounded-full">
+          הצטרפות
+        </button>
+      )}
+    </li>
+  )
+}
+
+export default function FestivalModal({ festival, groups, isFavorite, onToggleFavorite, onClose, onOpenChat }) {
   useEffect(() => {
     const onKey = (e) => e.key === 'Escape' && onClose()
     document.addEventListener('keydown', onKey)
@@ -20,7 +54,7 @@ export default function FestivalModal({ festival, groups, isFavorite, onToggleFa
     }
   }, [onClose])
 
-  const shareText = `מצאתי את קבוצות הוואטסאפ של ${festival.name} 🎶 ${window.location.href}`
+  const shareText = `מצאתי את קבוצות הצ׳אט של ${festival.name} 🎶 ${window.location.href}`
 
   return (
     <div className="fixed inset-0 z-50 flex justify-center bg-black/80 backdrop-blur-sm sm:p-6" onClick={onClose}>
@@ -67,41 +101,10 @@ export default function FestivalModal({ festival, groups, isFavorite, onToggleFa
             </a>
           </div>
 
-          <h3 className="font-black text-xl mt-8 mb-3">קבוצות וואטסאפ</h3>
+          <h3 className="font-black text-xl mt-8 mb-3">קבוצות</h3>
           <ul className="flex flex-col gap-2.5">
-            {groups.map((group) => {
-              const Icon = ICONS[group.icon]
-              return (
-                <li key={group.type} className="flex items-center gap-3 p-3 rounded-2xl bg-ink-800">
-                  <span className={`w-11 h-11 shrink-0 rounded-xl flex items-center justify-center ${group.invite ? 'bg-whatsapp/15 text-whatsapp' : 'bg-white/5 text-white/50'}`}>
-                    <Icon size={20} />
-                  </span>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-bold">{group.title}</p>
-                    <p className="text-xs text-white/50">{group.description}</p>
-                  </div>
-                  {group.invite ? (
-                    <a href={group.invite} target="_blank" rel="noopener noreferrer" className="shrink-0 bg-whatsapp hover:brightness-110 text-black text-sm font-bold px-4 py-2 rounded-full">
-                      הצטרפות
-                    </a>
-                  ) : (
-                    <a
-                      href={addGroupLinkUrl(festival, group)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="shrink-0 flex items-center gap-1 border border-white/15 text-white/70 hover:text-accent hover:border-accent text-xs font-medium px-3 py-2 rounded-full"
-                      title="הקבוצה עוד לא נפתחה – פתחתם אותה? שלחו לנו את הקישור"
-                    >
-                      <Plus size={14} /> הוספת קישור
-                    </a>
-                  )}
-                </li>
-              )
-            })}
+            {groups.map((group) => <GroupRow key={group.id} group={group} onOpenChat={onOpenChat} />)}
           </ul>
-          <p className="text-xs text-white/40 mt-4 leading-relaxed">
-            קבוצה בלי קישור עוד לא נפתחה. פתחתם אותה בוואטסאפ? לחצו על ״הוספת קישור״ ונעלה אותה לאתר אחרי בדיקה.
-          </p>
         </div>
       </div>
     </div>

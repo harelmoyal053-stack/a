@@ -1,9 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Globe, Heart, Home, Menu, Plus, Search, X } from 'lucide-react'
+import { Globe, Heart, Home, Menu, MessageCircle, Search, X } from 'lucide-react'
 import FestivalCard from './components/FestivalCard'
 import FestivalModal from './components/FestivalModal'
+import ChatScreen from './components/ChatScreen'
+import MyGroups from './components/MyGroups'
+import { useChat } from './chat/ChatContext'
 import { CONTINENTS, FESTIVALS, GENRES, MONTHS } from './data/festivals'
-import { groupsFor } from './data/groups'
+import { findGroup, groupsFor } from './data/groups'
 import { REPO_URL, suggestFestivalUrl } from './config'
 import { monthsAway } from './utils'
 
@@ -11,6 +14,7 @@ const FAVORITES_KEY = 'festival-groups:favorites'
 const TABS = [
   { id: 'home', label: 'בית', icon: Home },
   { id: 'search', label: 'חיפוש', icon: Search },
+  { id: 'chats', label: 'צ׳אטים', icon: MessageCircle },
   { id: 'world', label: 'בעולם', icon: Globe },
   { id: 'favorites', label: 'מועדפים', icon: Heart },
 ]
@@ -26,9 +30,10 @@ function loadFavorites() {
   }
 }
 
-function festivalIdFromHash() {
-  const match = window.location.hash.match(/^#\/festival\/([\w-]+)$/)
-  return match ? match[1] : null
+// "#/festival/<id>" or "#/chat/<group id>" → { type, id }, else null.
+function routeFromHash() {
+  const match = window.location.hash.match(/^#\/(festival|chat)\/([\w-]+)$/)
+  return match ? { type: match[1], id: match[2] } : null
 }
 
 function Chip({ active, onClick, children }) {
@@ -66,14 +71,19 @@ export default function App() {
   const [genre, setGenre] = useState('all')
   const [month, setMonth] = useState('all')
   const [favorites, setFavorites] = useState(loadFavorites)
-  const [openId, setOpenId] = useState(festivalIdFromHash)
+  const [route, setRoute] = useState(routeFromHash)
+  const { myGroups } = useChat()
   const [menuOpen, setMenuOpen] = useState(false)
   const searchRef = useRef(null)
 
   useEffect(() => {
-    const onHash = () => setOpenId(festivalIdFromHash())
-    window.addEventListener('hashchange', onHash)
-    return () => window.removeEventListener('hashchange', onHash)
+    const onNav = () => setRoute(routeFromHash())
+    window.addEventListener('popstate', onNav)
+    window.addEventListener('hashchange', onNav)
+    return () => {
+      window.removeEventListener('popstate', onNav)
+      window.removeEventListener('hashchange', onNav)
+    }
   }, [])
 
   useEffect(() => {
@@ -97,13 +107,20 @@ export default function App() {
       return next
     })
 
-  const openFestival = (id) => {
-    history.pushState(null, '', `#/festival/${id}`)
-    setOpenId(id)
+  const navigate = (type, id) => {
+    history.pushState({ inApp: true }, '', `#/${type}/${id}`)
+    setRoute({ type, id })
   }
-  const closeFestival = useCallback(() => {
-    history.replaceState(null, '', window.location.pathname + window.location.search)
-    setOpenId(null)
+  const openFestival = (id) => navigate('festival', id)
+  const openChat = (id) => navigate('chat', id)
+  // Go back when we opened this screen ourselves, so the back button stays in sync.
+  const closeScreen = useCallback(() => {
+    if (history.state?.inApp) {
+      history.back()
+    } else {
+      history.replaceState(null, '', window.location.pathname + window.location.search)
+      setRoute(null)
+    }
   }, [])
 
   const homeResults = useMemo(
@@ -147,7 +164,9 @@ export default function App() {
     </ChipRow>
   )
 
-  const openFestivalData = FESTIVALS.find((f) => f.id === openId)
+  const openFestivalData = route?.type === 'festival' ? FESTIVALS.find((f) => f.id === route.id) : null
+  const openChatData = route?.type === 'chat' ? findGroup(route.id) : null
+  const hasGroups = Object.keys(myGroups).length > 0
   const favoriteList = BY_UPCOMING.filter((f) => favorites.has(f.id))
 
   return (
@@ -172,11 +191,20 @@ export default function App() {
         {tab === 'home' && (
           <>
             <section className="mb-6">
-              <p className="text-white/50 text-sm">קבוצות וואטסאפ לפסטיבלים בכל העולם</p>
+              <p className="text-white/50 text-sm">קבוצות צ׳אט לפסטיבלים בכל העולם</p>
               <h1 className="font-black text-3xl sm:text-5xl leading-tight mt-1">
                 מוצאים את החבר׳ה <span className="text-accent">לפסטיבל הבא</span>
               </h1>
             </section>
+            {hasGroups && (
+              <section className="mb-8">
+                <div className="flex justify-between items-baseline">
+                  <SectionTitle>הקבוצות שלי</SectionTitle>
+                  <button type="button" onClick={() => setTab('chats')} className="text-sm text-whatsapp">לכל הצ׳אטים</button>
+                </div>
+                <MyGroups onOpen={openChat} limit={3} />
+              </section>
+            )}
             <div className="mb-5">{genreChips}</div>
             <SectionTitle count={homeResults.length}>הפסטיבלים הקרובים</SectionTitle>
             {renderGrid(homeResults)}
@@ -226,6 +254,13 @@ export default function App() {
           </>
         )}
 
+        {tab === 'chats' && (
+          <>
+            <SectionTitle>צ׳אטים</SectionTitle>
+            <MyGroups onOpen={openChat} emptyHint />
+          </>
+        )}
+
         {tab === 'world' && Object.entries(CONTINENTS).map(([key, label]) => {
           const list = BY_UPCOMING.filter((f) => f.continent === key)
           if (list.length === 0) return null
@@ -251,7 +286,7 @@ export default function App() {
         )}
 
         <footer className="text-center text-xs text-white/30 py-10">
-          FestiChat הוא אינדקס קהילתי ואינו קשור לפסטיבלים או ל-WhatsApp. החודשים משוערים – בדקו באתר הרשמי.
+          FestiChat היא קהילה עצמאית ואינה קשורה לפסטיבלים. החודשים משוערים – בדקו באתר הרשמי.
         </footer>
       </main>
 
@@ -273,10 +308,6 @@ export default function App() {
               </button>
             )
           })}
-          <a href={suggestFestivalUrl()} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-1 py-2.5 text-xs text-white/50">
-            <Plus size={24} />
-            הוספה
-          </a>
         </div>
       </nav>
 
@@ -285,9 +316,9 @@ export default function App() {
           <div className="absolute top-0 left-0 h-full w-72 max-w-[85%] bg-ink-800 p-6 flex flex-col gap-1 animate-slide-up" onClick={(e) => e.stopPropagation()}>
             <button type="button" onClick={() => setMenuOpen(false)} className="self-end mb-4" aria-label="סגירת תפריט"><X size={24} /></button>
             <a href={suggestFestivalUrl()} target="_blank" rel="noopener noreferrer" className="py-3 font-bold border-b border-white/10">הצעת פסטיבל חדש</a>
-            <a href={`${REPO_URL}/issues`} target="_blank" rel="noopener noreferrer" className="py-3 font-bold border-b border-white/10">בקשות פתוחות להוספת קבוצות</a>
+            <a href={`${REPO_URL}/issues`} target="_blank" rel="noopener noreferrer" className="py-3 font-bold border-b border-white/10">דיווח על בעיה</a>
             <p className="text-sm text-white/50 mt-4 leading-relaxed">
-              מנהלים קבוצת וואטסאפ לפסטיבל? פתחו את עמוד הפסטיבל ולחצו על ״הוספת קישור״. כל קישור נבדק לפני שהוא עולה.
+              בוחרים פסטיבל, מצטרפים לקבוצה ומתכתבים עם כל מי שמגיע. הקבוצות שהצטרפתם אליהן מחכות לכם בלשונית ״צ׳אטים״.
             </p>
           </div>
         </div>
@@ -299,8 +330,13 @@ export default function App() {
           groups={GROUPS[openFestivalData.id]}
           isFavorite={favorites.has(openFestivalData.id)}
           onToggleFavorite={() => toggleFavorite(openFestivalData.id)}
-          onClose={closeFestival}
+          onClose={closeScreen}
+          onOpenChat={openChat}
         />
+      )}
+
+      {openChatData && (
+        <ChatScreen festival={openChatData.festival} group={openChatData.group} onClose={closeScreen} />
       )}
     </div>
   )
