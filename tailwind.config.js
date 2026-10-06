@@ -7,6 +7,11 @@ export default {
   ],
   theme: {
     extend: {
+      colors: {
+        ink: { 900: '#0b0b0d', 800: '#1c1c1f', 700: '#2a2a2e' },
+        accent: '#facc15',
+        whatsapp: '#25d366',
+      },
       fontFamily: {
         hebrew: ['Rubik', 'Arial', 'sans-serif'],
       },

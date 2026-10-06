@@ -1,5 +1,7 @@
 // Festival catalog. `month` is the month the festival usually takes place (1-12).
 // Add a festival by appending an object with a unique `id`.
+// Optional `image: { src, credit }` shows a photo on the card instead of the
+// generated poster. Use only images you have the right to publish.
 export const CONTINENTS = {
   europe: 'אירופה',
   northAmerica: 'צפון אמריקה',
@@ -29,6 +31,7 @@ export const MONTHS = [
 ]
 
 export const FESTIVALS = [
+  { id: 'zamna-tulum', name: 'Zamna Tulum', city: 'טולום', country: 'מקסיקו', flag: '🇲🇽', continent: 'northAmerica', month: 1, genres: ['electronic'], emoji: '🌴', colors: ['#0f766e', '#a16207'], website: 'https://zamnafestival.com' },
   { id: 'tomorrowland', name: 'Tomorrowland', city: 'בום', country: 'בלגיה', flag: '🇧🇪', continent: 'europe', month: 7, genres: ['electronic'], emoji: '🦋', colors: ['#7c3aed', '#db2777'], website: 'https://www.tomorrowland.com' },
   { id: 'glastonbury', name: 'Glastonbury', city: 'פילטון', country: 'אנגליה', flag: '🇬🇧', continent: 'europe', month: 6, genres: ['rock', 'pop', 'indie'], emoji: '🎪', colors: ['#16a34a', '#ca8a04'], website: 'https://www.glastonburyfestivals.co.uk' },
   { id: 'coachella', name: 'Coachella', city: 'אינדיו, קליפורניה', country: 'ארה"ב', flag: '🇺🇸', continent: 'northAmerica', month: 4, genres: ['pop', 'indie', 'hiphop', 'electronic'], emoji: '🌴', colors: ['#f97316', '#ec4899'], website: 'https://www.coachella.com' },

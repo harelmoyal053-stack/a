@@ -1,63 +1,50 @@
-import { Calendar, Heart, MapPin, MessageCircle } from 'lucide-react'
-import { GENRES, MONTHS } from '../data/festivals'
+import { Heart, MapPin, Star } from 'lucide-react'
+import { MONTHS } from '../data/festivals'
+import { countdownLabel } from '../utils'
+import Poster from './Poster'
 
 export default function FestivalCard({ festival, groups, isFavorite, onToggleFavorite, onOpen }) {
   const openCount = groups.filter((g) => g.invite).length
-  const [from, to] = festival.colors
 
   return (
-    <article className="group relative bg-white rounded-3xl shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 overflow-hidden flex flex-col border border-slate-100">
-      <button
-        type="button"
-        onClick={onOpen}
-        className="relative h-36 text-right"
-        style={{ background: `linear-gradient(135deg, ${from}, ${to})` }}
-        aria-label={`פתח את ${festival.name}`}
-      >
-        <span className="absolute inset-0 flex items-center justify-center text-6xl drop-shadow-lg transition-transform duration-300 group-hover:scale-110">
-          {festival.emoji}
+    <article className="relative bg-ink-800 rounded-2xl overflow-hidden flex flex-col">
+      <button type="button" onClick={onOpen} className="relative aspect-square text-right group" aria-label={`פתח את ${festival.name}`}>
+        <Poster festival={festival} />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+        <span className="absolute top-2.5 right-2.5 bg-black/70 backdrop-blur text-white text-xs sm:text-sm font-semibold px-3 py-1 rounded-full border border-white/10">
+          {countdownLabel(festival.month)}
         </span>
-        <span className="absolute bottom-3 right-3 bg-black/30 backdrop-blur text-white text-xs font-medium px-2.5 py-1 rounded-full flex items-center gap-1">
-          <Calendar size={12} /> {MONTHS[festival.month - 1]}
+        <span className="absolute bottom-2.5 right-3 flex items-center gap-1 font-black text-lg sm:text-2xl drop-shadow-lg">
+          {openCount > 0 ? (
+            <>
+              <Star size={16} className="fill-accent text-accent" />
+              <span className="text-accent">{openCount} קבוצות פעילות</span>
+            </>
+          ) : (
+            <span className="text-white">{groups.length} קבוצות</span>
+          )}
         </span>
       </button>
 
       <button
         type="button"
         onClick={onToggleFavorite}
-        className="absolute top-3 left-3 w-9 h-9 rounded-full bg-white/90 flex items-center justify-center shadow hover:scale-110 transition-transform"
+        className="absolute top-2.5 left-2.5 w-8 h-8 rounded-full bg-black/60 backdrop-blur flex items-center justify-center border border-white/10"
         aria-label={isFavorite ? 'הסר ממועדפים' : 'הוסף למועדפים'}
         aria-pressed={isFavorite}
       >
-        <Heart size={18} className={isFavorite ? 'fill-rose-500 text-rose-500' : 'text-slate-500'} />
+        <Heart size={16} className={isFavorite ? 'fill-rose-500 text-rose-500' : 'text-white'} />
       </button>
 
-      <div className="p-4 flex flex-col gap-3 flex-1">
-        <div>
-          <h3 className="font-bold text-lg text-slate-900 leading-tight" dir="auto">{festival.name}</h3>
-          <p className="text-sm text-slate-500 flex items-center gap-1 mt-1">
-            <MapPin size={14} /> {festival.flag} {festival.city}, {festival.country}
-          </p>
-        </div>
-
-        <div className="flex flex-wrap gap-1.5">
-          {festival.genres.map((genre) => (
-            <span key={genre} className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">
-              {GENRES[genre]}
-            </span>
-          ))}
-        </div>
-
-        <button
-          type="button"
-          onClick={onOpen}
-          className="mt-auto w-full flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2.5 rounded-xl transition-colors"
-        >
-          <MessageCircle size={18} />
-          {groups.length} קבוצות
-          {openCount > 0 && <span className="bg-white/25 text-xs px-2 py-0.5 rounded-full">{openCount} פעילות</span>}
-        </button>
-      </div>
+      <button type="button" onClick={onOpen} className="p-3 sm:p-4 flex flex-col items-start gap-2 text-right flex-1">
+        <span className="text-xs sm:text-sm text-white/80 border border-white/15 bg-white/5 rounded-full px-3 py-1">
+          {MONTHS[festival.month - 1]} · {festival.flag} {festival.country}
+        </span>
+        <h3 className="font-black text-base sm:text-xl leading-tight text-white" dir="auto">{festival.name}</h3>
+        <p className="text-xs sm:text-sm text-white/50 flex items-start gap-1">
+          <MapPin size={14} className="text-rose-500 fill-rose-500/30 shrink-0 mt-0.5" /> {festival.city}, {festival.country}
+        </p>
+      </button>
     </article>
   )
 }
