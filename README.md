@@ -1,16 +1,40 @@
-# React + Vite
+# a
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This repo deploys to GitHub Pages at `https://harelmoyal053-stack.github.io/a/`. It holds two sites:
 
-Currently, two official plugins are available:
+| Path | Site |
+| --- | --- |
+| `/a/` | DropPrice – group-buying prototype (`index.html`, `src/`) |
+| `/a/festivals/` | **FestiChat** – WhatsApp groups for festivals worldwide (`festivals/index.html`, `src/festivals/`) |
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## FestiChat
 
-## React Compiler
+A Hebrew (RTL) directory of WhatsApp groups for festivals around the world. Users search and filter festivals by continent, genre, and month, save favorites, and open a festival page (shareable as `#/festival/<id>`) to join its groups.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Every festival comes with six group types: general, Israelis at the festival, rides, camping/lodging, ticket swaps, and solo travelers.
 
-## Expanding the ESLint configuration
+### Adding a WhatsApp group link
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Add the invite link to `INVITES` in `src/festivals/data/groups.js`:
+
+```js
+export const INVITES = {
+  'tomorrowland:general': 'https://chat.whatsapp.com/AbCdEfGhIjKlMnOpQrStUv',
+}
+```
+
+The key is `<festival id>:<group type>`. The site only accepts `https://chat.whatsapp.com/...` links. Until a group has a link, its "הוספת קישור" button opens a pre-filled GitHub issue, so group admins can submit links for review.
+
+### Adding a festival
+
+Append an entry to `FESTIVALS` in `src/festivals/data/festivals.js`. Visitors can suggest festivals through the "הצעת פסטיבל" button, which also opens a GitHub issue.
+
+## Development
+
+```bash
+npm install
+npm run dev     # http://localhost:5173/a/festivals/
+npm run build
+```
+
+Pushes to `master` deploy automatically (`.github/workflows/deploy.yml`).
