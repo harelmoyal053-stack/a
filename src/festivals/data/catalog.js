@@ -1,7 +1,5 @@
-import { FESTIVALS } from './festivals'
-
-// Turns the curated list plus the auto-updated event feed (events.json, written
-// daily by scripts/fetch-events.mjs) into one catalog of festivals and parties.
+// Turns the auto-updated event feed (events.json, written daily by
+// scripts/fetch-events.mjs) into the catalog of festivals and parties.
 
 const CONTINENT_BY_COUNTRY = {
   US: 'northAmerica', CA: 'northAmerica', MX: 'northAmerica',
@@ -38,15 +36,7 @@ export function sourceLabel(source) {
   return source
 }
 
-const normalize = (name) => name.toLowerCase().replace(/[^a-z0-9א-ת]+/g, ' ').trim()
 const today = () => new Date().toISOString().slice(0, 10)
-
-// Undated curated festivals sort as if on the 15th of their next occurrence.
-function approximateDate(month) {
-  const now = new Date()
-  const year = month - 1 < now.getMonth() ? now.getFullYear() + 1 : now.getFullYear()
-  return `${year}-${String(month).padStart(2, '0')}-15`
-}
 
 function fromEvent(e) {
   const style = GENRE_STYLE[e.genres[0]] ?? DEFAULT_STYLE
@@ -79,32 +69,10 @@ function fromEvent(e) {
 }
 
 export function buildCatalog(feed) {
-  const curated = FESTIVALS.map((f) => ({ ...f, kind: 'festival', source: 'curated' }))
-  const events = (feed?.events ?? []).filter((e) => e.endDate >= today()).map(fromEvent)
-
-  // A feed event for a curated festival enriches it (real dates, photo,
-  // tickets) instead of appearing twice. The curated id is kept so its chats stay.
-  const used = new Set()
-  for (const festival of curated) {
-    const name = normalize(festival.name)
-    const match = events.find((e) => !used.has(e.id) && e.kind === 'festival' && normalize(e.name).startsWith(name))
-    if (!match) continue
-    used.add(match.id)
-    Object.assign(festival, {
-      startDate: match.startDate,
-      endDate: match.endDate,
-      month: match.month,
-      image: festival.image ?? match.image,
-      tickets: match.tickets,
-      priceFrom: match.priceFrom,
-      currency: match.currency,
-      sources: match.sources,
-    })
-  }
-
-  return [...curated, ...events.filter((e) => !used.has(e.id))]
-    .map((item) => ({ ...item, sortDate: item.startDate ?? approximateDate(item.month) }))
-    .sort((a, b) => a.sortDate.localeCompare(b.sortDate))
+  return (feed?.events ?? [])
+    .filter((e) => e.endDate >= today())
+    .map(fromEvent)
+    .sort((a, b) => a.startDate.localeCompare(b.startDate))
 }
 
 export async function loadFeed() {

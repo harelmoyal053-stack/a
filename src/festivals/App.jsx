@@ -159,10 +159,14 @@ export default function App() {
     </ChipRow>
   )
 
+  // Only offer filters that match at least one event.
+  const genreOptions = Object.entries(GENRES).filter(([key]) => catalog.items.some((f) => f.genres.includes(key)))
+  const continentOptions = Object.entries(CONTINENTS).filter(([key]) => catalog.items.some((f) => f.continent === key))
+
   const genreChips = (
     <ChipRow>
       <Chip active={genre === 'all'} onClick={() => setGenre('all')}>הכול</Chip>
-      {Object.entries(GENRES).map(([key, label]) => (
+      {genreOptions.map(([key, label]) => (
         <Chip key={key} active={genre === key} onClick={() => setGenre(key)}>{label}</Chip>
       ))}
     </ChipRow>
@@ -213,8 +217,18 @@ export default function App() {
               {kindChips}
               {genreChips}
             </div>
-            <SectionTitle count={homeResults.length}>{kind === 'party' ? 'המסיבות הקרובות' : 'האירועים הקרובים'}</SectionTitle>
-            {renderGrid(homeResults, `home-${kind}-${genre}`)}
+            <SectionTitle count={catalog.loaded ? homeResults.length : undefined}>{kind === 'party' ? 'המסיבות הקרובות' : 'האירועים הקרובים'}</SectionTitle>
+            {!catalog.loaded && (
+              <div className="grid gap-3 sm:gap-5 grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" aria-label="טוען אירועים">
+                {Array.from({ length: 8 }, (_, i) => (
+                  <div key={i} className="bg-ink-800 rounded-2xl aspect-[3/4] animate-pulse" />
+                ))}
+              </div>
+            )}
+            {catalog.loaded && catalog.items.length === 0 && (
+              <p className="text-center text-white/50 py-16">לא הצלחנו לטעון אירועים כרגע. נסו לרענן בעוד כמה דקות.</p>
+            )}
+            {catalog.loaded && renderGrid(homeResults, `home-${kind}-${genre}`)}
             {catalog.updatedAt && (
               <p className="text-xs text-white/30 mt-4 text-center">
                 האירועים מתעדכנים אוטומטית מ: {catalog.sources.map(sourceLabel).join(', ')} · עודכן {new Date(catalog.updatedAt).toLocaleDateString('he-IL')}
@@ -244,7 +258,7 @@ export default function App() {
               {kindChips}
               <ChipRow>
                 <Chip active={continent === 'all'} onClick={() => setContinent('all')}>כל העולם</Chip>
-                {Object.entries(CONTINENTS).map(([key, label]) => (
+                {continentOptions.map(([key, label]) => (
                   <Chip key={key} active={continent === key} onClick={() => setContinent(key)}>{label}</Chip>
                 ))}
               </ChipRow>

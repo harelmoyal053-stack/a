@@ -11,7 +11,7 @@ function daysUntil(isoDate) {
   return Math.round((Date.UTC(y, m - 1, d) - Date.UTC(now.getFullYear(), now.getMonth(), now.getDate())) / DAY_MS)
 }
 
-// Countdown badge: real days for dated events, months for curated ones.
+// Countdown badge: days for the next six weeks, then months.
 export function countdownFor(item) {
   if (!item.startDate) return countdownLabel(item.month)
   const days = daysUntil(item.startDate)

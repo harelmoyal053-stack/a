@@ -9,7 +9,7 @@ This repo deploys to GitHub Pages at `https://harelmoyal053-stack.github.io/a/`.
 
 ## FestiChat
 
-A Hebrew (RTL) community app for festivals worldwide. Users find a festival, join its group chats (general, Israelis at the festival, rides, camping/lodging, ticket swaps, solo travelers), and chat in real time. Joined groups appear on the home screen and in the chats tab. Anyone can read a group; only members can write.
+A Hebrew (RTL) community app for festivals worldwide. Users find a festival or party, join its group chats (general, Israelis at the festival, rides, camping/lodging, ticket swaps, solo travelers), and chat in real time. Joined groups appear on the home screen and in the chats tab. Anyone can read a group; only members can write.
 
 ### Connecting the chat to Firebase
 
@@ -38,11 +38,9 @@ Sources without a key are skipped. If a source fails, its events from the previo
 
 **De-duplication** (`scripts/events/merge.mjs`): listings are first folded within a source (day passes, weekends, VIP), then matched across sources by country, city or venue, overlapping dates (±1 day), and shared name words. A merged event keeps every source's ticket link (cheapest first) and credits all sources. Each event reuses the id it had in the previous `events.json`, so its chats survive name or source changes. Tests: `npm run test:events`.
 
-When an event matches a curated festival, it fills in the festival's real dates, photo, and ticket links instead of being listed twice.
+### Event catalog
 
-### Adding a festival
-
-Append an entry to `FESTIVALS` in `src/festivals/data/festivals.js`. Each festival gets the group chats listed in `src/festivals/data/groups.js`.
+The site lists only events from the automatic feed above; there is no hand-maintained list. Shared labels (continents, genres, months) live in `src/festivals/data/festivals.js`.
 
 ## Development
 
