@@ -8,12 +8,17 @@ export default {
   theme: {
     extend: {
       colors: {
-        ink: { 900: '#0b0b0d', 800: '#1c1c1f', 700: '#2a2a2e' },
-        accent: '#facc15',
-        whatsapp: '#25d366',
+        // FestiChat palette: near-black surfaces, one acid accent.
+        ink: { 950: '#070707', 900: '#0b0b0b', 800: '#141414', 700: '#1c1c1c', 600: '#262626' },
+        muted: '#8b8b8b',
+        accent: '#c6ff3d',
+        whatsapp: '#c6ff3d',
       },
       fontFamily: {
         hebrew: ['Rubik', 'Arial', 'sans-serif'],
+        ui: ['"IBM Plex Sans Hebrew"', '"IBM Plex Sans"', 'system-ui', 'sans-serif'],
+        num: ['"IBM Plex Mono"', '"IBM Plex Sans Hebrew"', 'ui-monospace', 'monospace'],
+        poster: ['"IBM Plex Sans Condensed"', '"IBM Plex Sans Hebrew"', 'sans-serif'],
       },
       animation: {
         'pulse-slow': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',

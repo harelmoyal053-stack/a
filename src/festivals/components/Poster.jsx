@@ -1,52 +1,48 @@
 import { useState } from 'react'
-import { MONTHS } from '../data/festivals'
 
+// Shrink for long names, and for long single words so they never split mid-word.
 function titleSize(name, large) {
-  if (large) return name.length > 24 ? 'text-3xl' : 'text-5xl'
-  return name.length > 24 ? 'text-lg' : 'text-2xl'
+  const longestWord = Math.max(...name.split(/\s+/).map((w) => w.length))
+  const long = name.length > 22 || longestWord > 8
+  if (large) return long ? 'text-4xl' : 'text-6xl'
+  return long ? 'text-xl' : 'text-3xl'
 }
 
-// Festival artwork: the festival's photo when one is set, otherwise a
-// generated poster in the festival's colors.
-export default function Poster({ festival, large = false }) {
+// Event artwork: the event's photo, or a typographic flyer in its colour.
+export default function Poster({ festival, large = false, showTitle = true }) {
   const [failedSrc, setFailedSrc] = useState(null)
-  if (festival.image && festival.image.src !== failedSrc) {
+  const src = festival.image?.src
+  if (src && src !== failedSrc) {
     return (
-      <div className="absolute inset-0">
-        <img
-          src={festival.image.src}
-          alt={festival.name}
-          loading="lazy"
-          referrerPolicy="no-referrer"
-          onError={() => setFailedSrc(festival.image.src)}
-          className="w-full h-full object-cover"
-        />
-        {festival.image.credit && (
-          <span className="absolute bottom-1 left-2 text-[9px] text-white/60" dir="ltr">{festival.image.credit}</span>
-        )}
-      </div>
+      <img
+        src={src}
+        alt=""
+        loading="lazy"
+        referrerPolicy="no-referrer"
+        onError={() => setFailedSrc(src)}
+        className="absolute inset-0 w-full h-full object-cover"
+      />
     )
   }
 
-  const [from, to] = festival.colors
+  const [tone] = festival.colors
+  const [, m, d] = (festival.startDate ?? '').split('-')
   return (
-    <div
-      className="absolute inset-0 overflow-hidden"
-      style={{
-        background: `radial-gradient(circle at 75% 20%, ${from}cc, transparent 55%), radial-gradient(circle at 15% 85%, ${to}cc, transparent 60%), #0b0b0f`,
-      }}
-      aria-hidden="true"
-    >
+    <div className="absolute inset-0 overflow-hidden bg-ink-800" aria-hidden="true">
+      <div className="absolute inset-0 opacity-60" style={{ background: `linear-gradient(160deg, ${tone}55 0%, transparent 55%)` }} />
       <div className="absolute inset-0 poster-grain" />
-      <span className={`absolute ${large ? 'text-[9rem] -left-4 -bottom-6' : 'text-[6.5rem] -left-3 -bottom-4'} opacity-90 drop-shadow-2xl rotate-[-12deg]`}>
-        {festival.emoji}
-      </span>
-      <div className={`absolute inset-x-0 top-0 ${large ? 'p-6 pt-16' : 'p-3 pt-12'} text-left`} dir="ltr">
-        <p className={`${large ? 'text-sm' : 'text-[10px]'} text-white/70 font-medium`} dir="rtl">
-          {MONTHS[festival.month - 1]} · {festival.country}
-        </p>
-        <p className={`font-black uppercase leading-[0.9] text-white break-words line-clamp-3 ${titleSize(festival.name, large)}`} dir="auto">
-          {festival.name}
+      <div className={`absolute inset-0 flex flex-col justify-between ${large ? 'p-6 pt-20' : 'p-3'}`} dir="ltr">
+        <div className={`flex justify-between font-num uppercase tracking-[0.12em] text-white/50 ${large ? 'text-xs' : 'text-[9px]'}`}>
+          <span>{large && (festival.kind === 'festival' ? 'Festival' : 'Club night')}</span>
+          {d && <span>{d}.{m}</span>}
+        </div>
+        {showTitle ? (
+          <p className={`font-poster font-bold uppercase leading-[0.88] tracking-tight text-white line-clamp-4 break-words ${titleSize(festival.name, large)}`} dir="auto">
+            {festival.name}
+          </p>
+        ) : <span />}
+        <p className={`font-num uppercase tracking-[0.12em] truncate ${large ? 'text-xs' : 'text-[9px]'}`} style={{ color: tone }}>
+          {festival.city}
         </p>
       </div>
     </div>

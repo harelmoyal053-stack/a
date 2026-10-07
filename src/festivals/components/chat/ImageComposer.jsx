@@ -23,9 +23,9 @@ export default function ImageComposer({ image, onSend, onClose }) {
           onChange={(e) => setCaption(e.target.value)}
           maxLength={1000}
           placeholder="הוספת כיתוב…"
-          className="flex-1 bg-ink-800 rounded-full px-4 py-3 outline-none"
+          className="flex-1 h-12 bg-ink-800 border border-ink-600 rounded-lg px-4 outline-none"
         />
-        <button type="submit" className="w-12 h-12 rounded-full bg-whatsapp text-black flex items-center justify-center" aria-label="שליחה">
+        <button type="submit" className="w-12 h-12 rounded-lg bg-accent text-black flex items-center justify-center" aria-label="שליחה">
           <Send size={20} className="-scale-x-100" />
         </button>
       </form>

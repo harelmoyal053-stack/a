@@ -4,6 +4,7 @@ import { useChat, useGroupMeta } from '../chat/ChatContext'
 import { replyRef } from '../chat/messages'
 import { compressImage, currentLocation } from '../chat/media'
 import { dayLabel, isEnded, membersLabel } from '../utils'
+import EventAvatar from './EventAvatar'
 import GroupIcon from './GroupIcon'
 import Composer from './chat/Composer'
 import GroupInfo from './chat/GroupInfo'
@@ -146,11 +147,10 @@ export default function ChatScreen({ festival, group, onClose }) {
   }, [messages, search])
 
   const pinnedMessage = pinned && messages.find((m) => m.id === pinned.id && !m.deleted) ? pinned : null
-  const [from, to] = festival.colors
 
   return (
     <div className="fixed inset-0 z-[55] bg-ink-900 flex flex-col animate-slide-up" role="dialog" aria-modal="true" aria-label={`צ'אט ${group.title}`}>
-      <header className="flex items-center gap-2 px-2 h-16 bg-ink-800 border-b border-white/5 shrink-0">
+      <header className="flex items-center gap-2 px-2 h-14 bg-ink-900 border-b hairline shrink-0">
         <button type="button" onClick={onClose} className="w-10 h-10 flex items-center justify-center" aria-label="חזרה">
           <ArrowRight size={22} />
         </button>
@@ -160,17 +160,18 @@ export default function ChatScreen({ festival, group, onClose }) {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="חיפוש בצ׳אט…"
-            className="flex-1 bg-ink-700 rounded-full px-4 py-2 outline-none"
+            className="flex-1 h-9 bg-ink-700 rounded-md px-3 outline-none text-[15px]"
             aria-label="חיפוש בצ׳אט"
           />
         ) : (
-          <button type="button" onClick={() => setInfoOpen(true)} className="flex items-center gap-3 flex-1 min-w-0 text-right">
-            <span className="w-10 h-10 shrink-0 rounded-full flex items-center justify-center text-xl" style={{ background: `linear-gradient(135deg, ${from}, ${to})` }}>
-              {festival.emoji}
-            </span>
+          <button type="button" onClick={() => setInfoOpen(true)} className="flex items-center gap-3 flex-1 min-w-0 text-right" aria-label="פרטי הקבוצה">
+            <EventAvatar festival={festival} size="sm" />
             <span className="min-w-0">
-              <span className="block font-bold truncate"><span dir="auto">{festival.name}</span> · {group.title}</span>
-              <span className="block text-xs text-white/50">{membersLabel(memberCount)} · לחצו לפרטי הקבוצה</span>
+              <span className="block text-[15px] font-medium truncate">{group.title}</span>
+              <span className="flex gap-1.5 text-[12px] text-muted min-w-0">
+                <span className="truncate" dir="auto">{festival.name}</span>
+                <span className="shrink-0">· {membersLabel(memberCount)}</span>
+              </span>
             </span>
           </button>
         )}
@@ -185,13 +186,13 @@ export default function ChatScreen({ festival, group, onClose }) {
       </header>
 
       {service?.mode === 'local' && (
-        <p className="bg-accent/15 text-accent text-xs text-center px-4 py-1.5 shrink-0">
+        <p className="border-b hairline text-accent text-[12px] text-center px-4 py-1.5 shrink-0">
           מצב תצוגה: הצ׳אט עוד לא מחובר לשרת, וההודעות נשמרות רק במכשיר הזה.
         </p>
       )}
 
       {ended && (
-        <p className="bg-white/5 text-white/60 text-xs text-center px-4 py-1.5 shrink-0">
+        <p className="border-b hairline text-muted text-xs text-center px-4 py-1.5 shrink-0">
           האירוע הסתיים · הקבוצה ממשיכה לחברים שלה, ואי אפשר להצטרף אליה יותר
         </p>
       )}
@@ -200,7 +201,7 @@ export default function ChatScreen({ festival, group, onClose }) {
         <button type="button" onClick={() => jumpTo(pinnedMessage.id)} className="flex items-center gap-2 px-4 py-2 bg-ink-800/90 border-b border-white/5 text-right shrink-0">
           <Pin size={16} className="text-accent shrink-0" />
           <span className="min-w-0 flex-1">
-            <span className="block text-xs text-accent font-bold">הודעה נעוצה · {pinnedMessage.name}</span>
+            <span className="block text-xs text-accent font-semibold">הודעה נעוצה · {pinnedMessage.name}</span>
             <span className="block text-sm truncate" dir="auto">{pinnedMessage.text}</span>
           </span>
         </button>
@@ -209,10 +210,10 @@ export default function ChatScreen({ festival, group, onClose }) {
       <div className="flex-1 overflow-y-auto px-3 py-4 chat-wallpaper">
         <div className="max-w-2xl mx-auto flex flex-col gap-2">
           {!search && (
-            <div className="self-center text-center bg-ink-800/90 text-white/70 text-xs rounded-xl px-4 py-2 mb-3 max-w-xs">
-              <GroupIcon name={group.icon} size={18} className="mx-auto mb-1 text-whatsapp" />
+            <div className="self-center text-center border hairline text-muted text-xs rounded-lg px-4 py-3 mb-4 max-w-xs">
+              <GroupIcon name={group.icon} size={16} className="mx-auto mb-1.5 text-white/70" />
               {group.description}
-              <span className="block mt-1 text-white/40">לחיצה ארוכה על הודעה: תגובה, תשובה, נעיצה ועוד · לחיצה כפולה: ❤️</span>
+              <span className="block mt-1 text-white/40">לחיצה ארוכה על הודעה לתגובה, תשובה ונעיצה. לחיצה כפולה מסמנת לב.</span>
             </div>
           )}
           {visible.map((m, i) => {
@@ -221,7 +222,7 @@ export default function ChatScreen({ festival, group, onClose }) {
             const showDay = !prev || day !== dayLabel(prev.createdAt)
             return (
               <div key={m.id} className="flex flex-col">
-                {showDay && <span className="self-center bg-ink-800 text-white/60 text-xs rounded-lg px-3 py-1 my-2">{day}</span>}
+                {showDay && <span className="self-center text-[10px] text-muted my-3">{day}</span>}
                 <MessageBubble
                   message={m}
                   mine={m.uid === user?.uid}
@@ -246,9 +247,9 @@ export default function ChatScreen({ festival, group, onClose }) {
       </div>
 
       {error && <p className="text-rose-400 text-sm text-center py-1 shrink-0">{error}</p>}
-      {toast && <p className="fixed bottom-24 inset-x-0 mx-auto w-fit bg-white text-black text-sm rounded-full px-4 py-2 z-[90]">{toast}</p>}
+      {toast && <p className="fixed bottom-24 inset-x-0 mx-auto w-fit bg-white text-black text-[13px] rounded-md px-3 py-1.5 z-[90]">{toast}</p>}
 
-      <footer className="shrink-0 bg-ink-800 border-t border-white/5 px-3 py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+      <footer className="shrink-0 bg-ink-900 border-t hairline px-3 py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
         {isMember ? (
           <Composer
             key={editing?.id ?? 'compose'}
@@ -265,7 +266,7 @@ export default function ChatScreen({ festival, group, onClose }) {
         ) : (
           <div className="max-w-2xl mx-auto flex flex-col items-center gap-2 py-1">
             <p className="text-xs text-white/50">רק חברי הקבוצה יכולים לכתוב, להגיב ולהצביע</p>
-            <button type="button" onClick={() => withUser(() => run(() => chat.join(group, festival)))} className="w-full bg-whatsapp text-black font-bold py-3 rounded-full">
+            <button type="button" onClick={() => withUser(() => run(() => chat.join(group, festival)))} className="w-full h-11 bg-accent text-black font-medium rounded-md">
               הצטרפות לקבוצה
             </button>
           </div>

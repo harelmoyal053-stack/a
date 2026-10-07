@@ -12,7 +12,7 @@ const CATEGORIES = [
 export default function EmojiPicker({ onPick, className = '' }) {
   const [category, setCategory] = useState(0)
   return (
-    <div className={`bg-ink-800 border border-white/10 rounded-2xl shadow-2xl overflow-hidden ${className}`}>
+    <div className={`bg-ink-800 border border-white/10 rounded-lg shadow-2xl overflow-hidden ${className}`}>
       <div className="flex border-b border-white/10">
         {CATEGORIES.map((c, i) => (
           <button

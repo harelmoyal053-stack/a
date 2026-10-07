@@ -17,7 +17,7 @@ export default function PollCard({ poll, votes, myUid, canVote, onVote }) {
 
   return (
     <div className="min-w-[14rem]">
-      <p className="font-bold flex items-start gap-1.5 mb-1" dir="auto"><BarChart3 size={18} className="shrink-0 mt-0.5 text-whatsapp" />{poll.question}</p>
+      <p className="font-semibold flex items-start gap-1.5 mb-1" dir="auto"><BarChart3 size={18} className="shrink-0 mt-0.5 text-whatsapp" />{poll.question}</p>
       <p className="text-[11px] text-white/50 mb-2">{poll.multiple ? 'אפשר לבחור כמה תשובות' : 'בחרו תשובה אחת'}</p>
       <ul className="flex flex-col gap-2">
         {poll.options.map((option) => {

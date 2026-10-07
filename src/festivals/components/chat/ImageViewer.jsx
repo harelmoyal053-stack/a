@@ -13,7 +13,7 @@ export default function ImageViewer({ message, onClose }) {
     <div className="fixed inset-0 z-[80] bg-black/95 flex flex-col" onClick={onClose}>
       <div className="flex justify-between items-center p-4" onClick={(e) => e.stopPropagation()}>
         <div>
-          <p className="font-bold">{message.name}</p>
+          <p className="font-semibold">{message.name}</p>
           <p className="text-xs text-white/50">{clockTime(message.createdAt)}</p>
         </div>
         <div className="flex gap-4">

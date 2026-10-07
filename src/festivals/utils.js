@@ -42,10 +42,10 @@ export function dateChip(item, months) {
 
 export function priceLabel(item) {
   if (item.priceFrom == null) return null
-  if (item.priceFrom === 0) return 'כניסה חופשית'
+  if (item.priceFrom === 0) return 'חינם'
   try {
     const price = new Intl.NumberFormat('he-IL', { style: 'currency', currency: item.currency || 'USD', maximumFractionDigits: 0 }).format(item.priceFrom)
-    return `החל מ-${price}`
+    return `מ-${price}`
   } catch {
     return null
   }
@@ -87,4 +87,32 @@ export function dayLabel(ms) {
   if (d.toDateString() === today.toDateString()) return 'היום'
   if (d.toDateString() === yesterday.toDateString()) return 'אתמול'
   return d.toLocaleDateString('he-IL', { day: 'numeric', month: 'long' })
+}
+
+const WEEKDAYS = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת']
+
+// Section heading for a day in the event list: "היום", "מחר", "שבת 11.10".
+export function dayHeading(isoDate) {
+  const today = todayIso()
+  if (isoDate <= today) return 'היום'
+  const days = daysUntil(isoDate)
+  if (days === 1) return 'מחר'
+  const [, m, d] = isoDate.split('-')
+  const weekday = WEEKDAYS[new Date(`${isoDate}T12:00:00`).getDay()]
+  return `${weekday} ${d}.${m}`
+}
+
+// Compact meta line for a card: "שבת 11.10 · 23:00" or "09.04–16.04".
+export function cardDate(item) {
+  if (item.endDate && item.endDate !== item.startDate) {
+    const [, m1, d1] = item.startDate.split('-')
+    const [, m2, d2] = item.endDate.split('-')
+    return `\u2066${d1}.${m1}–${d2}.${m2}\u2069`
+  }
+  return [dayHeading(item.startDate), item.time].filter(Boolean).join(' · ')
+}
+
+export function initials(name) {
+  const words = name.replace(/[^\p{L}\p{N}\s]/gu, '').split(/\s+/).filter(Boolean)
+  return (words.length > 1 ? words[0][0] + words[1][0] : (words[0] ?? '?').slice(0, 2)).toUpperCase()
 }
