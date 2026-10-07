@@ -13,7 +13,7 @@ A Hebrew (RTL) community app for festivals worldwide. Users find a festival or p
 
 ### Accounts and chat (Firebase)
 
-Users sign in with Google and get a public profile (photo, name, short bio, Instagram link) that other group members can open from the chat. Until `src/festivals/chat/firebaseConfig.js` holds a config, the site runs in preview mode: sign-in asks only for a name, and accounts and messages stay in the visitor's browser. To make it live:
+Users sign in with Google and get a public profile (photo, name, short bio, Instagram link) that other group members can open from the chat. If `FIREBASE_CONFIG` in `src/festivals/chat/firebaseConfig.js` is set to `null`, the site runs in preview mode: sign-in asks only for a name, and accounts and messages stay in the visitor's browser. To make it live:
 
 1. Create a project at https://console.firebase.google.com (the free Spark plan is enough).
 2. **Build → Authentication → Sign-in method**: enable **Google**.
@@ -50,4 +50,4 @@ npm run dev     # http://localhost:5173/a/festivals/
 npm run build
 ```
 
-GitHub Pages serves the `gh-pages` branch. To publish FestiChat, build and copy `dist/festivals/` plus its `dist/assets/` files into that branch.
+GitHub Pages serves the `gh-pages` branch. To publish FestiChat, build and copy `dist/festivals/index.html` and every `dist/assets/` file except DropPrice's `main-*` into that branch. The Firebase code is a lazily loaded chunk that `index.html` doesn't reference directly, so copy the whole folder, not just the files the page links to.

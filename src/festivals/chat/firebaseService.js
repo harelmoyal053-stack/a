@@ -1,4 +1,5 @@
 import { initializeApp } from 'firebase/app'
+import { getAnalytics, isSupported as analyticsSupported } from 'firebase/analytics'
 import {
   GoogleAuthProvider, getAuth, onAuthStateChanged, signInWithPopup, signInWithRedirect, signOut,
 } from 'firebase/auth'
@@ -22,6 +23,8 @@ export const profileOf = (uid, data) => ({
 
 export function createFirebaseService(config) {
   const app = initializeApp(config)
+  // Visitor stats in Firebase → Analytics. Skipped where the browser can't run it.
+  if (config.measurementId) analyticsSupported().then((ok) => ok && getAnalytics(app)).catch(() => {})
   const auth = getAuth(app)
   const db = getFirestore(app)
   let current = null
