@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Globe, Heart, Home, Menu, MessageCircle, Search, X } from 'lucide-react'
+import { Heart, Home, Menu, MessageCircle, Search, X } from 'lucide-react'
 import FestivalGrid from './components/FestivalGrid'
 import FestivalModal from './components/FestivalModal'
 import ChatScreen from './components/ChatScreen'
@@ -16,7 +16,6 @@ const TABS = [
   { id: 'home', label: 'בית', icon: Home },
   { id: 'search', label: 'חיפוש', icon: Search },
   { id: 'chats', label: 'צ׳אטים', icon: MessageCircle },
-  { id: 'world', label: 'בעולם', icon: Globe },
   { id: 'favorites', label: 'מועדפים', icon: Heart },
 ]
 
@@ -290,17 +289,6 @@ export default function App() {
           </>
         )}
 
-        {tab === 'world' && Object.entries(CONTINENTS).map(([key, label]) => {
-          const list = catalog.items.filter((f) => f.continent === key)
-          if (list.length === 0) return null
-          return (
-            <section key={key} className="mb-10">
-              <SectionTitle count={list.length}>{label}</SectionTitle>
-              {renderGrid(list, `world-${key}`)}
-            </section>
-          )
-        })}
-
         {tab === 'favorites' && (
           <>
             <SectionTitle count={favoriteList.length}>המועדפים שלי</SectionTitle>
@@ -320,7 +308,7 @@ export default function App() {
       </main>
 
       <nav className="fixed bottom-0 inset-x-0 z-40 bg-ink-900/95 backdrop-blur border-t border-white/10 pb-[env(safe-area-inset-bottom)]">
-        <div className="max-w-xl mx-auto grid grid-cols-5">
+        <div className="max-w-xl mx-auto grid grid-cols-4">
           {TABS.map((item) => {
             const Icon = item.icon
             const active = tab === item.id
