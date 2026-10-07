@@ -4,7 +4,7 @@ import {
 } from 'lucide-react'
 import Carousel from './components/Carousel'
 import EventSlide from './components/EventSlide'
-import PopularGroups from './components/PopularGroups'
+import PopularGroups, { PopularGroupsPage } from './components/PopularGroups'
 import FestivalGrid from './components/FestivalGrid'
 import FestivalModal from './components/FestivalModal'
 import ChatScreen from './components/ChatScreen'
@@ -278,6 +278,10 @@ export default function App() {
       </header>
 
       <main className="max-w-6xl mx-auto px-4 pt-5">
+        {tab === 'home' && preset === 'groups' && (
+          <PopularGroupsPage onOpen={openChat} onBack={() => setPreset(null)} />
+        )}
+
         {tab === 'home' && activePreset && (
           <>
             <div className="flex items-center gap-2 mb-5">
@@ -293,7 +297,7 @@ export default function App() {
           </>
         )}
 
-        {tab === 'home' && !activePreset && (
+        {tab === 'home' && !preset && (
           <>
             <div className="grid grid-cols-4 gap-2 mb-8">
               {PRESETS.map((p) => {
@@ -325,7 +329,7 @@ export default function App() {
               </section>
             )}
 
-            <PopularGroups onOpen={openChat} />
+            <PopularGroups onOpen={openChat} onSeeAll={() => setPreset('groups')} />
 
             {!catalog.loaded && (
               <div className="flex gap-3 overflow-hidden mb-10" aria-label="טוען אירועים">

@@ -1,10 +1,45 @@
-import { useEffect, useState } from 'react'
-import { Users } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { ArrowRight, Users } from 'lucide-react'
 import { useChat, useGroupMeta } from '../chat/ChatContext'
 import { useCatalog } from '../data/CatalogContext'
-import { findGroup } from '../data/groups'
+import { findGroup, groupsFor } from '../data/groups'
+import { isEnded } from '../utils'
 import Carousel from './Carousel'
 import EventAvatar from './EventAvatar'
+
+const PAGE_SIZE = 50
+
+// Groups ranked by members, plus the general groups of the next festivals as
+// suggestions. Suggestions are labelled as such, never as "popular".
+function usePopularGroups() {
+  const { service, myGroups } = useChat()
+  const { items, byId } = useCatalog()
+  const [top, setTop] = useState([])
+
+  useEffect(() => (service ? service.onTopGroups(PAGE_SIZE, setTop) : undefined), [service])
+
+  return useMemo(() => {
+    const ranked = top
+      .map((g) => ({ ...g, ...findGroup(g.id, byId, myGroups) }))
+      .filter((g) => g.festival)
+    const rankedIds = new Set(ranked.map((g) => g.id))
+    const suggested = items
+      .filter((f) => f.kind === 'festival')
+      .map((festival) => {
+        const group = groupsFor(festival)[0]
+        return { id: group.id, memberCount: 0, festival, group }
+      })
+      .filter((g) => !rankedIds.has(g.id))
+      .slice(0, PAGE_SIZE)
+    return { mode: ranked.length > 0 ? 'popular' : 'suggested', ranked, suggested }
+  }, [top, items, byId, myGroups])
+}
+
+function MemberCount({ count }) {
+  return count > 0
+    ? <span className="flex items-center gap-1.5 font-num text-[11px] text-accent"><Users size={13} /> {count}</span>
+    : <span className="text-[11px] text-muted">קבוצה חדשה</span>
+}
 
 function GroupCard({ id, memberCount, festival, group, onOpen }) {
   const { lastMessage } = useGroupMeta(id)
@@ -24,29 +59,93 @@ function GroupCard({ id, memberCount, festival, group, onOpen }) {
       <span className="block text-[13px] text-white/70 mt-3 h-10 line-clamp-2 leading-snug">
         {lastMessage ? `${lastMessage.name}: ${lastMessage.text}` : group.description}
       </span>
-      <span className="flex items-center gap-1.5 font-num text-[11px] text-accent mt-3">
-        <Users size={13} /> {memberCount}
-      </span>
+      <span className="block mt-3"><MemberCount count={memberCount} /></span>
     </button>
   )
 }
 
-// Groups with the most members. Hidden until some group has members.
-export default function PopularGroups({ onOpen }) {
-  const { service, myGroups } = useChat()
-  const { byId } = useCatalog()
-  const [top, setTop] = useState([])
-
-  useEffect(() => (service ? service.onTopGroups(12, setTop) : undefined), [service])
-
-  const groups = top
-    .map((g) => ({ ...g, ...findGroup(g.id, byId, myGroups) }))
-    .filter((g) => g.festival)
+// Home-screen row; always shown once events have loaded.
+export default function PopularGroups({ onOpen, onSeeAll }) {
+  const { mode, ranked, suggested } = usePopularGroups()
+  // Top up a short popular list with suggestions so the row always has something to scroll.
+  const groups = [...ranked, ...suggested].slice(0, 12)
   if (groups.length === 0) return null
-
+  const popular = mode === 'popular'
   return (
-    <Carousel title="קבוצות פופולריות" subtitle="הקבוצות עם הכי הרבה חברים עכשיו">
+    <Carousel
+      title={popular ? 'קבוצות פופולריות' : 'קבוצות מומלצות'}
+      subtitle={popular ? 'הקבוצות עם הכי הרבה חברים עכשיו' : 'הקבוצות של הפסטיבלים הקרובים. היו הראשונים להצטרף'}
+      onSeeAll={onSeeAll}
+    >
       {groups.map((g) => <GroupCard key={g.id} {...g} onOpen={onOpen} />)}
     </Carousel>
+  )
+}
+
+function GroupRow({ rank, id, memberCount, festival, group, onOpen }) {
+  const { myGroups, withUser, join } = useChat()
+  const { lastMessage } = useGroupMeta(id)
+  const isMember = Boolean(myGroups[id])
+  const joinAndOpen = () =>
+    withUser(async () => {
+      await join(group, festival)
+      onOpen(id)
+    })
+
+  return (
+    <li className="flex items-center gap-3 py-3.5 border-b hairline">
+      <span className="font-num text-[12px] text-muted w-6 shrink-0 text-center">{rank}</span>
+      <button type="button" onClick={() => onOpen(id)} className="flex items-center gap-3 flex-1 min-w-0 text-right">
+        <EventAvatar festival={festival} />
+        <span className="flex-1 min-w-0">
+          <span className="block text-[15px] font-medium truncate">{group.title}</span>
+          <span className="block text-[13px] text-muted truncate" dir="auto">{festival.name}</span>
+          <span className="flex items-center gap-2 mt-1 min-w-0">
+            <MemberCount count={memberCount} />
+            {lastMessage && <span className="text-[12px] text-white/50 truncate">{lastMessage.name}: {lastMessage.text}</span>}
+          </span>
+        </span>
+      </button>
+      {isMember ? (
+        <button type="button" onClick={() => onOpen(id)} className="shrink-0 h-8 px-3 rounded-md border border-ink-600 text-[13px] hover:border-white/40">פתיחה</button>
+      ) : isEnded(festival) ? (
+        <span className="shrink-0 text-[12px] text-muted px-2">נסגר</span>
+      ) : (
+        <button type="button" onClick={joinAndOpen} className="shrink-0 h-8 px-3 rounded-md bg-accent text-black text-[13px] font-medium hover:brightness-110">הצטרפות</button>
+      )}
+    </li>
+  )
+}
+
+// Full ranked list, opened from the row's "see all".
+export function PopularGroupsPage({ onOpen, onBack }) {
+  const { mode, ranked, suggested } = usePopularGroups()
+  const popular = mode === 'popular'
+  return (
+    <>
+      <div className="flex items-center gap-2 mb-1">
+        <button type="button" onClick={onBack} className="w-9 h-9 -mr-2 flex items-center justify-center" aria-label="חזרה">
+          <ArrowRight size={20} />
+        </button>
+        <h1 className="text-[22px] font-semibold tracking-tight flex-1">{popular ? 'קבוצות פופולריות' : 'קבוצות מומלצות'}</h1>
+        <span className="font-num text-[11px] text-muted">{ranked.length + suggested.length}</span>
+      </div>
+      <p className="text-[13px] text-muted mb-4">
+        {popular ? 'מדורג לפי מספר החברים בקבוצה.' : 'עוד אין קבוצות עם חברים. אלה הקבוצות של הפסטיבלים הקרובים, היו הראשונים להצטרף.'}
+      </p>
+      {ranked.length > 0 && (
+        <ul className="border-t hairline">
+          {ranked.map((g, i) => <GroupRow key={g.id} rank={i + 1} {...g} onOpen={onOpen} />)}
+        </ul>
+      )}
+      {popular && suggested.length > 0 && (
+        <h2 className="text-[17px] font-semibold mt-9 mb-1">עוד קבוצות מומלצות</h2>
+      )}
+      {suggested.length > 0 && (
+        <ul className="border-t hairline">
+          {suggested.map((g, i) => <GroupRow key={g.id} rank={popular ? '·' : i + 1} {...g} onOpen={onOpen} />)}
+        </ul>
+      )}
+    </>
   )
 }
