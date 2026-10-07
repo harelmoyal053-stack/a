@@ -68,6 +68,26 @@ test('event names keep weekdays but lose ticket words and years', async () => {
   assert.equal(cleanName('Awakenings Festival - Saturday'), 'Awakenings Festival')
 })
 
+test('single shows from the festival search are dropped; festivals stay', () => {
+  const venue = { id: 'v', city: { name: 'Guanajuato' }, country: { countryCode: 'MX' } }
+  const raw = (name) => ({ id: name, name, dates: { start: { localDate: '2026-10-08' } }, _embedded: { venues: [venue] } })
+  assert.equal(fromTicketmaster(raw('Orquesta Moderna'), 'festival'), null)
+  assert.equal(fromTicketmaster(raw('Festival Internacional Cervantino'), 'festival').kind, 'festival')
+  assert.equal(fromTicketmaster(raw('Afterlife'), 'party').kind, 'party')
+})
+
+test('a weekly series stays one event per night; a festival weekend pair folds', () => {
+  const weekly = ['2026-11-07', '2026-11-14', '2026-11-21'].map((startDate) =>
+    entry({ source: 'ticketmaster', kind: 'party', name: 'Day Fever', startDate, city: 'Leeds', countryCode: 'GB' }))
+  assert.equal(mergeAll(weekly, [], { today: TODAY }).length, 3)
+  const series = ['2026-10-09', '2026-11-20'].map((startDate) =>
+    entry({ source: 'ticketmaster', name: 'Brownstone Jazz Fest', startDate, city: 'Brooklyn', countryCode: 'US' }))
+  assert.equal(mergeAll(series, [], { today: TODAY }).length, 2)
+  const weekends = ['2027-04-09', '2027-04-16'].map((startDate) =>
+    entry({ source: 'ticketmaster', name: 'Coachella', startDate, city: 'Indio', countryCode: 'US' }))
+  assert.equal(mergeAll(weekends, [], { today: TODAY }).length, 1)
+})
+
 test('past events are dropped', () => {
   const old = entry({ source: 'ticketmaster', name: 'Old Party', startDate: '2026-01-01', city: 'Berlin', countryCode: 'DE' })
   assert.equal(mergeAll([old], [], { today: TODAY }).length, 0)

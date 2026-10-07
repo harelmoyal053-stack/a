@@ -26,6 +26,7 @@ export function fromSeatGeek(raw, kind) {
   return {
     source: 'seatgeek',
     name: cleanName(title),
+    // SeatGeek's music_festival taxonomy is the festival itself, unlike Ticketmaster's keyword search.
     kind: kind === 'festival' || isFestivalName(title) ? 'festival' : 'party',
     startDate: start,
     endDate: raw.enddatetime_utc?.slice(0, 10) ?? start,

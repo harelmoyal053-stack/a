@@ -1,6 +1,11 @@
 import { useState } from 'react'
 import { MONTHS } from '../data/festivals'
 
+function titleSize(name, large) {
+  if (large) return name.length > 24 ? 'text-3xl' : 'text-5xl'
+  return name.length > 24 ? 'text-lg' : 'text-2xl'
+}
+
 // Festival artwork: the festival's photo when one is set, otherwise a
 // generated poster in the festival's colors.
 export default function Poster({ festival, large = false }) {
@@ -40,7 +45,7 @@ export default function Poster({ festival, large = false }) {
         <p className={`${large ? 'text-sm' : 'text-[10px]'} text-white/70 font-medium`} dir="rtl">
           {MONTHS[festival.month - 1]} · {festival.country}
         </p>
-        <p className={`font-black uppercase leading-[0.9] text-white ${large ? 'text-5xl' : 'text-2xl'} break-words`} dir="auto">
+        <p className={`font-black uppercase leading-[0.9] text-white break-words line-clamp-3 ${titleSize(festival.name, large)}`} dir="auto">
           {festival.name}
         </p>
       </div>

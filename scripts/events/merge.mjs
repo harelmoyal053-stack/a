@@ -47,11 +47,15 @@ export function sameEvent(a, b) {
   return shared / small.size >= 0.6
 }
 
-// Festivals keep one entry per yearly edition; parties one per night.
+// Listings of one source that belong together: same name and place. Dates are
+// handled by clustering (see FOLD_GAP_DAYS), not by the key.
 function listingKey(e) {
-  const when = e.kind === 'festival' ? e.startDate.slice(0, 4) : e.startDate
-  return [e.source, e.name.toLowerCase(), normPlace(e.venue) || normPlace(e.city), e.countryCode, when].join('|')
+  return [e.source, e.name.toLowerCase(), normPlace(e.venue) || normPlace(e.city), e.countryCode].join('|')
 }
+
+// A festival's day passes and weekends (Coachella's are a week apart) fold into
+// one event; a weekly club night stays one event per night.
+const FOLD_GAP_DAYS = { festival: 8, party: 0 }
 
 function hash(text) {
   let h = 0x811c9dc5
@@ -98,18 +102,32 @@ function startEvent(entry) {
 }
 
 export function mergeAll(entries, previous = [], { today = new Date().toISOString().slice(0, 10), maxEvents = 4000 } = {}) {
-  // 1. Within a source, fold day/weekend/VIP listings into one entry.
-  const listings = new Map()
+  // 1. Within a source, fold day/weekend/VIP listings into one entry, but only
+  //    when their dates are close together.
+  const groups = new Map()
   for (const entry of entries) {
     if (!entry || entry.endDate < today) continue
     const key = listingKey(entry)
-    const existing = listings.get(key)
-    if (!existing) listings.set(key, startEvent(entry))
-    else absorb(existing, entry)
+    if (!groups.has(key)) groups.set(key, [])
+    groups.get(key).push(entry)
+  }
+  const folded = []
+  for (const group of groups.values()) {
+    group.sort((a, b) => a.startDate.localeCompare(b.startDate))
+    let current = null
+    for (const entry of group) {
+      const gap = FOLD_GAP_DAYS[entry.kind] ?? 0
+      if (current && entry.startDate <= addDays(current.endDate, gap)) {
+        absorb(current, entry)
+      } else {
+        current = startEvent(entry)
+        folded.push(current)
+      }
+    }
   }
 
   // 2. Across sources, fold matching events, best source first.
-  const ordered = [...listings.values()].sort((a, b) => priority(a.sources[0]) - priority(b.sources[0]) || a.startDate.localeCompare(b.startDate))
+  const ordered = folded.sort((a, b) => priority(a.sources[0]) - priority(b.sources[0]) || a.startDate.localeCompare(b.startDate))
   const byCountry = new Map()
   const events = []
   for (const candidate of ordered) {

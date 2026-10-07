@@ -25,6 +25,9 @@ function pickImage(images = []) {
 
 export function fromTicketmaster(raw, kind) {
   if (!raw?.id || !raw.name || NOT_AN_EVENT.test(raw.name)) return null
+  // The "festival" keyword search also returns single shows that are part of a
+  // festival's programme; keep only listings that are the festival itself.
+  if (kind === 'festival' && !isFestivalName(raw.name)) return null
   const venue = raw._embedded?.venues?.[0]
   const start = raw.dates?.start?.localDate
   if (!venue?.country?.countryCode || !start) return null
@@ -32,7 +35,7 @@ export function fromTicketmaster(raw, kind) {
   return {
     source: 'ticketmaster',
     name: cleanName(raw.name),
-    kind: kind === 'festival' || isFestivalName(raw.name) ? 'festival' : 'party',
+    kind: isFestivalName(raw.name) ? 'festival' : 'party',
     startDate: start,
     endDate: start,
     time: raw.dates?.start?.localTime?.slice(0, 5) ?? null,
