@@ -215,10 +215,6 @@ export default function App() {
     return catalog.items.filter((f) => overlaps(f, from, to)).length
   }, [catalog.items])
 
-  const homeResults = useMemo(
-    () => catalog.items.filter((f) => (genre === 'all' || f.genres.includes(genre)) && (kind === 'all' || f.kind === kind)),
-    [catalog.items, genre, kind],
-  )
 
   const searchResults = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -353,19 +349,6 @@ export default function App() {
               <EmptyState icon={SearchX} title="אין אירועים להצגה">לא הצלחנו לטעון את האירועים. נסו לרענן בעוד כמה דקות.</EmptyState>
             )}
 
-            {catalog.loaded && catalog.items.length > 0 && (
-              <>
-                <div className="flex items-baseline justify-between mb-3">
-                  <h2 className="text-[19px] font-semibold tracking-tight">כל האירועים</h2>
-                  <span className="font-num text-[11px] text-muted">
-                    {numberFormat.format(homeResults.length)}{updated && ` · עודכן ${updated}`}
-                  </span>
-                </div>
-                <Segments options={KINDS} value={kind} onChange={setKind} />
-                <div className="mt-4 mb-2">{genreChips}</div>
-                {renderGrid(homeResults, `home-${kind}-${genre}`, true)}
-              </>
-            )}
           </>
         )}
 
@@ -429,7 +412,9 @@ export default function App() {
         )}
 
         <footer className="border-t hairline mt-10 py-6 text-[12px] text-muted leading-relaxed">
-          {catalog.sources.length > 0 && <p>נתוני אירועים: {catalog.sources.map(sourceLabel).join(', ')}. מתעדכן כל לילה.</p>}
+          {catalog.sources.length > 0 && (
+            <p>נתוני אירועים: {catalog.sources.map(sourceLabel).join(', ')}. מתעדכן כל לילה{updated && `, עדכון אחרון ${updated}`}.</p>
+          )}
           <p>FestiChat היא קהילה עצמאית ואינה קשורה למארגני האירועים.</p>
         </footer>
       </main>
