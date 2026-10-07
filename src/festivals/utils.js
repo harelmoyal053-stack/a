@@ -44,8 +44,9 @@ export function priceLabel(item) {
   if (item.priceFrom == null) return null
   if (item.priceFrom === 0) return 'חינם'
   try {
-    const price = new Intl.NumberFormat('he-IL', { style: 'currency', currency: item.currency || 'USD', maximumFractionDigits: 0 }).format(item.priceFrom)
-    return `מ-${price}`
+    // "CA$27", "€40", "₪180", isolated so the symbol stays next to the number in Hebrew text.
+    const price = new Intl.NumberFormat('en', { style: 'currency', currency: item.currency || 'USD', maximumFractionDigits: 0 }).format(item.priceFrom)
+    return `מ-\u2066${price}\u2069`
   } catch {
     return null
   }

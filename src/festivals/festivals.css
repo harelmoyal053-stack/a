@@ -49,3 +49,17 @@ body {
 input[type='search']::-webkit-search-cancel-button {
   -webkit-appearance: none;
 }
+
+/* iOS Safari zooms into any field under 16px on focus, which widens the page
+   and lets it pan sideways. Keep every field at 16px or more. */
+input,
+textarea,
+select {
+  font-size: max(16px, 1em);
+}
+
+/* Nothing on this site should scroll the page sideways. */
+html,
+body {
+  overflow-x: clip;
+}

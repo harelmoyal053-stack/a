@@ -160,7 +160,7 @@ export default function ChatScreen({ festival, group, onClose }) {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="חיפוש בצ׳אט…"
-            className="flex-1 h-9 bg-ink-700 rounded-md px-3 outline-none text-[15px]"
+            className="flex-1 h-9 bg-ink-700 rounded-md px-3 outline-none text-base"
             aria-label="חיפוש בצ׳אט"
           />
         ) : (

@@ -362,7 +362,7 @@ export default function App() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="אמן, אירוע, עיר או מדינה"
-                className="flex-1 outline-none bg-transparent text-[15px] placeholder:text-muted"
+                className="flex-1 outline-none bg-transparent text-base placeholder:text-muted"
                 aria-label="חיפוש אירוע"
               />
               {query && (
