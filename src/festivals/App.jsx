@@ -77,7 +77,7 @@ export default function App() {
   const [month, setMonth] = useState('all')
   const [favorites, setFavorites] = useState(loadFavorites)
   const [route, setRoute] = useState(routeFromHash)
-  const { myGroups } = useChat()
+  const { myGroups, groupsReady } = useChat()
   const catalog = useCatalog()
   const [menuOpen, setMenuOpen] = useState(false)
   const searchRef = useRef(null)
@@ -173,7 +173,9 @@ export default function App() {
   )
 
   const openFestivalData = route?.type === 'festival' ? catalog.byId.get(route.id) : null
-  const openChatData = route?.type === 'chat' ? findGroup(route.id, catalog.byId) : null
+  const openChatData = route?.type === 'chat' ? findGroup(route.id, catalog.byId, myGroups) : null
+  // A chat link for an event that has ended (or never existed), opened by someone outside the group.
+  const chatClosed = route?.type === 'chat' && !openChatData && catalog.loaded && groupsReady
   const hasGroups = Object.keys(myGroups).length > 0
   const favoriteList = catalog.items.filter((f) => favorites.has(f.id))
 
@@ -361,6 +363,17 @@ export default function App() {
           onClose={closeScreen}
           onOpenChat={openChat}
         />
+      )}
+
+      {chatClosed && (
+        <div className="fixed inset-0 z-[55] bg-black/80 flex items-center justify-center p-6" onClick={closeScreen}>
+          <div className="bg-ink-800 rounded-3xl p-6 max-w-sm text-center" onClick={(e) => e.stopPropagation()}>
+            <p className="text-4xl mb-3">🔒</p>
+            <p className="font-black text-xl">הקבוצה סגורה</p>
+            <p className="text-sm text-white/60 mt-2">האירוע הסתיים, ורק מי שהיה בקבוצה לפני כן יכול להמשיך להתכתב בה.</p>
+            <button type="button" onClick={closeScreen} className="mt-5 w-full bg-white text-black font-bold py-3 rounded-xl">לאירועים הקרובים</button>
+          </div>
+        </div>
       )}
 
       {openChatData && (

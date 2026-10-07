@@ -2,11 +2,12 @@ import { MessageCircle } from 'lucide-react'
 import { findGroup } from '../data/groups'
 import { useChat, useGroupMeta } from '../chat/ChatContext'
 import { useCatalog } from '../data/CatalogContext'
-import { shortTime } from '../utils'
+import { isEnded, shortTime } from '../utils'
 
 function GroupRow({ id, onOpen }) {
   const { byId } = useCatalog()
-  const found = findGroup(id, byId)
+  const { myGroups } = useChat()
+  const found = findGroup(id, byId, myGroups)
   const { lastMessage } = useGroupMeta(id)
   if (!found) return null
   const { festival, group } = found
@@ -20,7 +21,10 @@ function GroupRow({ id, onOpen }) {
         </span>
         <div className="flex-1 min-w-0 border-b border-white/5 pb-3">
           <div className="flex justify-between gap-2">
-            <p className="font-bold truncate"><span dir="auto">{festival.name}</span> · {group.title}</p>
+            <p className="font-bold truncate">
+              <span dir="auto">{festival.name}</span> · {group.title}
+              {isEnded(festival) && <span className="text-[10px] font-medium text-white/40 bg-white/5 rounded px-1.5 py-0.5 mr-1.5">הסתיים</span>}
+            </p>
             {lastMessage && <span className="text-xs text-white/40 shrink-0">{shortTime(lastMessage.createdAt)}</span>}
           </div>
           <p className="text-sm text-white/50 truncate mt-0.5">
@@ -35,7 +39,10 @@ function GroupRow({ id, onOpen }) {
 // The visitor's joined groups, newest first, WhatsApp-style.
 export default function MyGroups({ onOpen, emptyHint = false, limit }) {
   const { myGroups } = useChat()
-  const ids = Object.entries(myGroups).sort((a, b) => b[1] - a[1]).map(([id]) => id).slice(0, limit)
+  const ids = Object.entries(myGroups)
+    .sort((a, b) => b[1].joinedAt - a[1].joinedAt)
+    .map(([id]) => id)
+    .slice(0, limit)
 
   if (ids.length === 0) {
     if (!emptyHint) return null

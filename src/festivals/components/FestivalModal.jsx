@@ -4,18 +4,18 @@ import { GENRES, MONTHS } from '../data/festivals'
 import { sourceLabel } from '../data/catalog'
 import { whatsappShareUrl } from '../config'
 import { useChat, useGroupMeta } from '../chat/ChatContext'
-import { countdownFor, dateChip, membersLabel, priceLabel } from '../utils'
+import { countdownFor, dateChip, isEnded, membersLabel, priceLabel } from '../utils'
 import GroupIcon from './GroupIcon'
 import Poster from './Poster'
 
-function GroupRow({ group, onOpenChat }) {
+function GroupRow({ festival, group, onOpenChat }) {
   const { myGroups, withUser, join } = useChat()
   const { memberCount } = useGroupMeta(group.id)
   const isMember = Boolean(myGroups[group.id])
 
   const joinAndOpen = () =>
     withUser(async () => {
-      await join(group.id)
+      await join(group, festival)
       onOpenChat(group.id)
     })
 
@@ -35,6 +35,8 @@ function GroupRow({ group, onOpenChat }) {
         <button type="button" onClick={() => onOpenChat(group.id)} className="shrink-0 border border-whatsapp text-whatsapp text-sm font-bold px-4 py-2 rounded-full">
           לצ׳אט
         </button>
+      ) : isEnded(festival) ? (
+        <span className="shrink-0 text-xs text-white/40 px-2">האירוע הסתיים</span>
       ) : (
         <button type="button" onClick={joinAndOpen} className="shrink-0 bg-whatsapp hover:brightness-110 text-black text-sm font-bold px-4 py-2 rounded-full">
           הצטרפות
@@ -130,7 +132,7 @@ export default function FestivalModal({ festival, groups, isFavorite, onToggleFa
 
           <h3 className="font-black text-xl mt-8 mb-3">קבוצות</h3>
           <ul className="flex flex-col gap-2.5">
-            {groups.map((group) => <GroupRow key={group.id} group={group} onOpenChat={onOpenChat} />)}
+            {groups.map((group) => <GroupRow key={group.id} festival={festival} group={group} onOpenChat={onOpenChat} />)}
           </ul>
         </div>
       </div>

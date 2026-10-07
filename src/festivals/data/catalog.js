@@ -1,3 +1,5 @@
+import { todayIso } from '../utils'
+
 // Turns the auto-updated event feed (events.json, written daily by
 // scripts/fetch-events.mjs) into the catalog of festivals and parties.
 
@@ -36,8 +38,6 @@ export function sourceLabel(source) {
   return source
 }
 
-const today = () => new Date().toISOString().slice(0, 10)
-
 function fromEvent(e) {
   const style = GENRE_STYLE[e.genres[0]] ?? DEFAULT_STYLE
   const tickets = (e.tickets ?? []).filter((t) => t.url)
@@ -70,13 +70,13 @@ function fromEvent(e) {
 
 export function buildCatalog(feed) {
   return (feed?.events ?? [])
-    .filter((e) => e.endDate >= today())
+    .filter((e) => e.endDate >= todayIso())
     .map(fromEvent)
     .sort((a, b) => a.startDate.localeCompare(b.startDate))
 }
 
 export async function loadFeed() {
-  const url = `${import.meta.env.BASE_URL}festivals/events.json?v=${today()}`
+  const url = `${import.meta.env.BASE_URL}festivals/events.json?v=${todayIso()}`
   try {
     const res = await fetch(url)
     return res.ok ? await res.json() : null

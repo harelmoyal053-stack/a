@@ -7,7 +7,12 @@ const EMPTY = { user: null, myGroups: {}, groups: {} }
 
 function load() {
   try {
-    return { ...EMPTY, ...JSON.parse(localStorage.getItem(KEY)) }
+    const state = { ...EMPTY, ...JSON.parse(localStorage.getItem(KEY)) }
+    // Older saves stored only the join time.
+    for (const [id, value] of Object.entries(state.myGroups)) {
+      if (typeof value === 'number') state.myGroups[id] = { joinedAt: value, event: null }
+    }
+    return state
   } catch {
     return { ...EMPTY }
   }
@@ -58,9 +63,9 @@ export function createLocalService() {
       cb(Object.entries(state.groups[id]?.members ?? {}).map(([uid, m]) => ({ uid, ...m }))),
     ),
     onMessages: (id, cb) => subscribe(() => cb(structuredClone(state.groups[id]?.messages ?? []))),
-    async join(id) {
+    async join(id, event) {
       if (state.myGroups[id]) return
-      state.myGroups[id] = Date.now()
+      state.myGroups[id] = { joinedAt: Date.now(), event }
       group(id).memberCount += 1
       group(id).members[state.user.uid] = { name: state.user.name, joinedAt: Date.now() }
       save()

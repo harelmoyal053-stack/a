@@ -3,7 +3,7 @@ import { ArrowRight, Pin, Search, X } from 'lucide-react'
 import { useChat, useGroupMeta } from '../chat/ChatContext'
 import { replyRef } from '../chat/messages'
 import { compressImage, currentLocation } from '../chat/media'
-import { dayLabel, membersLabel } from '../utils'
+import { dayLabel, isEnded, membersLabel } from '../utils'
 import GroupIcon from './GroupIcon'
 import Composer from './chat/Composer'
 import GroupInfo from './chat/GroupInfo'
@@ -32,6 +32,7 @@ export default function ChatScreen({ festival, group, onClose }) {
   const [flashId, setFlashId] = useState(null)
   const bottomRef = useRef(null)
   const isMember = Boolean(myGroups[group.id])
+  const ended = isEnded(festival)
   const overlayOpen = Boolean(menuFor || pendingImage || viewing || pollOpen || infoOpen)
 
   useEffect(() => (service ? service.onMessages(group.id, setMessages) : undefined), [service, group.id])
@@ -189,6 +190,12 @@ export default function ChatScreen({ festival, group, onClose }) {
         </p>
       )}
 
+      {ended && (
+        <p className="bg-white/5 text-white/60 text-xs text-center px-4 py-1.5 shrink-0">
+          האירוע הסתיים · הקבוצה ממשיכה לחברים שלה, ואי אפשר להצטרף אליה יותר
+        </p>
+      )}
+
       {pinnedMessage && !searchOpen && (
         <button type="button" onClick={() => jumpTo(pinnedMessage.id)} className="flex items-center gap-2 px-4 py-2 bg-ink-800/90 border-b border-white/5 text-right shrink-0">
           <Pin size={16} className="text-accent shrink-0" />
@@ -253,10 +260,12 @@ export default function ChatScreen({ festival, group, onClose }) {
             onPoll={() => setPollOpen(true)}
             onLocation={shareLocation}
           />
+        ) : ended ? (
+          <p className="max-w-2xl mx-auto text-center text-sm text-white/50 py-2">האירוע הסתיים, והקבוצה סגורה להצטרפות</p>
         ) : (
           <div className="max-w-2xl mx-auto flex flex-col items-center gap-2 py-1">
             <p className="text-xs text-white/50">רק חברי הקבוצה יכולים לכתוב, להגיב ולהצביע</p>
-            <button type="button" onClick={() => withUser(() => run(() => chat.join(group.id)))} className="w-full bg-whatsapp text-black font-bold py-3 rounded-full">
+            <button type="button" onClick={() => withUser(() => run(() => chat.join(group, festival)))} className="w-full bg-whatsapp text-black font-bold py-3 rounded-full">
               הצטרפות לקבוצה
             </button>
           </div>

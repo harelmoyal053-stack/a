@@ -5,6 +5,11 @@ export function monthsAway(month) {
 
 const DAY_MS = 86400000
 
+// Today's date in the visitor's time zone, as YYYY-MM-DD.
+export const todayIso = () => new Date().toLocaleDateString('sv-SE')
+
+export const isEnded = (item) => (item.endDate ?? item.startDate) < todayIso()
+
 function daysUntil(isoDate) {
   const [y, m, d] = isoDate.split('-').map(Number)
   const now = new Date()

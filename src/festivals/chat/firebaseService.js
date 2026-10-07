@@ -2,7 +2,7 @@ import { initializeApp } from 'firebase/app'
 import { getAuth, onAuthStateChanged, signInAnonymously } from 'firebase/auth'
 import {
   collection, deleteField, doc, getDoc, getFirestore, increment, limitToLast, onSnapshot, orderBy, query,
-  serverTimestamp, setDoc, updateDoc, writeBatch,
+  serverTimestamp, setDoc, Timestamp, updateDoc, writeBatch,
 } from 'firebase/firestore'
 import { buildMessage, preview, replyRef } from './messages'
 
@@ -48,7 +48,7 @@ export function createFirebaseService(config) {
     onMyGroups(cb) {
       if (!current) return () => {}
       return onSnapshot(collection(db, 'users', current.uid, 'groups'), (snap) =>
-        cb(Object.fromEntries(snap.docs.map((d) => [d.id, millis(d.data().joinedAt)]))),
+        cb(Object.fromEntries(snap.docs.map((d) => [d.id, { joinedAt: millis(d.data().joinedAt), event: d.data().event ?? null }]))),
       )
     },
     onGroup(id, cb) {
@@ -72,11 +72,14 @@ export function createFirebaseService(config) {
         cb(snap.docs.map((d) => ({ ...d.data(), id: d.id, createdAt: millis(d.data().createdAt) }))),
       )
     },
-    async join(id) {
+    async join(id, event) {
       const batch = writeBatch(db)
       batch.set(memberRef(id, current.uid), { name: current.name, joinedAt: serverTimestamp() })
-      batch.set(myGroupRef(current.uid, id), { joinedAt: serverTimestamp() })
-      batch.set(groupRef(id), { memberCount: increment(1) }, { merge: true })
+      batch.set(myGroupRef(current.uid, id), { joinedAt: serverTimestamp(), event })
+      // The rules refuse new members after `endsAt` (a day of slack for time zones).
+      const endsAt = new Date(`${event.endDate ?? event.startDate}T23:59:59Z`)
+      endsAt.setUTCDate(endsAt.getUTCDate() + 1)
+      batch.set(groupRef(id), { memberCount: increment(1), endsAt: Timestamp.fromDate(endsAt) }, { merge: true })
       await batch.commit()
     },
     async leave(id) {

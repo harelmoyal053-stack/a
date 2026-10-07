@@ -16,10 +16,18 @@ export function groupsFor(item) {
     .map((group) => ({ ...group, id: `${item.id}${SEPARATOR}${group.type}` }))
 }
 
-// Resolves a group id back to its festival and group, or null if unknown.
-export function findGroup(id, byId) {
+// What a member keeps of the event when joining, so the group still shows
+// after the event has ended and dropped out of the catalog.
+export function eventSnapshot(item) {
+  const { id, name, kind, emoji, colors, city, country, flag, startDate, endDate } = item
+  return { id, name, kind, emoji, colors, city, country, flag, startDate, endDate, image: item.image ?? null }
+}
+
+// Resolves a group id to its event and group: from the live catalog, or for
+// a member, from the snapshot saved when they joined. Null if neither.
+export function findGroup(id, byId, myGroups = {}) {
   const [festivalId, type] = id.split(SEPARATOR)
-  const festival = byId.get(festivalId)
+  const festival = byId.get(festivalId) ?? myGroups[id]?.event
   const group = GROUP_TYPES.find((g) => g.type === type)
   return festival && group ? { festival, group: { ...group, id } } : null
 }

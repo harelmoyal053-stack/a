@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useRef, useState } f
 import { FIREBASE_CONFIG } from './firebaseConfig'
 import { createLocalService } from './localService'
 import NameModal from './NameModal'
+import { eventSnapshot } from '../data/groups'
 
 const ChatContext = createContext(null)
 
@@ -15,6 +16,8 @@ export function ChatProvider({ children }) {
   const [service, setService] = useState(null)
   const [user, setUser] = useState(null)
   const [myGroups, setMyGroups] = useState({})
+  const [userKnown, setUserKnown] = useState(false)
+  const [groupsLoaded, setGroupsLoaded] = useState(false)
   const [askingName, setAskingName] = useState(false)
   const pending = useRef(null)
 
@@ -22,14 +25,20 @@ export function ChatProvider({ children }) {
     let unsub = () => {}
     createService().then((s) => {
       setService(s)
-      unsub = s.onUser(setUser)
+      unsub = s.onUser((u) => {
+        setUser(u)
+        setUserKnown(true)
+      })
     })
     return () => unsub()
   }, [])
 
   useEffect(() => {
     if (!service || !user) return undefined
-    return service.onMyGroups(setMyGroups)
+    return service.onMyGroups((groups) => {
+      setMyGroups(groups)
+      setGroupsLoaded(true)
+    })
   }, [service, user])
 
   // Runs `action` once the visitor has a chat name, asking for one first if needed.
@@ -51,8 +60,10 @@ export function ChatProvider({ children }) {
     service,
     user,
     myGroups: user ? myGroups : {},
+    // True once we know which groups the visitor is in (or that they have none).
+    groupsReady: userKnown && (!user || groupsLoaded),
     withUser,
-    join: (id) => service.join(id),
+    join: (group, festival) => service.join(group.id, eventSnapshot(festival)),
     leave: (id) => service.leave(id),
     send: (id, payload) => service.send(id, payload),
     react: (id, messageId, emoji) => service.react(id, messageId, emoji),
