@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import { ChevronDown, MapPin } from 'lucide-react'
 import { clockTime } from '../../utils'
+import { t } from '../../i18n'
 import { useProfile } from '../../chat/ChatContext'
 import UserAvatar from '../UserAvatar'
 import PollCard from './PollCard'
@@ -24,7 +25,7 @@ function Reactions({ reactions, myUid, onToggle }) {
           onClick={() => onToggle(emoji)}
           className={`text-sm rounded-full px-1.5 py-0.5 border shadow ${mine === emoji ? 'bg-accent/20 border-accent/50' : 'bg-ink-800 border-ink-600'}`}
         >
-          {emoji}{count > 1 && <span className="text-[11px] text-white/70 mr-0.5">{count}</span>}
+          {emoji}{count > 1 && <span className="text-[11px] text-white/70 ms-0.5">{count}</span>}
         </button>
       ))}
     </div>
@@ -34,7 +35,7 @@ function Reactions({ reactions, myUid, onToggle }) {
 function SenderAvatar({ uid, name, onOpen }) {
   const profile = useProfile(uid)
   return (
-    <button type="button" onClick={onOpen} className="self-start mt-0.5" aria-label={`הפרופיל של ${name}`}>
+    <button type="button" onClick={onOpen} className="self-start mt-0.5" aria-label={t('msg.profileOf', { name })}>
       <UserAvatar name={profile?.name ?? name} photo={profile?.photo} size="xs" />
     </button>
   )
@@ -64,7 +65,7 @@ export default function MessageBubble({
       <div className={`group flex flex-col min-w-0 ${mine ? 'items-end' : 'items-start'}`}>
         <div
           className={`relative select-none sm:select-text transition-shadow ${flash ? 'ring-2 ring-accent' : ''} ${
-            big ? 'px-1' : `rounded-lg px-3 py-2 ${mine ? 'bg-[#1e2a0b] rounded-bl-sm' : 'bg-ink-800 border hairline rounded-br-sm'}`
+            big ? 'px-1' : `rounded-lg px-3 py-2 ${mine ? 'bg-[#1e2a0b] rounded-ee-sm' : 'bg-ink-800 border hairline rounded-es-sm'}`
           }`}
           onPointerDown={startPress}
           onPointerUp={cancelPress}
@@ -80,8 +81,8 @@ export default function MessageBubble({
             <button
               type="button"
               onClick={() => onMenu(m)}
-              className={`absolute top-1 ${mine ? 'left-1' : 'right-1'} hidden sm:group-hover:flex w-6 h-6 rounded-full bg-black/40 items-center justify-center z-[2]`}
-              aria-label="אפשרויות הודעה"
+              className={`absolute top-1 ${mine ? 'end-1' : 'start-1'} hidden sm:group-hover:flex w-6 h-6 rounded-full bg-black/40 items-center justify-center z-[2]`}
+              aria-label={t('msg.options')}
             >
               <ChevronDown size={16} />
             </button>
@@ -97,7 +98,7 @@ export default function MessageBubble({
             <button
               type="button"
               onClick={() => onJumpTo(m.replyTo.id)}
-              className="block w-full text-right bg-black/30 border-r-2 border-accent rounded-sm px-2 py-1 mb-1.5"
+              className="block w-full text-start bg-black/30 border-s-2 border-accent rounded-sm px-2 py-1 mb-1.5"
             >
               <p className="text-[12px] font-medium text-accent">{m.replyTo.name}</p>
               <p className="text-xs text-white/70 line-clamp-2" dir="auto">{m.replyTo.text}</p>
@@ -105,12 +106,12 @@ export default function MessageBubble({
           )}
 
           {m.deleted ? (
-            <p className="italic text-white/50 text-sm">🚫 ההודעה נמחקה</p>
+            <p className="italic text-white/50 text-sm">🚫 {t('msg.deleted')}</p>
           ) : (
             <>
               {m.type === 'image' && (
                 <button type="button" onClick={() => onOpenImage(m)} className="block -mx-1 mb-1">
-                  <img src={m.image} alt={m.caption || 'תמונה'} className="rounded-md max-h-80 w-full object-cover" loading="lazy" />
+                  <img src={m.image} alt={m.caption || t('common.image')} className="rounded-md max-h-80 w-full object-cover" loading="lazy" />
                 </button>
               )}
               {m.type === 'location' && (
@@ -122,8 +123,8 @@ export default function MessageBubble({
                 >
                   <span className="w-10 h-10 rounded-md bg-ink-600 flex items-center justify-center"><MapPin size={18} /></span>
                   <span>
-                    <span className="block font-semibold text-sm">המיקום שלי</span>
-                    <span className="block text-xs text-white/60">פתיחה במפות</span>
+                    <span className="block font-semibold text-sm">{t('msg.myLocation')}</span>
+                    <span className="block text-xs text-white/60">{t('msg.openMaps')}</span>
                   </span>
                 </a>
               )}
@@ -140,7 +141,7 @@ export default function MessageBubble({
 
           <p className={`font-num text-[10px] text-white/45 mt-0.5 flex gap-1 ${big ? 'justify-center' : 'justify-end'}`} dir="ltr">
             {clockTime(m.createdAt)}
-            {m.edited && !m.deleted && <span>נערך</span>}
+            {m.edited && !m.deleted && <span>{t('msg.edited')}</span>}
           </p>
         </div>
         <Reactions reactions={m.reactions} myUid={myUid} onToggle={toggleReaction} />

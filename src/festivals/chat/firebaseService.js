@@ -7,6 +7,7 @@ import {
   collection, collectionGroup, deleteField, doc, getCountFromServer, getDoc, getDocs, getFirestore, increment, limit,
   limitToLast, onSnapshot, orderBy, query, serverTimestamp, setDoc, Timestamp, updateDoc, where, writeBatch,
 } from 'firebase/firestore'
+import { t } from '../i18n'
 import { buildMessage, preview, replyRef } from './messages'
 
 const MESSAGE_LIMIT = 150
@@ -54,7 +55,7 @@ export function createFirebaseService(config) {
           if (!snap.data().createdAt) setDoc(ref, { createdAt: serverTimestamp() }, { merge: true }).catch(() => {})
         } else {
           // First sign-in: start the profile from the Google account.
-          const fresh = { name: (fbUser.displayName || 'משתמש').slice(0, 30), bio: '', instagram: '', photo: fbUser.photoURL ?? null }
+          const fresh = { name: (fbUser.displayName || t('user.defaultName')).slice(0, 30), bio: '', instagram: '', photo: fbUser.photoURL ?? null }
           try {
             await setDoc(ref, { ...fresh, createdAt: serverTimestamp() })
           } catch {

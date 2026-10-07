@@ -4,6 +4,7 @@ import { useChat, useGroupMeta } from '../chat/ChatContext'
 import { useCatalog } from '../data/CatalogContext'
 import { findGroup, groupsFor } from '../data/groups'
 import { isEnded } from '../utils'
+import { t } from '../i18n'
 import Carousel from './Carousel'
 import EventAvatar from './EventAvatar'
 
@@ -38,7 +39,7 @@ function usePopularGroups() {
 function MemberCount({ count }) {
   return count > 0
     ? <span className="flex items-center gap-1.5 font-num text-[11px] text-accent"><Users size={13} /> {count}</span>
-    : <span className="text-[11px] text-muted">קבוצה חדשה</span>
+    : <span className="text-[11px] text-muted">{t('group.new')}</span>
 }
 
 function GroupCard({ id, memberCount, festival, group, onOpen }) {
@@ -47,7 +48,7 @@ function GroupCard({ id, memberCount, festival, group, onOpen }) {
     <button
       type="button"
       onClick={() => onOpen(id)}
-      className="snap-start shrink-0 w-64 text-right rounded-lg border hairline bg-ink-800 p-3.5 hover:border-white/20"
+      className="snap-start shrink-0 w-64 text-start rounded-lg border hairline bg-ink-800 p-3.5 hover:border-white/20"
     >
       <span className="flex items-center gap-3">
         <EventAvatar festival={festival} size="sm" />
@@ -73,8 +74,8 @@ export default function PopularGroups({ onOpen, onSeeAll }) {
   const popular = mode === 'popular'
   return (
     <Carousel
-      title={popular ? 'קבוצות פופולריות' : 'קבוצות מומלצות'}
-      subtitle={popular ? 'הקבוצות עם הכי הרבה חברים עכשיו' : 'הקבוצות של הפסטיבלים הקרובים. היו הראשונים להצטרף'}
+      title={popular ? t('popular.title') : t('popular.suggested')}
+      subtitle={popular ? t('popular.titleSub') : t('popular.suggestedSub')}
       onSeeAll={onSeeAll}
     >
       {groups.map((g) => <GroupCard key={g.id} {...g} onOpen={onOpen} />)}
@@ -95,7 +96,7 @@ function GroupRow({ rank, id, memberCount, festival, group, onOpen }) {
   return (
     <li className="flex items-center gap-3 py-3.5 border-b hairline">
       <span className="font-num text-[12px] text-muted w-6 shrink-0 text-center">{rank}</span>
-      <button type="button" onClick={() => onOpen(id)} className="flex items-center gap-3 flex-1 min-w-0 text-right">
+      <button type="button" onClick={() => onOpen(id)} className="flex items-center gap-3 flex-1 min-w-0 text-start">
         <EventAvatar festival={festival} />
         <span className="flex-1 min-w-0">
           <span className="block text-[15px] font-medium truncate">{group.title}</span>
@@ -107,11 +108,11 @@ function GroupRow({ rank, id, memberCount, festival, group, onOpen }) {
         </span>
       </button>
       {isMember ? (
-        <button type="button" onClick={() => onOpen(id)} className="shrink-0 h-8 px-3 rounded-md border border-ink-600 text-[13px] hover:border-white/40">פתיחה</button>
+        <button type="button" onClick={() => onOpen(id)} className="shrink-0 h-8 px-3 rounded-md border border-ink-600 text-[13px] hover:border-white/40">{t('common.open')}</button>
       ) : isEnded(festival) ? (
-        <span className="shrink-0 text-[12px] text-muted px-2">נסגר</span>
+        <span className="shrink-0 text-[12px] text-muted px-2">{t('common.closed')}</span>
       ) : (
-        <button type="button" onClick={joinAndOpen} className="shrink-0 h-8 px-3 rounded-md bg-accent text-black text-[13px] font-medium hover:brightness-110">הצטרפות</button>
+        <button type="button" onClick={joinAndOpen} className="shrink-0 h-8 px-3 rounded-md bg-accent text-black text-[13px] font-medium hover:brightness-110">{t('common.join')}</button>
       )}
     </li>
   )
@@ -124,14 +125,14 @@ export function PopularGroupsPage({ onOpen, onBack }) {
   return (
     <>
       <div className="flex items-center gap-2 mb-1">
-        <button type="button" onClick={onBack} className="w-9 h-9 -mr-2 flex items-center justify-center" aria-label="חזרה">
-          <ArrowRight size={20} />
+        <button type="button" onClick={onBack} className="w-9 h-9 -ms-2 flex items-center justify-center" aria-label={t('common.back')}>
+          <ArrowRight size={20} className="ltr:-scale-x-100" />
         </button>
-        <h1 className="text-[22px] font-semibold tracking-tight flex-1">{popular ? 'קבוצות פופולריות' : 'קבוצות מומלצות'}</h1>
+        <h1 className="text-[22px] font-semibold tracking-tight flex-1">{popular ? t('popular.title') : t('popular.suggested')}</h1>
         <span className="font-num text-[11px] text-muted">{ranked.length + suggested.length}</span>
       </div>
       <p className="text-[13px] text-muted mb-4">
-        {popular ? 'מדורג לפי מספר החברים בקבוצה.' : 'עוד אין קבוצות עם חברים. אלה הקבוצות של הפסטיבלים הקרובים, היו הראשונים להצטרף.'}
+        {popular ? t('popular.rankNote') : t('popular.suggestedNote')}
       </p>
       {ranked.length > 0 && (
         <ul className="border-t hairline">
@@ -139,7 +140,7 @@ export function PopularGroupsPage({ onOpen, onBack }) {
         </ul>
       )}
       {popular && suggested.length > 0 && (
-        <h2 className="text-[17px] font-semibold mt-9 mb-1">עוד קבוצות מומלצות</h2>
+        <h2 className="text-[17px] font-semibold mt-9 mb-1">{t('popular.more')}</h2>
       )}
       {suggested.length > 0 && (
         <ul className="border-t hairline">

@@ -4,6 +4,7 @@ import { useChat, useGroupMeta } from '../chat/ChatContext'
 import { replyRef } from '../chat/messages'
 import { compressImage, currentLocation } from '../chat/media'
 import { dayLabel, isEnded, membersLabel } from '../utils'
+import { t } from '../i18n'
 import EventAvatar from './EventAvatar'
 import GroupIcon from './GroupIcon'
 import Composer from './chat/Composer'
@@ -65,8 +66,8 @@ export default function ChatScreen({ festival, group, onClose }) {
       await action()
     } catch (e) {
       setError(e?.message === 'storage-full'
-        ? 'אין מספיק מקום במכשיר לשמור את זה במצב תצוגה.'
-        : 'הפעולה נכשלה. בדקו את החיבור ונסו שוב.')
+        ? t('chat.errStorage')
+        : t('chat.errAction'))
     }
   }
 
@@ -90,7 +91,7 @@ export default function ChatScreen({ festival, group, onClose }) {
       try {
         setPendingImage(await compressImage(file))
       } catch {
-        setError('לא הצלחנו לטעון את התמונה. נסו תמונה אחרת.')
+        setError(t('chat.errImage'))
       }
     })
 
@@ -100,7 +101,7 @@ export default function ChatScreen({ festival, group, onClose }) {
         const location = await currentLocation()
         await send({ type: 'location', location })
       } catch {
-        setError('לא הצלחנו לקבל מיקום. בדקו שאישרתם גישה למיקום.')
+        setError(t('chat.errLocation'))
       }
     })
 
@@ -125,18 +126,18 @@ export default function ChatScreen({ festival, group, onClose }) {
       setReplyTo(m)
     }
     if (action === 'copy') {
-      navigator.clipboard?.writeText(m.text || m.caption || '').then(() => flash('הועתק'), () => {})
+      navigator.clipboard?.writeText(m.text || m.caption || '').then(() => flash(t('common.copied')), () => {})
     }
     if (action === 'pin') run(() => chat.pin(group.id, pinned?.id === m.id ? null : m))
     if (action === 'edit') {
       setReplyTo(null)
       setEditing(m)
     }
-    if (action === 'delete' && window.confirm('למחוק את ההודעה לכולם?')) run(() => chat.remove(group.id, m.id))
+    if (action === 'delete' && window.confirm(t('chat.confirmDelete'))) run(() => chat.remove(group.id, m.id))
   }
 
   const leaveGroup = () => {
-    if (window.confirm(`לצאת מהקבוצה "${group.title}"?`)) {
+    if (window.confirm(t('chat.confirmLeave', { title: group.title }))) {
       setInfoOpen(false)
       run(() => chat.leave(group.id))
     }
@@ -151,22 +152,22 @@ export default function ChatScreen({ festival, group, onClose }) {
   const pinnedMessage = pinned && messages.find((m) => m.id === pinned.id && !m.deleted) ? pinned : null
 
   return (
-    <div className="fixed inset-0 z-[55] bg-ink-900 flex flex-col animate-slide-up" role="dialog" aria-modal="true" aria-label={`צ'אט ${group.title}`}>
+    <div className="fixed inset-0 z-[55] bg-ink-900 flex flex-col animate-slide-up" role="dialog" aria-modal="true" aria-label={t('chat.dialog', { title: group.title })}>
       <header className="flex items-center gap-2 px-2 h-14 bg-ink-900 border-b hairline shrink-0">
-        <button type="button" onClick={onClose} className="w-10 h-10 flex items-center justify-center" aria-label="חזרה">
-          <ArrowRight size={22} />
+        <button type="button" onClick={onClose} className="w-10 h-10 flex items-center justify-center" aria-label={t('common.back')}>
+          <ArrowRight size={22} className="ltr:-scale-x-100" />
         </button>
         {searchOpen ? (
           <input
             autoFocus
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="חיפוש בצ׳אט…"
+            placeholder={t('chat.searchPlaceholder')}
             className="flex-1 h-9 bg-ink-700 rounded-md px-3 outline-none text-base"
-            aria-label="חיפוש בצ׳אט"
+            aria-label={t('chat.search')}
           />
         ) : (
-          <button type="button" onClick={() => setInfoOpen(true)} className="flex items-center gap-3 flex-1 min-w-0 text-right" aria-label="פרטי הקבוצה">
+          <button type="button" onClick={() => setInfoOpen(true)} className="flex items-center gap-3 flex-1 min-w-0 text-start" aria-label={t('chat.info')}>
             <EventAvatar festival={festival} size="sm" />
             <span className="min-w-0">
               <span className="block text-[15px] font-medium truncate">{group.title}</span>
@@ -181,7 +182,7 @@ export default function ChatScreen({ festival, group, onClose }) {
           type="button"
           onClick={() => { setSearchOpen(!searchOpen); setSearch('') }}
           className="w-10 h-10 flex items-center justify-center text-white/70"
-          aria-label={searchOpen ? 'סגירת חיפוש' : 'חיפוש בצ׳אט'}
+          aria-label={searchOpen ? t('chat.closeSearch') : t('chat.search')}
         >
           {searchOpen ? <X size={20} /> : <Search size={20} />}
         </button>
@@ -189,21 +190,21 @@ export default function ChatScreen({ festival, group, onClose }) {
 
       {service?.mode === 'local' && (
         <p className="border-b hairline text-accent text-[12px] text-center px-4 py-1.5 shrink-0">
-          מצב תצוגה: הצ׳אט עוד לא מחובר לשרת, וההודעות נשמרות רק במכשיר הזה.
+          {t('chat.preview')}
         </p>
       )}
 
       {ended && (
         <p className="border-b hairline text-muted text-xs text-center px-4 py-1.5 shrink-0">
-          האירוע הסתיים · הקבוצה ממשיכה לחברים שלה, ואי אפשר להצטרף אליה יותר
+          {t('chat.endedBanner')}
         </p>
       )}
 
       {pinnedMessage && !searchOpen && (
-        <button type="button" onClick={() => jumpTo(pinnedMessage.id)} className="flex items-center gap-2 px-4 py-2 bg-ink-800/90 border-b border-white/5 text-right shrink-0">
+        <button type="button" onClick={() => jumpTo(pinnedMessage.id)} className="flex items-center gap-2 px-4 py-2 bg-ink-800/90 border-b border-white/5 text-start shrink-0">
           <Pin size={16} className="text-accent shrink-0" />
           <span className="min-w-0 flex-1">
-            <span className="block text-xs text-accent font-semibold">הודעה נעוצה · {pinnedMessage.name}</span>
+            <span className="block text-xs text-accent font-semibold">{t('chat.pinned')} · {pinnedMessage.name}</span>
             <span className="block text-sm truncate" dir="auto">{pinnedMessage.text}</span>
           </span>
         </button>
@@ -215,7 +216,7 @@ export default function ChatScreen({ festival, group, onClose }) {
             <div className="self-center text-center border hairline text-muted text-xs rounded-lg px-4 py-3 mb-4 max-w-xs">
               <GroupIcon name={group.icon} size={16} className="mx-auto mb-1.5 text-white/70" />
               {group.description}
-              <span className="block mt-1 text-white/40">לחיצה ארוכה על הודעה לתגובה, תשובה ונעיצה. לחיצה כפולה מסמנת לב.</span>
+              <span className="block mt-1 text-white/40">{t('chat.hint')}</span>
             </div>
           )}
           {visible.map((m, i) => {
@@ -243,8 +244,8 @@ export default function ChatScreen({ festival, group, onClose }) {
               </div>
             )
           })}
-          {messages.length === 0 && <p className="self-center text-white/40 text-sm mt-10">עוד אין הודעות. תגידו שלום 👋</p>}
-          {search && visible.length === 0 && <p className="self-center text-white/40 text-sm mt-10">לא נמצאו הודעות</p>}
+          {messages.length === 0 && <p className="self-center text-white/40 text-sm mt-10">{t('chat.empty')}</p>}
+          {search && visible.length === 0 && <p className="self-center text-white/40 text-sm mt-10">{t('chat.noResults')}</p>}
           <div ref={bottomRef} />
         </div>
       </div>
@@ -265,12 +266,12 @@ export default function ChatScreen({ festival, group, onClose }) {
             onLocation={shareLocation}
           />
         ) : ended ? (
-          <p className="max-w-2xl mx-auto text-center text-sm text-white/50 py-2">האירוע הסתיים, והקבוצה סגורה להצטרפות</p>
+          <p className="max-w-2xl mx-auto text-center text-sm text-white/50 py-2">{t('chat.endedFooter')}</p>
         ) : (
           <div className="max-w-2xl mx-auto flex flex-col items-center gap-2 py-1">
-            <p className="text-xs text-white/50">רק חברי הקבוצה יכולים לכתוב, להגיב ולהצביע</p>
+            <p className="text-xs text-white/50">{t('chat.membersOnly')}</p>
             <button type="button" onClick={() => withUser(() => run(() => chat.join(group, festival)))} className="w-full h-11 bg-accent text-black font-medium rounded-md">
-              הצטרפות לקבוצה
+              {t('chat.join')}
             </button>
           </div>
         )}

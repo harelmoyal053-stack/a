@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { X } from 'lucide-react'
+import { t } from '../i18n'
 
 function GoogleMark() {
   return (
@@ -25,7 +26,7 @@ export default function SignInSheet({ canUseGoogle, onGoogle, onPreviewName, onC
     try {
       await action()
     } catch {
-      setError('ההתחברות לא הצליחה. נסו שוב.')
+      setError(t('signin.error'))
       setBusy(false)
     }
   }
@@ -35,10 +36,10 @@ export default function SignInSheet({ canUseGoogle, onGoogle, onPreviewName, onC
       <div onClick={(e) => e.stopPropagation()} className="bg-ink-800 w-full sm:max-w-sm rounded-t-lg sm:rounded-lg border hairline p-6 animate-slide-up">
         <div className="flex justify-between items-start">
           <div>
-            <h2 className="text-xl font-semibold">התחברות</h2>
-            <p className="text-sm text-muted mt-1">כדי להצטרף לקבוצות ולכתוב בהן.</p>
+            <h2 className="text-xl font-semibold">{t('signin.title')}</h2>
+            <p className="text-sm text-muted mt-1">{t('signin.subtitle')}</p>
           </div>
-          <button type="button" onClick={onClose} aria-label="סגירה"><X size={20} className="text-muted" /></button>
+          <button type="button" onClick={onClose} aria-label={t('common.close')}><X size={20} className="text-muted" /></button>
         </div>
 
         {canUseGoogle ? (
@@ -48,7 +49,7 @@ export default function SignInSheet({ canUseGoogle, onGoogle, onPreviewName, onC
             onClick={() => run(onGoogle)}
             className="w-full h-12 mt-6 rounded-md bg-white text-black font-medium flex items-center justify-center gap-2.5 disabled:opacity-50"
           >
-            <GoogleMark /> {busy ? 'מתחברים…' : 'המשך עם Google'}
+            <GoogleMark /> {busy ? t('signin.connecting') : t('signin.google')}
           </button>
         ) : (
           <form
@@ -59,25 +60,25 @@ export default function SignInSheet({ canUseGoogle, onGoogle, onPreviewName, onC
             className="mt-5"
           >
             <p className="text-[12px] text-accent border border-accent/30 rounded-md px-3 py-2 mb-4 leading-relaxed">
-              מצב תצוגה: ההתחברות עם Google תפעל אחרי חיבור השרת. בינתיים נכנסים עם שם, והחשבון נשמר רק במכשיר הזה.
+              {t('signin.preview')}
             </p>
             <input
               autoFocus
               value={name}
               onChange={(e) => setName(e.target.value)}
               maxLength={30}
-              placeholder="השם שלך"
+              placeholder={t('signin.namePlaceholder')}
               className="w-full h-12 bg-ink-900 border border-ink-600 rounded-md px-3 outline-none focus:border-white/40"
             />
             <button type="submit" disabled={!trimmed || busy} className="w-full h-12 mt-3 rounded-md bg-accent text-black font-medium disabled:opacity-40">
-              {busy ? 'רגע…' : 'כניסה'}
+              {busy ? t('signin.wait') : t('signin.enter')}
             </button>
           </form>
         )}
 
         {error && <p className="text-rose-400 text-sm mt-3">{error}</p>}
         <p className="text-[11px] text-muted mt-5 leading-relaxed">
-          הפרופיל שלך (שם, תמונה, ביו ואינסטגרם) גלוי לחברי הקבוצות שלך.
+          {t('signin.privacy')}
         </p>
       </div>
     </div>

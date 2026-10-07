@@ -1,12 +1,13 @@
 import { useState } from 'react'
+import { t } from '../../i18n'
 
 const CATEGORIES = [
-  { label: '😀', name: 'פרצופים', emojis: '😀 😃 😄 😁 😆 😅 🤣 😂 🙂 😉 😊 😇 🥰 😍 🤩 😘 😋 😛 😜 🤪 😎 🥳 🤗 🤭 🤫 🤔 😐 😏 😴 🤤 😮 😲 🥺 😢 😭 😤 😡 🤯 😱 🥵 🥶 🤮 🤠 🤓 😈 💀 👻 👽 🤖 💩'.split(' ') },
-  { label: '👍', name: 'ידיים', emojis: '👍 👎 👌 ✌️ 🤞 🤟 🤘 🤙 👈 👉 👆 👇 ☝️ ✋ 👋 👏 🙌 👐 🤲 🙏 💪 🫶 🤝 ✍️ 💅 🫡 🫠 🙋 🤷 🙆 🙅 💃 🕺 🧘'.split(' ') },
-  { label: '🎉', name: 'מסיבה', emojis: '🎉 🎊 🥳 🎶 🎵 🎧 🎤 🎸 🥁 🎷 🎺 🎹 🪩 🔊 💥 ✨ 🌟 ⭐ 🔥 ⚡ 🌈 🎪 🎡 🎢 🎆 🎇 🍾 🥂 🍻 🍺 🍹 🍸 🍕 🌮 🍔 🍟 🍦'.split(' ') },
-  { label: '❤️', name: 'לבבות', emojis: '❤️ 🧡 💛 💚 💙 💜 🖤 🤍 🤎 💔 ❣️ 💕 💞 💓 💗 💖 💘 💝 💯 💢 💫 💦 💤'.split(' ') },
-  { label: '🏕️', name: 'טיול', emojis: '✈️ 🚗 🚌 🚐 🚕 🚆 🛫 🛬 🧳 🎒 🏕️ ⛺ 🏖️ 🏝️ 🏜️ 🌋 🗻 🌅 🌄 🌃 🌌 🗺️ 📍 🧭 🎟️ 🎫 💸 💰 🛒 🔋 📱 📸 🧴 🕶️ 👙 🩴'.split(' ') },
-  { label: '🌴', name: 'טבע', emojis: '🌴 🌵 🌲 🌳 🌿 🍀 🌸 🌺 🌻 🌼 🍄 🌙 ☀️ 🌤️ ⛅ 🌧️ ⛈️ 🌊 💧 🔥 🦋 🐬 🐳 🐢 🦄 🐶 🐱 🦁 🐸 🐵'.split(' ') },
+  { label: '😀', id: 'faces', emojis: '😀 😃 😄 😁 😆 😅 🤣 😂 🙂 😉 😊 😇 🥰 😍 🤩 😘 😋 😛 😜 🤪 😎 🥳 🤗 🤭 🤫 🤔 😐 😏 😴 🤤 😮 😲 🥺 😢 😭 😤 😡 🤯 😱 🥵 🥶 🤮 🤠 🤓 😈 💀 👻 👽 🤖 💩'.split(' ') },
+  { label: '👍', id: 'hands', emojis: '👍 👎 👌 ✌️ 🤞 🤟 🤘 🤙 👈 👉 👆 👇 ☝️ ✋ 👋 👏 🙌 👐 🤲 🙏 💪 🫶 🤝 ✍️ 💅 🫡 🫠 🙋 🤷 🙆 🙅 💃 🕺 🧘'.split(' ') },
+  { label: '🎉', id: 'party', emojis: '🎉 🎊 🥳 🎶 🎵 🎧 🎤 🎸 🥁 🎷 🎺 🎹 🪩 🔊 💥 ✨ 🌟 ⭐ 🔥 ⚡ 🌈 🎪 🎡 🎢 🎆 🎇 🍾 🥂 🍻 🍺 🍹 🍸 🍕 🌮 🍔 🍟 🍦'.split(' ') },
+  { label: '❤️', id: 'hearts', emojis: '❤️ 🧡 💛 💚 💙 💜 🖤 🤍 🤎 💔 ❣️ 💕 💞 💓 💗 💖 💘 💝 💯 💢 💫 💦 💤'.split(' ') },
+  { label: '🏕️', id: 'travel', emojis: '✈️ 🚗 🚌 🚐 🚕 🚆 🛫 🛬 🧳 🎒 🏕️ ⛺ 🏖️ 🏝️ 🏜️ 🌋 🗻 🌅 🌄 🌃 🌌 🗺️ 📍 🧭 🎟️ 🎫 💸 💰 🛒 🔋 📱 📸 🧴 🕶️ 👙 🩴'.split(' ') },
+  { label: '🌴', id: 'nature', emojis: '🌴 🌵 🌲 🌳 🌿 🍀 🌸 🌺 🌻 🌼 🍄 🌙 ☀️ 🌤️ ⛅ 🌧️ ⛈️ 🌊 💧 🔥 🦋 🐬 🐳 🐢 🦄 🐶 🐱 🦁 🐸 🐵'.split(' ') },
 ]
 
 export default function EmojiPicker({ onPick, className = '' }) {
@@ -16,11 +17,11 @@ export default function EmojiPicker({ onPick, className = '' }) {
       <div className="flex border-b border-white/10">
         {CATEGORIES.map((c, i) => (
           <button
-            key={c.name}
+            key={c.id}
             type="button"
             onClick={() => setCategory(i)}
             className={`flex-1 py-2 text-xl ${i === category ? 'bg-white/10' : ''}`}
-            aria-label={c.name}
+            aria-label={t(`emoji.${c.id}`)}
             aria-pressed={i === category}
           >
             {c.label}

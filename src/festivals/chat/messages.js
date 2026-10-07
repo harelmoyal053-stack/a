@@ -1,3 +1,5 @@
+import { t } from '../i18n'
+
 // Shared helpers for chat message payloads.
 
 export const REACTIONS = ['👍', '❤\ufe0f', '😂', '😮', '😢', '🙏']
@@ -7,14 +9,14 @@ export const MAX_IMAGE_CHARS = 700_000
 
 // One-line preview used for "last message", replies and pins.
 export function preview(message) {
-  if (message.deleted) return 'ההודעה נמחקה'
+  if (message.deleted) return t('msg.deleted')
   switch (message.type) {
     case 'image':
-      return `📷 ${message.caption || 'תמונה'}`
+      return `📷 ${message.caption || t('common.image')}`
     case 'poll':
       return `📊 ${message.poll.question}`
     case 'location':
-      return '📍 מיקום'
+      return `📍 ${t('msg.location')}`
     default:
       return message.text
   }

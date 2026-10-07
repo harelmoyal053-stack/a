@@ -3,6 +3,7 @@ import { findGroup } from '../data/groups'
 import { useChat, useGroupMeta } from '../chat/ChatContext'
 import { useCatalog } from '../data/CatalogContext'
 import { isEnded, shortTime } from '../utils'
+import { t } from '../i18n'
 import EventAvatar from './EventAvatar'
 
 function GroupRow({ id, onOpen }) {
@@ -15,7 +16,7 @@ function GroupRow({ id, onOpen }) {
 
   return (
     <li>
-      <button type="button" onClick={() => onOpen(id)} className="w-full flex items-center gap-3 py-3 text-right border-b hairline hover:bg-white/[0.03] -mx-2 px-2 rounded-sm">
+      <button type="button" onClick={() => onOpen(id)} className="w-full flex items-center gap-3 py-3 text-start border-b hairline hover:bg-white/[0.03] -mx-2 px-2 rounded-sm">
         <EventAvatar festival={festival} />
         <span className="flex-1 min-w-0">
           <span className="flex items-baseline justify-between gap-2">
@@ -25,9 +26,9 @@ function GroupRow({ id, onOpen }) {
             {lastMessage && <span className="font-num text-[11px] text-muted shrink-0">{shortTime(lastMessage.createdAt)}</span>}
           </span>
           <span className="flex items-center gap-2 mt-0.5">
-            {isEnded(festival) && <span className="text-[10px] text-muted border border-ink-600 rounded-sm px-1">הסתיים</span>}
+            {isEnded(festival) && <span className="text-[10px] text-muted border border-ink-600 rounded-sm px-1">{t('common.ended')}</span>}
             <span className="text-[13px] text-muted truncate">
-              {lastMessage ? `${lastMessage.name}: ${lastMessage.text}` : 'עוד אין הודעות'}
+              {lastMessage ? `${lastMessage.name}: ${lastMessage.text}` : t('mygroups.noMessages')}
             </span>
           </span>
         </span>
@@ -49,8 +50,8 @@ export default function MyGroups({ onOpen, emptyHint = false, limit }) {
     return (
       <div className="py-20 flex flex-col items-center text-center">
         <MessageCircle size={22} strokeWidth={1.5} className="text-muted mb-4" />
-        <p className="font-medium">עוד לא הצטרפת לקבוצות</p>
-        <p className="text-sm text-muted mt-1 max-w-xs">פתחו אירוע ולחצו ״הצטרפות״ ליד הקבוצה שמתאימה לכם.</p>
+        <p className="font-medium">{t('mygroups.emptyTitle')}</p>
+        <p className="text-sm text-muted mt-1 max-w-xs">{t('mygroups.emptyBody')}</p>
       </div>
     )
   }

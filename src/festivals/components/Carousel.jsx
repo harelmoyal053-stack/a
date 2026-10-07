@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { ChevronLeft } from 'lucide-react'
+import { t } from '../i18n'
 
 // Horizontally scrolling row with snap points and a position indicator.
 export default function Carousel({ title, subtitle, count, onSeeAll, children }) {
@@ -22,13 +23,13 @@ export default function Carousel({ title, subtitle, count, onSeeAll, children })
         <div>
           <h2 className="text-[19px] font-semibold tracking-tight">
             {title}
-            {count != null && <span className="font-num text-[12px] text-muted font-normal mr-2">{count}</span>}
+            {count != null && <span className="font-num text-[12px] text-muted font-normal ms-2">{count}</span>}
           </h2>
           {subtitle && <p className="text-[13px] text-muted mt-0.5">{subtitle}</p>}
         </div>
         {onSeeAll && (
           <button type="button" onClick={onSeeAll} className="flex items-center text-[13px] text-accent shrink-0">
-            הכול <ChevronLeft size={16} />
+            {t('common.all')} <ChevronLeft size={16} className="ltr:-scale-x-100" />
           </button>
         )}
       </div>

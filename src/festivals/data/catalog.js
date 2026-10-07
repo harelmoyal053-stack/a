@@ -1,3 +1,4 @@
+import { locale, t } from '../i18n'
 import { todayIso } from '../utils'
 
 // Turns the auto-updated event feed (events.json, written daily by
@@ -24,7 +25,6 @@ const GENRE_STYLE = {
 }
 const DEFAULT_STYLE = { emoji: '🎶', colors: ['#4f46e5', '#0891b2'] }
 
-const regionNames = new Intl.DisplayNames(['he'], { type: 'region' })
 
 function flagEmoji(code) {
   return [...code.toUpperCase()].map((c) => String.fromCodePoint(0x1f1e6 + c.charCodeAt(0) - 65)).join('')
@@ -33,12 +33,12 @@ function flagEmoji(code) {
 export function sourceLabel(source) {
   if (source === 'ticketmaster') return 'Ticketmaster'
   if (source === 'seatgeek') return 'SeatGeek'
-  if (source === 'community') return 'מפיקים ב-FestiChat'
+  if (source === 'community') return t('source.community')
   if (source.startsWith('partner:')) return source.slice('partner:'.length)
   return source
 }
 
-function fromEvent(e) {
+function fromEvent(e, regionNames) {
   const style = GENRE_STYLE[e.genres[0]] ?? DEFAULT_STYLE
   const tickets = (e.tickets ?? []).filter((t) => t.url)
   const cheapest = (e.tickets ?? []).find((t) => t.priceFrom != null)
@@ -69,13 +69,22 @@ function fromEvent(e) {
 }
 
 export function buildCatalog(feed) {
+  const regionNames = new Intl.DisplayNames([locale()], { type: 'region' })
   return (feed?.events ?? [])
     .filter((e) => e.endDate >= todayIso())
-    .map(fromEvent)
+    .map((e) => fromEvent(e, regionNames))
     .sort((a, b) => a.startDate.localeCompare(b.startDate))
 }
 
-export async function loadFeed() {
+// Fetched once per page load; a language switch rebuilds the catalog from it.
+let feedPromise = null
+
+export function loadFeed() {
+  feedPromise ??= fetchFeed()
+  return feedPromise
+}
+
+async function fetchFeed() {
   const url = `${import.meta.env.BASE_URL}festivals/events.json?v=${todayIso()}`
   try {
     const res = await fetch(url)

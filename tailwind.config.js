@@ -16,9 +16,9 @@ export default {
       },
       fontFamily: {
         hebrew: ['Rubik', 'Arial', 'sans-serif'],
-        ui: ['"IBM Plex Sans Hebrew"', '"IBM Plex Sans"', 'system-ui', 'sans-serif'],
-        num: ['"IBM Plex Mono"', '"IBM Plex Sans Hebrew"', 'ui-monospace', 'monospace'],
-        poster: ['"IBM Plex Sans Condensed"', '"IBM Plex Sans Hebrew"', 'sans-serif'],
+        ui: ['"IBM Plex Sans Hebrew"', '"IBM Plex Sans"', '"IBM Plex Sans Arabic"', 'system-ui', 'sans-serif'],
+        num: ['"IBM Plex Mono"', '"IBM Plex Sans Hebrew"', '"IBM Plex Sans"', '"IBM Plex Sans Arabic"', 'ui-monospace', 'monospace'],
+        poster: ['"IBM Plex Sans Condensed"', '"IBM Plex Sans Hebrew"', '"IBM Plex Sans"', '"IBM Plex Sans Arabic"', 'sans-serif'],
       },
       animation: {
         'pulse-slow': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',

@@ -11,14 +11,14 @@ export default function EventSlide({ festival, onOpen }) {
     <button
       type="button"
       onClick={onOpen}
-      className="snap-start shrink-0 w-[78%] sm:w-80 relative aspect-[4/5] rounded-lg overflow-hidden bg-ink-800 text-right group"
+      className="snap-start shrink-0 w-[78%] sm:w-80 relative aspect-[4/5] rounded-lg overflow-hidden bg-ink-800 text-start group"
     >
       <div className="absolute inset-0 transition-transform duration-500 group-hover:scale-[1.03]">
         <Poster festival={festival} large showTitle={!hasPhoto} showCity={false} />
       </div>
       {hasPhoto && <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />}
       {price && (
-        <span className="absolute top-3 left-3 bg-black/70 backdrop-blur-sm font-num text-[11px] px-1.5 py-0.5 rounded-sm">{price}</span>
+        <span className="absolute top-3 end-3 bg-black/70 backdrop-blur-sm font-num text-[11px] px-1.5 py-0.5 rounded-sm">{price}</span>
       )}
       <div className="absolute inset-x-0 bottom-0 p-4">
         <p className="font-num text-[11px] text-accent">{cardDate(festival)}</p>

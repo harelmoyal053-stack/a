@@ -1,4 +1,5 @@
 import { BarChart3, Check } from 'lucide-react'
+import { t } from '../../i18n'
 
 export default function PollCard({ poll, votes, myUid, canVote, onVote }) {
   const mine = votes?.[myUid] ?? []
@@ -18,7 +19,7 @@ export default function PollCard({ poll, votes, myUid, canVote, onVote }) {
   return (
     <div className="min-w-[14rem]">
       <p className="font-semibold flex items-start gap-1.5 mb-1" dir="auto"><BarChart3 size={18} className="shrink-0 mt-0.5 text-whatsapp" />{poll.question}</p>
-      <p className="text-[11px] text-white/50 mb-2">{poll.multiple ? 'אפשר לבחור כמה תשובות' : 'בחרו תשובה אחת'}</p>
+      <p className="text-[11px] text-white/50 mb-2">{poll.multiple ? t('poll.multiple') : t('poll.single')}</p>
       <ul className="flex flex-col gap-2">
         {poll.options.map((option) => {
           const selected = mine.includes(option.id)
@@ -28,7 +29,7 @@ export default function PollCard({ poll, votes, myUid, canVote, onVote }) {
                 type="button"
                 onClick={() => toggle(option.id)}
                 disabled={!canVote}
-                className="w-full text-right disabled:cursor-default"
+                className="w-full text-start disabled:cursor-default"
                 aria-pressed={selected}
               >
                 <div className="flex items-center gap-2">
@@ -38,7 +39,7 @@ export default function PollCard({ poll, votes, myUid, canVote, onVote }) {
                   <span className="flex-1 text-sm" dir="auto">{option.text}</span>
                   <span className="text-xs text-white/60">{counts[option.id]}</span>
                 </div>
-                <div className="h-1.5 rounded-full bg-white/10 mt-1 mr-7 overflow-hidden">
+                <div className="h-1.5 rounded-full bg-white/10 mt-1 ms-7 overflow-hidden">
                   <div className="h-full bg-whatsapp transition-all duration-500" style={{ width: `${(counts[option.id] / max) * 100}%` }} />
                 </div>
               </button>
@@ -46,7 +47,7 @@ export default function PollCard({ poll, votes, myUid, canVote, onVote }) {
           )
         })}
       </ul>
-      <p className="text-[11px] text-white/50 mt-2">{voters.length === 1 ? 'הצבעה אחת' : `${voters.length} הצבעות`}</p>
+      <p className="text-[11px] text-white/50 mt-2">{t('count.votes', { count: voters.length })}</p>
     </div>
   )
 }

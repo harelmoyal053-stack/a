@@ -1,10 +1,11 @@
 import { useEffect } from 'react'
 import { ArrowRight, ArrowUpLeft, Heart, Share2 } from 'lucide-react'
-import { GENRES, MONTHS } from '../data/festivals'
+import { GENRES } from '../data/festivals'
+import { t } from '../i18n'
 import { sourceLabel } from '../data/catalog'
 import { whatsappShareUrl } from '../config'
 import { useChat, useGroupMeta } from '../chat/ChatContext'
-import { countdownFor, dateChip, isEnded, priceLabel } from '../utils'
+import { countdownFor, dateChip, isEnded, monthName, priceLabel } from '../utils'
 import GroupIcon from './GroupIcon'
 import Poster from './Poster'
 
@@ -21,7 +22,7 @@ function GroupRow({ festival, group, onOpenChat }) {
 
   return (
     <li className="flex items-center gap-3 py-3.5 border-b hairline">
-      <button type="button" onClick={() => onOpenChat(group.id)} className="flex items-center gap-3 flex-1 min-w-0 text-right">
+      <button type="button" onClick={() => onOpenChat(group.id)} className="flex items-center gap-3 flex-1 min-w-0 text-start">
         <span className={`w-9 h-9 shrink-0 rounded-md flex items-center justify-center ${isMember ? 'bg-accent text-black' : 'bg-ink-700 text-white/70'}`}>
           <GroupIcon name={group.icon} size={17} />
         </span>
@@ -33,13 +34,13 @@ function GroupRow({ festival, group, onOpenChat }) {
       </button>
       {isMember ? (
         <button type="button" onClick={() => onOpenChat(group.id)} className="shrink-0 h-8 px-3 rounded-md border border-ink-600 text-[13px] hover:border-white/40">
-          פתיחה
+          {t('common.open')}
         </button>
       ) : isEnded(festival) ? (
-        <span className="shrink-0 text-[12px] text-muted px-2">נסגר</span>
+        <span className="shrink-0 text-[12px] text-muted px-2">{t('common.closed')}</span>
       ) : (
         <button type="button" onClick={joinAndOpen} className="shrink-0 h-8 px-3 rounded-md bg-accent text-black text-[13px] font-medium hover:brightness-110">
-          הצטרפות
+          {t('common.join')}
         </button>
       )}
     </li>
@@ -66,7 +67,7 @@ export default function FestivalModal({ festival, groups, isFavorite, onToggleFa
     }
   }, [onClose])
 
-  const shareText = `${festival.name} ב-FestiChat ${window.location.href}`
+  const shareText = t('event.share', { name: festival.name, url: window.location.href })
   const iconButton = 'w-9 h-9 rounded-md bg-black/60 backdrop-blur flex items-center justify-center'
 
   return (
@@ -82,10 +83,10 @@ export default function FestivalModal({ festival, groups, isFavorite, onToggleFa
           <Poster festival={festival} large showTitle={false} />
           <div className="absolute inset-0 bg-gradient-to-t from-ink-900 via-transparent to-black/30" />
           <div className="absolute top-3 inset-x-3 flex justify-between">
-            <button type="button" onClick={onClose} className={iconButton} aria-label="חזרה"><ArrowRight size={18} /></button>
+            <button type="button" onClick={onClose} className={iconButton} aria-label={t('common.back')}><ArrowRight size={18} className="ltr:-scale-x-100" /></button>
             <div className="flex gap-2">
-              <a href={whatsappShareUrl(shareText)} target="_blank" rel="noopener noreferrer" className={iconButton} aria-label="שיתוף"><Share2 size={16} /></a>
-              <button type="button" onClick={onToggleFavorite} className={iconButton} aria-label={isFavorite ? 'הסר ממועדפים' : 'שמירה'} aria-pressed={isFavorite}>
+              <a href={whatsappShareUrl(shareText)} target="_blank" rel="noopener noreferrer" className={iconButton} aria-label={t('common.share')}><Share2 size={16} /></a>
+              <button type="button" onClick={onToggleFavorite} className={iconButton} aria-label={isFavorite ? t('saved.remove') : t('saved.add')} aria-pressed={isFavorite}>
                 <Heart size={16} className={isFavorite ? 'fill-accent text-accent' : ''} />
               </button>
             </div>
@@ -97,15 +98,15 @@ export default function FestivalModal({ festival, groups, isFavorite, onToggleFa
           <h2 id="festival-title" className="text-[28px] font-semibold leading-tight tracking-tight mt-1.5" dir="auto">{festival.name}</h2>
 
           <dl className="mt-5 border-t hairline">
-            <Fact label="מתי">
-              {festival.startDate ? `${dateChip(festival, MONTHS)}${festival.time ? ` · ${festival.time}` : ''}` : MONTHS[festival.month - 1]}
+            <Fact label={t('event.when')}>
+              {festival.startDate ? `${dateChip(festival)}${festival.time ? ` · ${festival.time}` : ''}` : monthName(festival.month)}
             </Fact>
-            <Fact label="איפה">
+            <Fact label={t('event.where')}>
               <span className="block" dir="auto">{[festival.venue, festival.city].filter(Boolean).join(', ')}</span>
               <span className="block text-muted text-[13px]">{festival.country}</span>
             </Fact>
-            {festival.genres.length > 0 && <Fact label="סגנון">{festival.genres.map((g) => GENRES[g]).filter(Boolean).join(', ')}</Fact>}
-            {festival.sources?.length > 0 && <Fact label="מקור">{festival.sources.map(sourceLabel).join(', ')}</Fact>}
+            {festival.genres.length > 0 && <Fact label={t('event.genre')}>{festival.genres.map((g) => GENRES[g]).filter(Boolean).join(', ')}</Fact>}
+            {festival.sources?.length > 0 && <Fact label={t('event.source')}>{festival.sources.map(sourceLabel).join(', ')}</Fact>}
           </dl>
 
           {festival.tickets?.length > 0 && (
@@ -120,7 +121,7 @@ export default function FestivalModal({ festival, groups, isFavorite, onToggleFa
                     i === 0 ? 'bg-accent text-black hover:brightness-110' : 'border border-ink-600 hover:border-white/40'
                   }`}
                 >
-                  <span className="flex items-center gap-2">כרטיסים · {sourceLabel(ticket.source)}<ArrowUpLeft size={16} /></span>
+                  <span className="flex items-center gap-2">{t('event.tickets', { source: sourceLabel(ticket.source) })}<ArrowUpLeft size={16} className="ltr:-scale-x-100" /></span>
                   {priceLabel(ticket) && <span className="font-num text-[13px]">{priceLabel(ticket)}</span>}
                 </a>
               ))}
@@ -128,13 +129,13 @@ export default function FestivalModal({ festival, groups, isFavorite, onToggleFa
           )}
           {festival.website && (
             <a href={festival.website} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-[13px] text-muted hover:text-white mt-3">
-              אתר רשמי <ArrowUpLeft size={14} />
+              {t('event.website')} <ArrowUpLeft size={14} className="ltr:-scale-x-100" />
             </a>
           )}
 
           <div className="flex items-baseline justify-between mt-9 mb-1">
-            <h3 className="text-[17px] font-semibold">קבוצות</h3>
-            <span className="font-num text-[11px] text-muted">חברים</span>
+            <h3 className="text-[17px] font-semibold">{t('event.groups')}</h3>
+            <span className="font-num text-[11px] text-muted">{t('event.members')}</span>
           </div>
           <ul className="border-t hairline">
             {groups.map((group) => <GroupRow key={group.id} festival={festival} group={group} onOpenChat={onOpenChat} />)}

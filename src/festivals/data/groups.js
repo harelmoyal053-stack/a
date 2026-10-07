@@ -1,11 +1,25 @@
+import { t } from '../i18n'
+
+const groupType = (type, icon, extra = {}) => ({
+  type,
+  icon,
+  ...extra,
+  get title() {
+    return t(`group.${type}.title`)
+  },
+  get description() {
+    return t(`group.${type}.description`)
+  },
+})
+
 // Every festival gets these group chats.
 export const GROUP_TYPES = [
-  { type: 'general', title: 'קבוצה כללית', description: 'עדכונים, ליינאפ ושאלות לפני ובמהלך הפסטיבל', icon: 'MessageCircle' },
-  { type: 'israelis', title: 'ישראלים שמגיעים', description: 'מכירים את החבר׳ה מהארץ שמגיעים', icon: 'Flag' },
-  { type: 'rides', title: 'טרמפים והסעות', description: 'חלוקת נסיעות משדה התעופה ומהעיר', icon: 'Car' },
-  { type: 'camping', title: 'קמפינג ולינה', description: 'שותפים לאוהל, דירה או מלון', icon: 'Tent', festivalOnly: true },
-  { type: 'tickets', title: 'החלפת כרטיסים', description: 'מכירה והחלפה של כרטיסים במחיר מקור', icon: 'Ticket' },
-  { type: 'solo', title: 'מגיעים לבד', description: 'מוצאים חברים לפני שנוחתים', icon: 'UserRound' },
+  groupType('general', 'MessageCircle'),
+  groupType('israelis', 'Flag'),
+  groupType('rides', 'Car'),
+  groupType('camping', 'Tent', { festivalOnly: true }),
+  groupType('tickets', 'Ticket'),
+  groupType('solo', 'UserRound'),
 ]
 
 const SEPARATOR = '__'

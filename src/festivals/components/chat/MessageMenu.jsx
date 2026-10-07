@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Copy, Pencil, Pin, PinOff, Plus, Reply, Trash2 } from 'lucide-react'
+import { t } from '../../i18n'
 import { REACTIONS, preview } from '../../chat/messages'
 import EmojiPicker from './EmojiPicker'
 
@@ -7,11 +8,11 @@ import EmojiPicker from './EmojiPicker'
 export default function MessageMenu({ message, mine, myReaction, canInteract, isPinned, onReact, onAction, onClose }) {
   const [moreEmoji, setMoreEmoji] = useState(false)
   const actions = [
-    canInteract && { id: 'reply', label: 'השב', icon: Reply },
-    message.type !== 'poll' && { id: 'copy', label: 'העתקה', icon: Copy },
-    canInteract && { id: 'pin', label: isPinned ? 'ביטול נעיצה' : 'נעיצה', icon: isPinned ? PinOff : Pin },
-    mine && message.type === 'text' && { id: 'edit', label: 'עריכה', icon: Pencil },
-    mine && { id: 'delete', label: 'מחיקה', icon: Trash2, danger: true },
+    canInteract && { id: 'reply', label: t('msg.reply'), icon: Reply },
+    message.type !== 'poll' && { id: 'copy', label: t('msg.copy'), icon: Copy },
+    canInteract && { id: 'pin', label: isPinned ? t('msg.unpin') : t('msg.pin'), icon: isPinned ? PinOff : Pin },
+    mine && message.type === 'text' && { id: 'edit', label: t('msg.edit'), icon: Pencil },
+    mine && { id: 'delete', label: t('msg.delete'), icon: Trash2, danger: true },
   ].filter(Boolean)
 
   return (
@@ -32,12 +33,12 @@ export default function MessageMenu({ message, mine, myReaction, canInteract, is
                   type="button"
                   onClick={() => onReact(emoji === myReaction ? null : emoji)}
                   className={`w-11 h-11 rounded-full text-2xl hover:scale-125 transition-transform ${myReaction === emoji ? 'bg-white/15' : ''}`}
-                  aria-label={`תגובה ${emoji}`}
+                  aria-label={t('msg.react', { emoji })}
                 >
                   {emoji}
                 </button>
               ))}
-              <button type="button" onClick={() => setMoreEmoji(true)} className="w-11 h-11 rounded-full bg-white/10 flex items-center justify-center" aria-label="עוד אימוג׳ים">
+              <button type="button" onClick={() => setMoreEmoji(true)} className="w-11 h-11 rounded-full bg-white/10 flex items-center justify-center" aria-label={t('msg.moreEmoji')}>
                 <Plus size={20} />
               </button>
             </div>

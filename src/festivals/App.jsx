@@ -11,40 +11,42 @@ import FestivalGrid from './components/FestivalGrid'
 import FestivalModal from './components/FestivalModal'
 import ChatScreen from './components/ChatScreen'
 import MyGroups from './components/MyGroups'
+import LanguageList from './components/LanguageList'
 import { useChat } from './chat/ChatContext'
-import { CONTINENTS, GENRES, MONTHS } from './data/festivals'
+import { CONTINENTS, GENRES } from './data/festivals'
 import { findGroup, groupsFor } from './data/groups'
 import { useCatalog } from './data/CatalogContext'
 import { REPO_URL, addEventUrl } from './config'
 import { sourceLabel } from './data/catalog'
-import { overlaps, thisWeekRange, todayIso, weekendRange } from './utils'
+import { monthName, overlaps, thisWeekRange, todayIso, weekendRange } from './utils'
+import { locale, t } from './i18n'
+import { useLanguage } from './i18n/I18nProvider'
 
 const FAVORITES_KEY = 'festival-groups:favorites'
+// Labels are getters so they read in the current language.
 const TABS = [
-  { id: 'home', label: 'בית', icon: Home },
-  { id: 'search', label: 'חיפוש', icon: Search },
-  { id: 'chats', label: 'צ׳אטים', icon: MessageCircle },
-  { id: 'favorites', label: 'שמורים', icon: Heart },
-  { id: 'profile', label: 'פרופיל', icon: User },
-]
+  { id: 'home', key: 'nav.home', icon: Home },
+  { id: 'search', key: 'nav.search', icon: Search },
+  { id: 'chats', key: 'nav.chats', icon: MessageCircle },
+  { id: 'favorites', key: 'nav.saved', icon: Heart },
+  { id: 'profile', key: 'nav.profile', icon: User },
+].map((tab) => ({ ...tab, get label() { return t(tab.key) } }))
 
 const KINDS = [
-  { id: 'all', label: 'הכול' },
-  { id: 'festival', label: 'פסטיבלים' },
-  { id: 'party', label: 'מסיבות' },
-]
-
-const numberFormat = new Intl.NumberFormat('he-IL')
+  { id: 'all', key: 'kind.all' },
+  { id: 'festival', key: 'kind.festival' },
+  { id: 'party', key: 'kind.party' },
+].map((kind) => ({ ...kind, get label() { return t(kind.key) } }))
 
 // Home shortcuts; each opens a filtered list.
 const PRESETS = [
-  { id: 'today', label: 'היום', icon: CalendarClock, match: (f) => overlaps(f, todayIso(), todayIso()) },
-  { id: 'weekend', label: 'סופ״ש', icon: CalendarRange, match: (f) => overlaps(f, ...weekendRange()) },
-  { id: 'festival', label: 'פסטיבלים', icon: Tent, match: (f) => f.kind === 'festival' },
-  { id: 'party', label: 'מסיבות', icon: Disc3, match: (f) => f.kind === 'party' },
-]
+  { id: 'today', key: 'preset.today', icon: CalendarClock, match: (f) => overlaps(f, todayIso(), todayIso()) },
+  { id: 'weekend', key: 'preset.weekend', icon: CalendarRange, match: (f) => overlaps(f, ...weekendRange()) },
+  { id: 'festival', key: 'kind.festival', icon: Tent, match: (f) => f.kind === 'festival' },
+  { id: 'party', key: 'kind.party', icon: Disc3, match: (f) => f.kind === 'party' },
+].map((preset) => ({ ...preset, get label() { return t(preset.key) } }))
 // Lists reachable from "see all" links but not shown as shortcuts.
-const ALL_PRESETS = [...PRESETS, { id: 'week', label: 'השבוע', match: (f) => overlaps(f, ...thisWeekRange()) }]
+const ALL_PRESETS = [...PRESETS, { id: 'week', get label() { return t('preset.week') }, match: (f) => overlaps(f, ...thisWeekRange()) }]
 const CAROUSEL_SIZE = 12
 
 function loadFavorites() {
@@ -101,7 +103,7 @@ function ChipRow({ label, children }) {
   return (
     <div className="flex items-center gap-3">
       {label && <span className="text-[10px] text-muted shrink-0 w-14">{label}</span>}
-      <div className="flex gap-1.5 overflow-x-auto no-scrollbar -ml-4 pl-4 min-w-0">{children}</div>
+      <div className="flex gap-1.5 overflow-x-auto no-scrollbar -me-4 pe-4 min-w-0">{children}</div>
     </div>
   )
 }
@@ -127,6 +129,8 @@ function EmptyState({ icon, title, children }) {
 }
 
 export default function App() {
+  const numberFormat = useMemo(() => new Intl.NumberFormat(locale()), [])
+  const { lang, setLang, languages } = useLanguage()
   const [tab, setTab] = useState('home')
   const [preset, setPreset] = useState(null)
   const [query, setQuery] = useState('')
@@ -241,8 +245,8 @@ export default function App() {
   const continentOptions = Object.entries(CONTINENTS).filter(([key]) => catalog.items.some((f) => f.continent === key))
 
   const genreChips = (
-    <ChipRow label="סגנון">
-      <Chip active={genre === 'all'} onClick={() => setGenre('all')}>הכול</Chip>
+    <ChipRow label={t('filter.genre')}>
+      <Chip active={genre === 'all'} onClick={() => setGenre('all')}>{t('common.all')}</Chip>
       {genreOptions.map(([key, label]) => (
         <Chip key={key} active={genre === key} onClick={() => setGenre(key)}>{label}</Chip>
       ))}
@@ -255,21 +259,21 @@ export default function App() {
   const chatClosed = route?.type === 'chat' && !openChatData && catalog.loaded && groupsReady
   const hasGroups = Object.keys(myGroups).length > 0
   const favoriteList = catalog.items.filter((f) => favorites.has(f.id))
-  const updated = catalog.updatedAt ? new Date(catalog.updatedAt).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit' }) : null
+  const updated = catalog.updatedAt ? new Date(catalog.updatedAt).toLocaleDateString(locale(), { day: '2-digit', month: '2-digit' }) : null
 
   return (
     <div className="min-h-screen bg-ink-900 text-[#ededed] font-ui pb-20">
       <header className="sticky top-0 z-40 bg-ink-900/90 backdrop-blur-md border-b hairline">
         <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
-          <button type="button" onClick={() => goTab('home')} className="flex items-center gap-2" dir="ltr" aria-label="FestiChat – דף הבית">
+          <button type="button" onClick={() => goTab('home')} className="flex items-center gap-2" dir="ltr" aria-label={t('home.label')}>
             <span className="w-2.5 h-2.5 bg-accent rounded-[2px]" />
             <span className="text-[17px] font-semibold tracking-tight lowercase">festichat</span>
           </button>
-          <div className="flex items-center -ml-2">
-            <button type="button" onClick={() => goTab('search')} className="w-10 h-10 flex items-center justify-center text-white/80 hover:text-white" aria-label="חיפוש">
+          <div className="flex items-center -me-2">
+            <button type="button" onClick={() => goTab('search')} className="w-10 h-10 flex items-center justify-center text-white/80 hover:text-white" aria-label={t('common.search')}>
               <Search size={20} strokeWidth={1.75} />
             </button>
-            <button type="button" onClick={() => setMenuOpen(true)} className="w-10 h-10 flex items-center justify-center text-white/80 hover:text-white" aria-label="תפריט">
+            <button type="button" onClick={() => setMenuOpen(true)} className="w-10 h-10 flex items-center justify-center text-white/80 hover:text-white" aria-label={t('common.menu')}>
               <Menu size={20} strokeWidth={1.75} />
             </button>
           </div>
@@ -284,15 +288,15 @@ export default function App() {
         {tab === 'home' && activePreset && (
           <>
             <div className="flex items-center gap-2 mb-5">
-              <button type="button" onClick={() => setPreset(null)} className="w-9 h-9 -mr-2 flex items-center justify-center" aria-label="חזרה">
-                <ArrowRight size={20} />
+              <button type="button" onClick={() => setPreset(null)} className="w-9 h-9 -ms-2 flex items-center justify-center" aria-label={t('common.back')}>
+                <ArrowRight size={20} className="ltr:-scale-x-100" />
               </button>
               <h1 className="text-[22px] font-semibold tracking-tight flex-1">{activePreset.label}</h1>
-              <span className="font-num text-[11px] text-muted">{numberFormat.format(presetResults.length)} אירועים</span>
+              <span className="font-num text-[11px] text-muted">{t('count.events', { count: presetResults.length })}</span>
             </div>
             {presetResults.length > 0
               ? renderGrid(presetResults, `preset-${preset}`, true)
-              : <EmptyState icon={SearchX} title="אין אירועים כרגע">נסו קטגוריה אחרת.</EmptyState>}
+              : <EmptyState icon={SearchX} title={t('preset.emptyTitle')}>{t('preset.emptyBody')}</EmptyState>}
           </>
         )}
 
@@ -306,7 +310,7 @@ export default function App() {
                     key={p.id}
                     type="button"
                     onClick={() => setPreset(p.id)}
-                    className="flex flex-col items-start gap-3 rounded-lg border hairline bg-ink-800 px-3 py-3 hover:border-white/20 text-right"
+                    className="flex flex-col items-start gap-3 rounded-lg border hairline bg-ink-800 px-3 py-3 hover:border-white/20 text-start"
                   >
                     <Icon size={18} strokeWidth={1.75} className="text-accent" />
                     <span>
@@ -321,8 +325,8 @@ export default function App() {
             {hasGroups && (
               <section className="mb-10">
                 <div className="flex items-end justify-between mb-1">
-                  <h2 className="text-[19px] font-semibold tracking-tight">הקבוצות שלי</h2>
-                  <button type="button" onClick={() => goTab('chats')} className="text-[13px] text-accent">הכול</button>
+                  <h2 className="text-[19px] font-semibold tracking-tight">{t('home.myGroups')}</h2>
+                  <button type="button" onClick={() => goTab('chats')} className="text-[13px] text-accent">{t('common.all')}</button>
                 </div>
                 <MyGroups onOpen={openChat} limit={3} />
               </section>
@@ -331,25 +335,25 @@ export default function App() {
             <PopularGroups onOpen={openChat} onSeeAll={() => setPreset('groups')} />
 
             {!catalog.loaded && (
-              <div className="flex gap-3 overflow-hidden mb-10" aria-label="טוען אירועים">
+              <div className="flex gap-3 overflow-hidden mb-10" aria-label={t('home.loadingEvents')}>
                 {[0, 1].map((i) => <div key={i} className="shrink-0 w-[78%] sm:w-80 aspect-[4/5] rounded-lg bg-ink-800 animate-pulse" />)}
               </div>
             )}
 
             {upcomingFestivals.length > 0 && (
-              <Carousel title="פסטיבלים קרובים" subtitle="הפסטיבלים הבאים בעולם" onSeeAll={() => setPreset('festival')}>
+              <Carousel title={t('home.upcomingFestivals')} subtitle={t('home.upcomingFestivalsSub')} onSeeAll={() => setPreset('festival')}>
                 {upcomingFestivals.map((f) => <EventSlide key={f.id} festival={f} onOpen={() => openFestival(f.id)} />)}
               </Carousel>
             )}
 
             {thisWeek.length > 0 && (
-              <Carousel title="השבוע" count={numberFormat.format(thisWeekCount)} subtitle="מסיבות והופעות בשבעת הימים הקרובים" onSeeAll={() => setPreset('week')}>
+              <Carousel title={t('home.thisWeek')} count={numberFormat.format(thisWeekCount)} subtitle={t('home.thisWeekSub')} onSeeAll={() => setPreset('week')}>
                 {thisWeek.map((f) => <EventSlide key={f.id} festival={f} onOpen={() => openFestival(f.id)} />)}
               </Carousel>
             )}
 
             {catalog.loaded && catalog.items.length === 0 && (
-              <EmptyState icon={SearchX} title="אין אירועים להצגה">לא הצלחנו לטעון את האירועים. נסו לרענן בעוד כמה דקות.</EmptyState>
+              <EmptyState icon={SearchX} title={t('home.noEventsTitle')}>{t('home.noEventsBody')}</EmptyState>
             )}
 
           </>
@@ -364,35 +368,35 @@ export default function App() {
                 type="search"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="אמן, אירוע, עיר או מדינה"
+                placeholder={t('search.placeholder')}
                 className="flex-1 outline-none bg-transparent text-base placeholder:text-muted"
-                aria-label="חיפוש אירוע"
+                aria-label={t('search.label')}
               />
               {query && (
-                <button type="button" onClick={() => setQuery('')} aria-label="ניקוי חיפוש"><X size={16} className="text-muted" /></button>
+                <button type="button" onClick={() => setQuery('')} aria-label={t('search.clear')}><X size={16} className="text-muted" /></button>
               )}
             </label>
             <Segments options={KINDS} value={kind} onChange={setKind} />
             <div className="flex flex-col gap-2.5 mt-4 mb-6">
-              <ChipRow label="אזור">
-                <Chip active={continent === 'all'} onClick={() => setContinent('all')}>הכול</Chip>
+              <ChipRow label={t('filter.region')}>
+                <Chip active={continent === 'all'} onClick={() => setContinent('all')}>{t('common.all')}</Chip>
                 {continentOptions.map(([key, label]) => (
                   <Chip key={key} active={continent === key} onClick={() => setContinent(key)}>{label}</Chip>
                 ))}
               </ChipRow>
               {genreChips}
-              <ChipRow label="חודש">
-                <Chip active={month === 'all'} onClick={() => setMonth('all')}>הכול</Chip>
-                {MONTHS.map((name, i) => (
-                  <Chip key={name} active={month === String(i + 1)} onClick={() => setMonth(String(i + 1))}>{name}</Chip>
+              <ChipRow label={t('filter.month')}>
+                <Chip active={month === 'all'} onClick={() => setMonth('all')}>{t('common.all')}</Chip>
+                {Array.from({ length: 12 }, (_, i) => (
+                  <Chip key={i} active={month === String(i + 1)} onClick={() => setMonth(String(i + 1))}>{monthName(i + 1)}</Chip>
                 ))}
               </ChipRow>
             </div>
-            <p className="font-num text-[11px] text-muted mb-4">{numberFormat.format(searchResults.length)} תוצאות</p>
+            <p className="font-num text-[11px] text-muted mb-4">{t('count.results', { count: searchResults.length })}</p>
             {searchResults.length > 0 ? renderGrid(searchResults, `search-${query}-${continent}-${genre}-${month}-${kind}`) : (
-              <EmptyState icon={SearchX} title="לא נמצאו אירועים">
-                נסו מילה אחרת או הסירו סינון.{' '}
-                <a href={addEventUrl()} target="_blank" rel="noopener noreferrer" className="text-accent">מפיקים? הוסיפו אירוע</a>
+              <EmptyState icon={SearchX} title={t('search.emptyTitle')}>
+                {t('search.emptyBody')}{' '}
+                <a href={addEventUrl()} target="_blank" rel="noopener noreferrer" className="text-accent">{t('search.addEvent')}</a>
               </EmptyState>
             )}
           </>
@@ -400,16 +404,16 @@ export default function App() {
 
         {tab === 'chats' && (
           <>
-            <PageTitle>צ׳אטים</PageTitle>
+            <PageTitle>{t('chats.title')}</PageTitle>
             <MyGroups onOpen={openChat} emptyHint />
           </>
         )}
 
         {tab === 'favorites' && (
           <>
-            <PageTitle meta={favoriteList.length ? numberFormat.format(favoriteList.length) : null}>שמורים</PageTitle>
+            <PageTitle meta={favoriteList.length ? numberFormat.format(favoriteList.length) : null}>{t('saved.title')}</PageTitle>
             {favoriteList.length > 0 ? renderGrid(favoriteList, 'favorites') : (
-              <EmptyState icon={Heart} title="עוד לא שמרת אירועים">לחצו על הלב בכרטיס של אירוע כדי לשמור אותו כאן.</EmptyState>
+              <EmptyState icon={Heart} title={t('saved.emptyTitle')}>{t('saved.emptyBody')}</EmptyState>
             )}
           </>
         )}
@@ -419,9 +423,12 @@ export default function App() {
 
         <footer className="border-t hairline mt-10 py-6 text-[12px] text-muted leading-relaxed">
           {catalog.sources.length > 0 && (
-            <p>נתוני אירועים: {catalog.sources.map(sourceLabel).join(', ')}. מתעדכן כל לילה{updated && `, עדכון אחרון ${updated}`}.</p>
+            <p>
+              {t('footer.sources', { sources: catalog.sources.map(sourceLabel).join(', ') })}
+              {updated && ` ${t('footer.updated', { date: updated })}`}
+            </p>
           )}
-          <p>FestiChat היא קהילה עצמאית ואינה קשורה למארגני האירועים.</p>
+          <p>{t('footer.independent')}</p>
         </footer>
       </main>
 
@@ -449,16 +456,18 @@ export default function App() {
 
       {menuOpen && (
         <div className="fixed inset-0 z-50 bg-black/60" onClick={() => setMenuOpen(false)}>
-          <div className="absolute top-0 left-0 h-full w-72 max-w-[85%] bg-ink-800 border-r hairline flex flex-col animate-slide-up" onClick={(e) => e.stopPropagation()}>
+          <div className="absolute top-0 end-0 h-full w-72 max-w-[85%] bg-ink-800 border-s hairline flex flex-col overflow-y-auto animate-slide-up" onClick={(e) => e.stopPropagation()}>
             <div className="h-14 px-4 flex items-center justify-between border-b hairline">
-              <span className="text-[11px] text-muted">תפריט</span>
-              <button type="button" onClick={() => setMenuOpen(false)} aria-label="סגירת תפריט"><X size={20} strokeWidth={1.75} /></button>
+              <span className="text-[11px] text-muted">{t('common.menu')}</span>
+              <button type="button" onClick={() => setMenuOpen(false)} aria-label={t('common.close')}><X size={20} strokeWidth={1.75} /></button>
             </div>
-            <a href={addEventUrl()} target="_blank" rel="noopener noreferrer" className="px-4 py-3.5 border-b hairline hover:bg-white/5">הוספת אירוע (למפיקים)</a>
-            <a href={`${REPO_URL}/issues`} target="_blank" rel="noopener noreferrer" className="px-4 py-3.5 border-b hairline hover:bg-white/5">דיווח על בעיה</a>
-            <p className="px-4 py-4 text-[13px] text-muted leading-relaxed">
-              בוחרים אירוע, מצטרפים לקבוצה ומתכתבים עם מי שמגיע. הקבוצות שלכם נמצאות בלשונית ״צ׳אטים״.
-            </p>
+            <a href={addEventUrl()} target="_blank" rel="noopener noreferrer" className="px-4 py-3.5 border-b hairline hover:bg-white/5">{t('menu.addEvent')}</a>
+            <a href={`${REPO_URL}/issues`} target="_blank" rel="noopener noreferrer" className="px-4 py-3.5 border-b hairline hover:bg-white/5">{t('menu.report')}</a>
+            <div className="px-4 pt-4 pb-2 border-b hairline">
+              <p className="text-[11px] text-muted mb-1">{t('menu.language')}</p>
+              <LanguageList value={lang} languages={languages} onChange={(code) => { setMenuOpen(false); setLang(code) }} />
+            </div>
+            <p className="px-4 py-4 text-[13px] text-muted leading-relaxed">{t('menu.about')}</p>
           </div>
         </div>
       )}
@@ -478,9 +487,9 @@ export default function App() {
         <div className="fixed inset-0 z-[55] bg-black/80 flex items-center justify-center p-6" onClick={closeScreen}>
           <div className="bg-ink-800 border hairline rounded-lg p-6 max-w-sm w-full" onClick={(e) => e.stopPropagation()}>
             <Lock size={20} strokeWidth={1.75} className="text-muted" />
-            <p className="font-semibold text-lg mt-4">הקבוצה סגורה</p>
-            <p className="text-sm text-muted mt-1.5 leading-relaxed">האירוע הסתיים, ורק מי שהיה בקבוצה לפני כן יכול להמשיך להתכתב בה.</p>
-            <button type="button" onClick={closeScreen} className="mt-6 w-full h-11 bg-white text-black font-medium rounded-md">לאירועים הקרובים</button>
+            <p className="font-semibold text-lg mt-4">{t('closed.title')}</p>
+            <p className="text-sm text-muted mt-1.5 leading-relaxed">{t('closed.body')}</p>
+            <button type="button" onClick={closeScreen} className="mt-6 w-full h-11 bg-white text-black font-medium rounded-md">{t('closed.cta')}</button>
           </div>
         </div>
       )}

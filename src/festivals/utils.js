@@ -1,3 +1,5 @@
+import { locale, t } from './i18n'
+
 // Months from now until the festival's usual month (0 = this month).
 export function monthsAway(month) {
   return (month - 1 - new Date().getMonth() + 12) % 12
@@ -20,9 +22,9 @@ function daysUntil(isoDate) {
 export function countdownFor(item) {
   if (!item.startDate) return countdownLabel(item.month)
   const days = daysUntil(item.startDate)
-  if (days <= 0) return daysUntil(item.endDate ?? item.startDate) >= 0 ? 'עכשיו!' : 'הסתיים'
-  if (days === 1) return 'מחר'
-  if (days <= 45) return `בעוד ${days} ימים`
+  if (days <= 0) return daysUntil(item.endDate ?? item.startDate) >= 0 ? t('countdown.now') : t('countdown.ended')
+  if (days === 1) return t('countdown.tomorrow')
+  if (days <= 45) return t('countdown.days', { count: days })
   return countdownLabel(Number(item.startDate.slice(5, 7)))
 }
 
@@ -31,22 +33,22 @@ function shortDate(isoDate) {
   return `${d}.${m}`
 }
 
-// "חמישי · 12.11", "09.04–16.04", or the usual month for undated festivals.
-export function dateChip(item, months) {
-  if (!item.startDate) return months[item.month - 1]
+// "Thursday · 12.11", "09.04–16.04", or the usual month for undated festivals.
+export function dateChip(item) {
+  if (!item.startDate) return monthName(item.month)
   // Isolated as left-to-right, or the range reads backwards inside Hebrew text.
   if (item.endDate && item.endDate !== item.startDate) return `\u2066${shortDate(item.startDate)}–${shortDate(item.endDate)}\u2069`
-  const weekday = new Date(`${item.startDate}T12:00:00`).toLocaleDateString('he-IL', { weekday: 'long' }).replace(/^יום /, '')
+  const weekday = new Date(`${item.startDate}T12:00:00`).toLocaleDateString(locale(), { weekday: 'long' }).replace(/^יום /, '')
   return `${weekday} · ${shortDate(item.startDate)}`
 }
 
 export function priceLabel(item) {
   if (item.priceFrom == null) return null
-  if (item.priceFrom === 0) return 'חינם'
+  if (item.priceFrom === 0) return t('price.free')
   try {
-    // "CA$27", "€40", "₪180", isolated so the symbol stays next to the number in Hebrew text.
+    // "CA$27", "€40", "₪180", isolated so the symbol stays next to the number in right-to-left text.
     const price = new Intl.NumberFormat('en', { style: 'currency', currency: item.currency || 'USD', maximumFractionDigits: 0 }).format(item.priceFrom)
-    return `מ-\u2066${price}\u2069`
+    return t('price.from', { price: `\u2066${price}\u2069` })
   } catch {
     return null
   }
@@ -54,17 +56,15 @@ export function priceLabel(item) {
 
 export function countdownLabel(month) {
   const n = monthsAway(month)
-  if (n === 0) return 'החודש'
-  if (n === 1) return 'בחודש הבא'
-  if (n === 2) return 'בעוד חודשיים'
-  return `בעוד ${n} חודשים`
+  if (n === 0) return t('countdown.thisMonth')
+  if (n === 1) return t('countdown.nextMonth')
+  return t('countdown.months', { count: n })
 }
 
-export function membersLabel(count) {
-  if (count === 0) return 'עוד אין חברים'
-  if (count === 1) return 'חבר אחד'
-  return `${count} חברים`
-}
+export const membersLabel = (count) => t('members', { count })
+
+// Month name (1-12) in the current language.
+export const monthName = (month) => new Date(2000, month - 1, 15).toLocaleDateString(locale(), { month: 'long' })
 
 const pad = (n) => String(n).padStart(2, '0')
 
@@ -85,9 +85,9 @@ export function dayLabel(ms) {
   const d = new Date(ms)
   const today = new Date()
   const yesterday = new Date(Date.now() - 86400000)
-  if (d.toDateString() === today.toDateString()) return 'היום'
-  if (d.toDateString() === yesterday.toDateString()) return 'אתמול'
-  return d.toLocaleDateString('he-IL', { day: 'numeric', month: 'long' })
+  if (d.toDateString() === today.toDateString()) return t('day.today')
+  if (d.toDateString() === yesterday.toDateString()) return t('day.yesterday')
+  return d.toLocaleDateString(locale(), { day: 'numeric', month: 'long' })
 }
 
 function addDaysIso(isoDate, days) {
@@ -113,20 +113,18 @@ export function weekendRange() {
   return [from, addDaysIso(from, 6 - Math.max(day, 4))]
 }
 
-const WEEKDAYS = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת']
-
-// Section heading for a day in the event list: "היום", "מחר", "שבת 11.10".
+// Section heading for a day in the event list: "Today", "Tomorrow", "Sat 11.10".
 export function dayHeading(isoDate) {
   const today = todayIso()
-  if (isoDate <= today) return 'היום'
+  if (isoDate <= today) return t('day.today')
   const days = daysUntil(isoDate)
-  if (days === 1) return 'מחר'
+  if (days === 1) return t('day.tomorrow')
   const [, m, d] = isoDate.split('-')
-  const weekday = WEEKDAYS[new Date(`${isoDate}T12:00:00`).getDay()]
+  const weekday = new Date(`${isoDate}T12:00:00`).toLocaleDateString(locale(), { weekday: locale().startsWith('he') ? 'long' : 'short' }).replace(/^יום /, '')
   return `${weekday} ${d}.${m}`
 }
 
-// Compact meta line for a card: "שבת 11.10 · 23:00" or "09.04–16.04".
+// Compact meta line for a card: "Sat 11.10 · 23:00" or "09.04–16.04".
 export function cardDate(item) {
   if (item.endDate && item.endDate !== item.startDate) {
     const [, m1, d1] = item.startDate.split('-')
