@@ -6,6 +6,7 @@ import Carousel from './components/Carousel'
 import EventSlide from './components/EventSlide'
 import PopularGroups, { PopularGroupsPage } from './components/PopularGroups'
 import ProfileTab from './components/ProfileTab'
+import AdminPage from './components/AdminPage'
 import FestivalGrid from './components/FestivalGrid'
 import FestivalModal from './components/FestivalModal'
 import ChatScreen from './components/ChatScreen'
@@ -413,7 +414,8 @@ export default function App() {
           </>
         )}
 
-        {tab === 'profile' && <ProfileTab onOpenChats={() => goTab('chats')} />}
+        {tab === 'profile' && <ProfileTab onOpenChats={() => goTab('chats')} onOpenAdmin={() => goTab('admin')} />}
+        {tab === 'admin' && <AdminPage onBack={() => goTab('profile')} onOpenChat={openChat} />}
 
         <footer className="border-t hairline mt-10 py-6 text-[12px] text-muted leading-relaxed">
           {catalog.sources.length > 0 && (

@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
-import { AtSign, Camera, LogOut, MessageCircle, Pencil } from 'lucide-react'
+import { AtSign, BarChart3, Camera, LogOut, MessageCircle, Pencil } from 'lucide-react'
+import { useIsAdmin } from '../chat/admin'
 import { useChat } from '../chat/ChatContext'
 import { compressAvatar } from '../chat/media'
 import { instagramUrl, parseInstagram } from '../utils'
@@ -84,8 +85,9 @@ function EditProfile({ user, onDone }) {
   )
 }
 
-export default function ProfileTab({ onOpenChats }) {
+export default function ProfileTab({ onOpenChats, onOpenAdmin }) {
   const { service, user, myGroups, withUser, signOut } = useChat()
+  const isAdmin = useIsAdmin()
   const [editing, setEditing] = useState(false)
 
   if (!user) {
@@ -134,6 +136,11 @@ export default function ProfileTab({ onOpenChats }) {
           <span className="flex items-center gap-3"><MessageCircle size={18} strokeWidth={1.75} className="text-muted" /> הקבוצות שלי</span>
           <span className="font-num text-[13px] text-muted">{groupCount}</span>
         </button>
+        {isAdmin && (
+          <button type="button" onClick={onOpenAdmin} className="w-full flex items-center justify-between py-4 border-b hairline">
+            <span className="flex items-center gap-3"><BarChart3 size={18} strokeWidth={1.75} className="text-accent" /> לוח ניהול</span>
+          </button>
+        )}
         <button type="button" onClick={() => signOut()} className="w-full flex items-center gap-3 py-4 border-b hairline text-rose-400">
           <LogOut size={18} strokeWidth={1.75} /> התנתקות
         </button>

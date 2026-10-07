@@ -53,8 +53,20 @@ export function createLocalService() {
     onUser: (cb) => subscribe(() => cb(state.user)),
     // Preview sign-in: a name only, kept on this device.
     async signIn(name) {
-      state.user = { uid: `local-${crypto.randomUUID()}`, name, bio: '', instagram: '', photo: null }
+      state.user = { uid: `local-${crypto.randomUUID()}`, name, bio: '', instagram: '', photo: null, createdAt: Date.now() }
       save()
+    },
+    async getAdminStats() {
+      const weekAgo = Date.now() - 7 * 86400000
+      const groups = Object.values(state.groups)
+      return {
+        users: state.user ? 1 : 0,
+        newUsers: state.user && state.user.createdAt >= weekAgo ? 1 : 0,
+        groups: groups.filter((g) => g.memberCount > 0).length,
+        activeGroups: groups.filter((g) => g.lastMessage?.createdAt >= weekAgo).length,
+        messages: groups.reduce((n, g) => n + g.messages.length, 0),
+        recentUsers: state.user ? [state.user] : [],
+      }
     },
     async signOut() {
       state.user = null

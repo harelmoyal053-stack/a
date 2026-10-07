@@ -4,8 +4,8 @@ import {
   GoogleAuthProvider, getAuth, onAuthStateChanged, signInWithPopup, signInWithRedirect, signOut,
 } from 'firebase/auth'
 import {
-  collection, deleteField, doc, getDoc, getFirestore, increment, limit, limitToLast, onSnapshot, orderBy, query,
-  serverTimestamp, setDoc, Timestamp, updateDoc, writeBatch,
+  collection, collectionGroup, deleteField, doc, getCountFromServer, getDoc, getDocs, getFirestore, increment, limit,
+  limitToLast, onSnapshot, orderBy, query, serverTimestamp, setDoc, Timestamp, updateDoc, where, writeBatch,
 } from 'firebase/firestore'
 import { buildMessage, preview, replyRef } from './messages'
 
@@ -50,12 +50,22 @@ export function createFirebaseService(config) {
         const snap = await getDoc(ref)
         if (snap.exists()) {
           current = profileOf(fbUser.uid, snap.data())
+          // Profiles made before sign-up dates were recorded get one now.
+          if (!snap.data().createdAt) setDoc(ref, { createdAt: serverTimestamp() }, { merge: true }).catch(() => {})
         } else {
           // First sign-in: start the profile from the Google account.
           const fresh = { name: (fbUser.displayName || 'משתמש').slice(0, 30), bio: '', instagram: '', photo: fbUser.photoURL ?? null }
-          await setDoc(ref, fresh)
+          try {
+            await setDoc(ref, { ...fresh, createdAt: serverTimestamp() })
+          } catch {
+            // Rules published before sign-up dates existed reject `createdAt`;
+            // sign the user up anyway rather than locking them out.
+            await setDoc(ref, fresh)
+          }
           current = profileOf(fbUser.uid, fresh)
         }
+        // The email stays on this device (it is never written to Firestore).
+        current = { ...current, email: fbUser.email ?? null }
         cb(current)
       })
     },
@@ -73,6 +83,35 @@ export function createFirebaseService(config) {
       }
     },
     signOut: () => signOut(auth),
+    // Site-wide numbers for the admin page. A figure that can't be counted is null.
+    async getAdminStats() {
+      const weekAgo = Timestamp.fromMillis(Date.now() - 7 * 86400000)
+      const count = async (q) => {
+        try {
+          return (await getCountFromServer(q)).data().count
+        } catch (err) {
+          console.warn('admin count failed', err)
+          return null
+        }
+      }
+      const users = collection(db, 'users')
+      const groups = collection(db, 'groups')
+      const [userCount, newUsers, groupCount, activeGroups, messages] = await Promise.all([
+        count(users),
+        count(query(users, where('createdAt', '>=', weekAgo))),
+        count(query(groups, where('memberCount', '>', 0))),
+        count(query(groups, where('lastMessage.createdAt', '>=', weekAgo))),
+        count(collectionGroup(db, 'messages')),
+      ])
+      let recentUsers = []
+      try {
+        const snap = await getDocs(query(users, orderBy('createdAt', 'desc'), limit(8)))
+        recentUsers = snap.docs.map((d) => ({ ...profileOf(d.id, d.data()), createdAt: millis(d.data().createdAt) }))
+      } catch (err) {
+        console.warn('recent users failed', err)
+      }
+      return { users: userCount, newUsers, groups: groupCount, activeGroups, messages, recentUsers }
+    },
     async updateProfile(fields) {
       await setDoc(doc(db, 'users', current.uid), fields, { merge: true })
       current = { ...current, ...fields }
