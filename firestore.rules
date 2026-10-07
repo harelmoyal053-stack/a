@@ -22,12 +22,18 @@ service cloud.firestore {
       return !(key in data) || (data[key] is string && data[key].size() <= max);
     }
 
+    // Public profiles: anyone can read; only the owner writes their own.
     match /users/{uid} {
-      allow read: if signedIn() && request.auth.uid == uid;
-      allow write: if signedIn() && request.auth.uid == uid
-        && request.resource.data.keys().hasOnly(['name'])
+      allow read: if true;
+      allow create, update: if signedIn() && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['name', 'bio', 'instagram', 'photo'])
         && request.resource.data.name is string
-        && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 30;
+        && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 30
+        && optionalString(request.resource.data, 'bio', 160)
+        && optionalString(request.resource.data, 'instagram', 30)
+        && (!('photo' in request.resource.data) || request.resource.data.photo == null
+            || (request.resource.data.photo is string && request.resource.data.photo.size() <= 200000));
+      allow delete: if false;
 
       match /groups/{groupId} {
         allow read, write: if signedIn() && request.auth.uid == uid;

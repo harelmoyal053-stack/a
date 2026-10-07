@@ -13,6 +13,7 @@ import ImageViewer from './chat/ImageViewer'
 import MessageBubble from './chat/MessageBubble'
 import MessageMenu from './chat/MessageMenu'
 import PollComposer from './chat/PollComposer'
+import ProfileSheet from './ProfileSheet'
 
 export default function ChatScreen({ festival, group, onClose }) {
   const chat = useChat()
@@ -31,10 +32,11 @@ export default function ChatScreen({ festival, group, onClose }) {
   const [searchOpen, setSearchOpen] = useState(false)
   const [search, setSearch] = useState('')
   const [flashId, setFlashId] = useState(null)
+  const [profileOf, setProfileOf] = useState(null)
   const bottomRef = useRef(null)
   const isMember = Boolean(myGroups[group.id])
   const ended = isEnded(festival)
-  const overlayOpen = Boolean(menuFor || pendingImage || viewing || pollOpen || infoOpen)
+  const overlayOpen = Boolean(menuFor || pendingImage || viewing || pollOpen || infoOpen || profileOf)
 
   useEffect(() => (service ? service.onMessages(group.id, setMessages) : undefined), [service, group.id])
 
@@ -236,6 +238,7 @@ export default function ChatScreen({ festival, group, onClose }) {
                   onVote={(msg, ids) => run(() => chat.vote(group.id, msg.id, ids))}
                   onOpenImage={setViewing}
                   onJumpTo={jumpTo}
+                  onOpenProfile={(uid, name) => setProfileOf({ uid, name })}
                 />
               </div>
             )
@@ -321,8 +324,10 @@ export default function ChatScreen({ festival, group, onClose }) {
           onJumpTo={jumpTo}
           onLeave={leaveGroup}
           onClose={() => setInfoOpen(false)}
+          onOpenProfile={(uid, name) => setProfileOf({ uid, name })}
         />
       )}
+      {profileOf && <ProfileSheet uid={profileOf.uid} fallbackName={profileOf.name} onClose={() => setProfileOf(null)} />}
     </div>
   )
 }

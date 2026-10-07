@@ -1,5 +1,7 @@
 import { initializeApp } from 'firebase/app'
-import { getAuth, onAuthStateChanged, signInAnonymously } from 'firebase/auth'
+import {
+  GoogleAuthProvider, getAuth, onAuthStateChanged, signInWithPopup, signInWithRedirect, signOut,
+} from 'firebase/auth'
 import {
   collection, deleteField, doc, getDoc, getFirestore, increment, limit, limitToLast, onSnapshot, orderBy, query,
   serverTimestamp, setDoc, Timestamp, updateDoc, writeBatch,
@@ -9,6 +11,14 @@ import { buildMessage, preview, replyRef } from './messages'
 const MESSAGE_LIMIT = 150
 
 const millis = (ts) => ts?.toMillis?.() ?? Date.now()
+
+export const profileOf = (uid, data) => ({
+  uid,
+  name: data.name,
+  bio: data.bio ?? '',
+  instagram: data.instagram ?? '',
+  photo: data.photo ?? null,
+})
 
 export function createFirebaseService(config) {
   const app = initializeApp(config)
@@ -24,6 +34,7 @@ export function createFirebaseService(config) {
 
   return {
     mode: 'live',
+    canUseGoogle: true,
     onUser(cb) {
       notifyUser = cb
       return onAuthStateChanged(auth, async (fbUser) => {
@@ -32,18 +43,40 @@ export function createFirebaseService(config) {
           return cb(null)
         }
         if (current?.uid === fbUser.uid) return cb(current)
-        const snap = await getDoc(doc(db, 'users', fbUser.uid))
-        // signIn() may have finished while we were reading; it already reported the user.
-        if (current?.uid === fbUser.uid) return undefined
-        current = snap.exists() ? { uid: fbUser.uid, name: snap.data().name } : null
+        const ref = doc(db, 'users', fbUser.uid)
+        const snap = await getDoc(ref)
+        if (snap.exists()) {
+          current = profileOf(fbUser.uid, snap.data())
+        } else {
+          // First sign-in: start the profile from the Google account.
+          const fresh = { name: (fbUser.displayName || 'משתמש').slice(0, 30), bio: '', instagram: '', photo: fbUser.photoURL ?? null }
+          await setDoc(ref, fresh)
+          current = profileOf(fbUser.uid, fresh)
+        }
         cb(current)
       })
     },
-    async signIn(name) {
-      const { user } = await signInAnonymously(auth)
-      await setDoc(doc(db, 'users', user.uid), { name })
-      current = { uid: user.uid, name }
+    async signInWithGoogle() {
+      const provider = new GoogleAuthProvider()
+      try {
+        await signInWithPopup(auth, provider)
+      } catch (err) {
+        // Some in-app browsers block popups; a full-page redirect still works.
+        if (err?.code === 'auth/popup-blocked' || err?.code === 'auth/operation-not-supported-in-this-environment') {
+          await signInWithRedirect(auth, provider)
+          return
+        }
+        throw err
+      }
+    },
+    signOut: () => signOut(auth),
+    async updateProfile(fields) {
+      await setDoc(doc(db, 'users', current.uid), fields, { merge: true })
+      current = { ...current, ...fields }
       notifyUser(current)
+    },
+    onProfile(uid, cb) {
+      return onSnapshot(doc(db, 'users', uid), (snap) => cb(snap.exists() ? profileOf(uid, snap.data()) : null))
     },
     onMyGroups(cb) {
       if (!current) return () => {}

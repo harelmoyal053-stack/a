@@ -1,10 +1,27 @@
 import { useEffect, useState } from 'react'
 import { ArrowRight, BarChart3, Image as ImageIcon, LogOut, Users } from 'lucide-react'
-import { useChat } from '../../chat/ChatContext'
+import { useChat, useProfile } from '../../chat/ChatContext'
 import { membersLabel } from '../../utils'
 import EventAvatar from '../EventAvatar'
+import UserAvatar from '../UserAvatar'
 
-export default function GroupInfo({ festival, group, messages, memberCount, isMember, onOpenImage, onJumpTo, onLeave, onClose }) {
+function MemberRow({ member, isMe, onOpenProfile }) {
+  const profile = useProfile(member.uid)
+  return (
+    <li>
+      <button type="button" onClick={() => onOpenProfile(member.uid, member.name)} className="w-full flex items-center gap-3 px-4 py-3 border-b hairline text-right hover:bg-white/[0.03]">
+        <UserAvatar name={profile?.name ?? member.name} photo={profile?.photo} size="sm" />
+        <span className="flex-1 min-w-0">
+          <span className="block truncate">{profile?.name ?? member.name}</span>
+          {profile?.bio && <span className="block text-[12px] text-muted truncate" dir="auto">{profile.bio}</span>}
+        </span>
+        {isMe && <span className="text-xs text-muted">את/ה</span>}
+      </button>
+    </li>
+  )
+}
+
+export default function GroupInfo({ festival, group, messages, memberCount, isMember, onOpenImage, onJumpTo, onLeave, onClose, onOpenProfile }) {
   const { service, user } = useChat()
   const [members, setMembers] = useState([])
   useEffect(() => (service ? service.onMembers(group.id, setMembers) : undefined), [service, group.id])
@@ -60,11 +77,7 @@ export default function GroupInfo({ festival, group, messages, memberCount, isMe
           <h3 className="flex items-center gap-2 font-semibold mb-3"><Users size={18} /> חברים <span className="text-white/40 text-sm">{members.length}</span></h3>
           <ul className="bg-ink-800 rounded-lg overflow-hidden">
             {members.map((member) => (
-              <li key={member.uid} className="flex items-center gap-3 px-4 py-3 border-b border-white/5">
-                <span className="w-8 h-8 rounded-md bg-ink-700 flex items-center justify-center font-num text-[12px]">{member.name.slice(0, 1)}</span>
-                <span className="flex-1">{member.name}</span>
-                {member.uid === user?.uid && <span className="text-xs text-white/40">את/ה</span>}
-              </li>
+              <MemberRow key={member.uid} member={member} isMe={member.uid === user?.uid} onOpenProfile={onOpenProfile} />
             ))}
             {members.length === 0 && <li className="px-4 py-3 text-sm text-white/40">עוד אין חברים.</li>}
           </ul>

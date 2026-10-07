@@ -140,3 +140,11 @@ export function initials(name) {
   const words = name.replace(/[^\p{L}\p{N}\s]/gu, '').split(/\s+/).filter(Boolean)
   return (words.length > 1 ? words[0][0] + words[1][0] : (words[0] ?? '?').slice(0, 2)).toUpperCase()
 }
+
+export const instagramUrl = (handle) => `https://instagram.com/${encodeURIComponent(handle)}`
+
+// Accepts "@name", "name" or an instagram.com link; returns the bare handle, or null if invalid.
+export function parseInstagram(value) {
+  const handle = value.trim().replace(/^https?:\/\/(www\.)?instagram\.com\//i, '').replace(/^@/, '').replace(/\/.*$/, '')
+  return /^[A-Za-z0-9._]{1,30}$/.test(handle) ? handle : null
+}

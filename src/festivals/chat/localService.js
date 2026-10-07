@@ -49,11 +49,23 @@ export function createLocalService() {
 
   return {
     mode: 'local',
+    canUseGoogle: false,
     onUser: (cb) => subscribe(() => cb(state.user)),
+    // Preview sign-in: a name only, kept on this device.
     async signIn(name) {
-      state.user = { uid: `local-${crypto.randomUUID()}`, name }
+      state.user = { uid: `local-${crypto.randomUUID()}`, name, bio: '', instagram: '', photo: null }
       save()
     },
+    async signOut() {
+      state.user = null
+      save()
+    },
+    async updateProfile(fields) {
+      state.user = { ...state.user, ...fields }
+      save()
+    },
+    // Only the visitor's own profile exists in preview mode.
+    onProfile: (uid, cb) => subscribe(() => cb(state.user?.uid === uid ? state.user : null)),
     onMyGroups: (cb) => subscribe(() => cb({ ...state.myGroups })),
     onGroup: (id, cb) => subscribe(() => {
       const g = state.groups[id]

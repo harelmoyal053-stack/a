@@ -11,17 +11,17 @@ This repo deploys to GitHub Pages at `https://harelmoyal053-stack.github.io/a/`.
 
 A Hebrew (RTL) community app for festivals worldwide. Users find a festival or party, join its group chats (general, Israelis at the festival, rides, camping/lodging, ticket swaps, solo travelers), and chat in real time. Joined groups appear on the home screen and in the chats tab. Anyone can read a group; only members can write.
 
-### Connecting the chat to Firebase
+### Accounts and chat (Firebase)
 
-Until `src/festivals/chat/firebaseConfig.js` holds a config, the chat runs in preview mode: messages are stored only in the visitor's browser. To make it live:
+Users sign in with Google and get a public profile (photo, name, short bio, Instagram link) that other group members can open from the chat. Until `src/festivals/chat/firebaseConfig.js` holds a config, the site runs in preview mode: sign-in asks only for a name, and accounts and messages stay in the visitor's browser. To make it live:
 
 1. Create a project at https://console.firebase.google.com (the free Spark plan is enough).
-2. **Build → Authentication → Sign-in method**: enable **Anonymous**.
-3. **Build → Firestore Database**: create a database, then paste `firestore.rules` into the **Rules** tab and publish.
-4. **Project settings → Your apps → Web app**: register an app and copy its `firebaseConfig` object into `FIREBASE_CONFIG` in `src/festivals/chat/firebaseConfig.js`.
-5. **Authentication → Settings → Authorized domains**: add `harelmoyal053-stack.github.io`.
+2. **Build → Authentication → Sign-in method**: enable **Google**.
+3. **Authentication → Settings → Authorized domains**: add `harelmoyal053-stack.github.io`.
+4. **Build → Firestore Database**: create a database, then paste `firestore.rules` into the **Rules** tab and publish.
+5. **Project settings → Your apps → Web app**: register an app and copy its `firebaseConfig` object into `FIREBASE_CONFIG` in `src/festivals/chat/firebaseConfig.js`.
 
-The web config is not a secret; access is controlled by `firestore.rules`.
+The web config is not a secret; access is controlled by `firestore.rules`. Profiles are public; each user can edit only their own. Profile photos are resized to 256px and stored in the profile document.
 
 ### Automatic event updates
 

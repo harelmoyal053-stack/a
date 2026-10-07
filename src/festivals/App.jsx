@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
-  ArrowRight, CalendarClock, CalendarRange, Disc3, Heart, Home, Lock, Menu, MessageCircle, Search, SearchX, Tent, X,
+  ArrowRight, CalendarClock, CalendarRange, Disc3, Heart, Home, Lock, Menu, MessageCircle, Search, SearchX, Tent, User, X,
 } from 'lucide-react'
 import Carousel from './components/Carousel'
 import EventSlide from './components/EventSlide'
 import PopularGroups, { PopularGroupsPage } from './components/PopularGroups'
+import ProfileTab from './components/ProfileTab'
 import FestivalGrid from './components/FestivalGrid'
 import FestivalModal from './components/FestivalModal'
 import ChatScreen from './components/ChatScreen'
@@ -23,6 +24,7 @@ const TABS = [
   { id: 'search', label: 'חיפוש', icon: Search },
   { id: 'chats', label: 'צ׳אטים', icon: MessageCircle },
   { id: 'favorites', label: 'שמורים', icon: Heart },
+  { id: 'profile', label: 'פרופיל', icon: User },
 ]
 
 const KINDS = [
@@ -411,6 +413,8 @@ export default function App() {
           </>
         )}
 
+        {tab === 'profile' && <ProfileTab onOpenChats={() => goTab('chats')} />}
+
         <footer className="border-t hairline mt-10 py-6 text-[12px] text-muted leading-relaxed">
           {catalog.sources.length > 0 && (
             <p>נתוני אירועים: {catalog.sources.map(sourceLabel).join(', ')}. מתעדכן כל לילה{updated && `, עדכון אחרון ${updated}`}.</p>
@@ -420,7 +424,7 @@ export default function App() {
       </main>
 
       <nav className="fixed bottom-0 inset-x-0 z-40 bg-ink-950/95 backdrop-blur-md border-t hairline pb-[env(safe-area-inset-bottom)]">
-        <div className="max-w-md mx-auto grid grid-cols-4">
+        <div className="max-w-md mx-auto grid grid-cols-5">
           {TABS.map((item) => {
             const Icon = item.icon
             const active = tab === item.id

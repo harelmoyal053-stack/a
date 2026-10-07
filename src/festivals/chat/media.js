@@ -32,6 +32,21 @@ export async function compressImage(file) {
   }
 }
 
+// Square, centre-cropped profile photo, small enough to live in the user's profile.
+export async function compressAvatar(file, size = 256) {
+  const { img, url } = await loadImage(file)
+  try {
+    const side = Math.min(img.width, img.height)
+    const canvas = document.createElement('canvas')
+    canvas.width = size
+    canvas.height = size
+    canvas.getContext('2d').drawImage(img, (img.width - side) / 2, (img.height - side) / 2, side, side, 0, 0, size, size)
+    return canvas.toDataURL('image/jpeg', 0.8)
+  } finally {
+    URL.revokeObjectURL(url)
+  }
+}
+
 export function currentLocation() {
   return new Promise((resolve, reject) => {
     if (!navigator.geolocation) return reject(new Error('unsupported'))

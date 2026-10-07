@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { FIREBASE_CONFIG } from './firebaseConfig'
 import { createLocalService } from './localService'
-import NameModal from './NameModal'
+import SignInSheet from './SignInSheet'
 import { eventSnapshot } from '../data/groups'
 
 const ChatContext = createContext(null)
@@ -18,8 +18,9 @@ export function ChatProvider({ children }) {
   const [myGroups, setMyGroups] = useState({})
   const [userKnown, setUserKnown] = useState(false)
   const [groupsLoaded, setGroupsLoaded] = useState(false)
-  const [askingName, setAskingName] = useState(false)
+  const [signingIn, setSigningIn] = useState(false)
   const pending = useRef(null)
+  const waitingForUser = useRef(false)
 
   useEffect(() => {
     let unsub = () => {}
@@ -28,6 +29,14 @@ export function ChatProvider({ children }) {
       unsub = s.onUser((u) => {
         setUser(u)
         setUserKnown(true)
+        // Resume the action that asked for sign-in once the account arrives.
+        if (u && waitingForUser.current) {
+          waitingForUser.current = false
+          setSigningIn(false)
+          const action = pending.current
+          pending.current = null
+          setTimeout(() => action?.(), 0)
+        }
       })
     })
     return () => unsub()
@@ -41,20 +50,13 @@ export function ChatProvider({ children }) {
     })
   }, [service, user])
 
-  // Runs `action` once the visitor has a chat name, asking for one first if needed.
+  // Runs `action` once the visitor is signed in, asking them to sign in first if needed.
   const withUser = useCallback((action) => {
-    if (user) return action()
+    if (user) return action?.()
     pending.current = action
-    setAskingName(true)
+    waitingForUser.current = true
+    setSigningIn(true)
   }, [user])
-
-  const submitName = async (name) => {
-    await service.signIn(name)
-    setAskingName(false)
-    const action = pending.current
-    pending.current = null
-    action?.()
-  }
 
   const value = {
     service,
@@ -63,6 +65,8 @@ export function ChatProvider({ children }) {
     // True once we know which groups the visitor is in (or that they have none).
     groupsReady: userKnown && (!user || groupsLoaded),
     withUser,
+    signOut: () => service.signOut(),
+    updateProfile: (fields) => service.updateProfile(fields),
     join: (group, festival) => service.join(group.id, eventSnapshot(festival)),
     leave: (id) => service.leave(id),
     send: (id, payload) => service.send(id, payload),
@@ -76,7 +80,18 @@ export function ChatProvider({ children }) {
   return (
     <ChatContext.Provider value={value}>
       {children}
-      {askingName && <NameModal onSubmit={submitName} onClose={() => setAskingName(false)} />}
+      {signingIn && service && (
+        <SignInSheet
+          canUseGoogle={service.canUseGoogle}
+          onGoogle={() => service.signInWithGoogle()}
+          onPreviewName={(name) => service.signIn(name)}
+          onClose={() => {
+            pending.current = null
+            waitingForUser.current = false
+            setSigningIn(false)
+          }}
+        />
+      )}
     </ChatContext.Provider>
   )
 }
@@ -84,6 +99,15 @@ export function ChatProvider({ children }) {
 // eslint-disable-next-line react-refresh/only-export-components
 export function useChat() {
   return useContext(ChatContext)
+}
+
+// A user's public profile, or null while loading or if unknown.
+// eslint-disable-next-line react-refresh/only-export-components
+export function useProfile(uid) {
+  const { service } = useChat()
+  const [profile, setProfile] = useState(null)
+  useEffect(() => (service && uid ? service.onProfile(uid, setProfile) : undefined), [service, uid])
+  return profile
 }
 
 // Live { memberCount, lastMessage, pinned } for a group.
