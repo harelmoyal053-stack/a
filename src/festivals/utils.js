@@ -89,6 +89,29 @@ export function dayLabel(ms) {
   return d.toLocaleDateString('he-IL', { day: 'numeric', month: 'long' })
 }
 
+function addDaysIso(isoDate, days) {
+  const d = new Date(`${isoDate}T12:00:00`)
+  d.setDate(d.getDate() + days)
+  return d.toLocaleDateString('sv-SE')
+}
+
+// Is the event on during [from, to] (inclusive ISO dates)?
+export const overlaps = (item, from, to) => item.startDate <= to && (item.endDate ?? item.startDate) >= from
+
+export function thisWeekRange() {
+  const from = todayIso()
+  return [from, addDaysIso(from, 6)]
+}
+
+// The coming Israeli weekend, Thursday to Saturday (this one if we're in it).
+export function weekendRange() {
+  const today = todayIso()
+  const day = new Date(`${today}T12:00:00`).getDay()
+  const toThursday = day >= 4 ? 0 : 4 - day
+  const from = day >= 4 ? today : addDaysIso(today, toThursday)
+  return [from, addDaysIso(from, 6 - Math.max(day, 4))]
+}
+
 const WEEKDAYS = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת']
 
 // Section heading for a day in the event list: "היום", "מחר", "שבת 11.10".

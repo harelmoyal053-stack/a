@@ -1,7 +1,7 @@
 import { initializeApp } from 'firebase/app'
 import { getAuth, onAuthStateChanged, signInAnonymously } from 'firebase/auth'
 import {
-  collection, deleteField, doc, getDoc, getFirestore, increment, limitToLast, onSnapshot, orderBy, query,
+  collection, deleteField, doc, getDoc, getFirestore, increment, limit, limitToLast, onSnapshot, orderBy, query,
   serverTimestamp, setDoc, Timestamp, updateDoc, writeBatch,
 } from 'firebase/firestore'
 import { buildMessage, preview, replyRef } from './messages'
@@ -60,6 +60,13 @@ export function createFirebaseService(config) {
           pinned: data.pinned ?? null,
         })
       })
+    },
+    // The groups with the most members, for the home screen.
+    onTopGroups(count, cb) {
+      const q = query(collection(db, 'groups'), orderBy('memberCount', 'desc'), limit(count))
+      return onSnapshot(q, (snap) =>
+        cb(snap.docs.map((d) => ({ id: d.id, memberCount: d.data().memberCount ?? 0 })).filter((g) => g.memberCount > 0)),
+      )
     },
     onMembers(id, cb) {
       return onSnapshot(collection(db, 'groups', id, 'members'), (snap) =>

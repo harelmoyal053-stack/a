@@ -9,7 +9,7 @@ function titleSize(name, large) {
 }
 
 // Event artwork: the event's photo, or a typographic flyer in its colour.
-export default function Poster({ festival, large = false, showTitle = true }) {
+export default function Poster({ festival, large = false, showTitle = true, showCity = true }) {
   const [failedSrc, setFailedSrc] = useState(null)
   const src = festival.image?.src
   if (src && src !== failedSrc) {
@@ -41,9 +41,11 @@ export default function Poster({ festival, large = false, showTitle = true }) {
             {festival.name}
           </p>
         ) : <span />}
-        <p className={`font-num uppercase tracking-[0.12em] truncate ${large ? 'text-xs' : 'text-[9px]'}`} style={{ color: tone }}>
-          {festival.city}
-        </p>
+        {showTitle && showCity ? (
+          <p className={`font-num uppercase tracking-[0.12em] truncate ${large ? 'text-xs' : 'text-[9px]'}`} style={{ color: tone }}>
+            {festival.city}
+          </p>
+        ) : <span />}
       </div>
     </div>
   )

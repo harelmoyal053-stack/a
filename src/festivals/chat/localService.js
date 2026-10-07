@@ -59,6 +59,13 @@ export function createLocalService() {
       const g = state.groups[id]
       cb({ memberCount: g?.memberCount ?? 0, lastMessage: g?.lastMessage ?? null, pinned: g?.pinned ?? null })
     }),
+    onTopGroups: (count, cb) => subscribe(() =>
+      cb(Object.entries(state.groups)
+        .map(([id, g]) => ({ id, memberCount: g.memberCount }))
+        .filter((g) => g.memberCount > 0)
+        .sort((a, b) => b.memberCount - a.memberCount)
+        .slice(0, count)),
+    ),
     onMembers: (id, cb) => subscribe(() =>
       cb(Object.entries(state.groups[id]?.members ?? {}).map(([uid, m]) => ({ uid, ...m }))),
     ),
