@@ -4,7 +4,7 @@ import {
   GoogleAuthProvider, getAuth, onAuthStateChanged, signInWithPopup, signInWithRedirect, signOut,
 } from 'firebase/auth'
 import {
-  collection, collectionGroup, deleteField, doc, getCountFromServer, getDoc, getDocs, getFirestore, increment, limit,
+  addDoc, collection, collectionGroup, deleteDoc, deleteField, doc, getCountFromServer, getDoc, getDocs, getFirestore, increment, limit,
   limitToLast, onSnapshot, orderBy, query, serverTimestamp, setDoc, Timestamp, updateDoc, where, writeBatch,
 } from 'firebase/firestore'
 import { t } from '../i18n'
@@ -113,6 +113,24 @@ export function createFirebaseService(config) {
       }
       return { users: userCount, newUsers, groups: groupCount, activeGroups, messages, recentUsers }
     },
+    // Event suggestions and problem reports from the site menu, read on the admin page.
+    async submitInbox(entry) {
+      await addDoc(collection(db, 'inbox'), {
+        ...entry,
+        ...(current ? { uid: current.uid, userName: current.name } : {}),
+        createdAt: serverTimestamp(),
+      })
+    },
+    onInbox(cb, onError) {
+      const q = query(collection(db, 'inbox'), orderBy('createdAt', 'desc'), limit(200))
+      return onSnapshot(
+        q,
+        (snap) => cb(snap.docs.map((d) => ({ ...d.data(), id: d.id, createdAt: millis(d.data().createdAt) }))),
+        onError,
+      )
+    },
+    setInboxDone: (id, done) => updateDoc(doc(db, 'inbox', id), { done }),
+    deleteInbox: (id) => deleteDoc(doc(db, 'inbox', id)),
     async updateProfile(fields) {
       await setDoc(doc(db, 'users', current.uid), fields, { merge: true })
       current = { ...current, ...fields }

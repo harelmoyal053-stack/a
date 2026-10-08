@@ -14,11 +14,12 @@ import MyGroups from './components/MyGroups'
 import LanguageList from './components/LanguageList'
 import Hero from './components/Hero'
 import UserAvatar from './components/UserAvatar'
+import ContactSheet from './components/ContactSheet'
 import { useChat } from './chat/ChatContext'
+import { useInbox, useIsAdmin } from './chat/admin'
 import { CONTINENTS, GENRES } from './data/festivals'
 import { findGroup, groupsFor } from './data/groups'
 import { useCatalog } from './data/CatalogContext'
-import { REPO_URL, addEventUrl } from './config'
 import { sourceLabel } from './data/catalog'
 import { monthName, overlaps, thisWeekRange, todayIso, weekendRange } from './utils'
 import { locale, t } from './i18n'
@@ -146,6 +147,9 @@ export default function App() {
   const [atTop, setAtTop] = useState(true)
   const catalog = useCatalog()
   const [menuOpen, setMenuOpen] = useState(false)
+  const [contact, setContact] = useState(null)
+  const isAdmin = useIsAdmin()
+  const adminAlert = useInbox(isAdmin).entries.some((e) => !e.done)
   const searchRef = useRef(null)
 
   useEffect(() => {
@@ -295,7 +299,8 @@ export default function App() {
             <button type="button" onClick={() => setMenuOpen(true)} className="w-10 h-10 flex items-center justify-center text-white/90 hover:text-white" aria-label={t('common.menu')}>
               <Menu size={22} strokeWidth={1.75} />
             </button>
-            <button type="button" onClick={() => goTab('profile')} className="ms-1 rounded-full ring-2 ring-accent/60" aria-label={t('nav.profile')}>
+            <button type="button" onClick={() => goTab('profile')} className="relative ms-1 rounded-full ring-2 ring-accent/60" aria-label={t('nav.profile')}>
+              {adminAlert && <span className="absolute -top-0.5 -end-0.5 z-10 w-3 h-3 rounded-full bg-rose-500 ring-2 ring-ink-900" />}
               {user ? <UserAvatar name={user.name} photo={user.photo} size="sm" /> : <span className="w-9 h-9 rounded-full bg-ink-700 flex items-center justify-center"><User size={18} /></span>}
             </button>
           </div>
@@ -428,7 +433,7 @@ export default function App() {
             {searchResults.length > 0 ? renderGrid(searchResults, `search-${query}-${continent}-${genre}-${month}-${kind}`) : (
               <EmptyState icon={SearchX} title={t('search.emptyTitle')}>
                 {t('search.emptyBody')}{' '}
-                <a href={addEventUrl()} target="_blank" rel="noopener noreferrer" className="text-accent">{t('search.addEvent')}</a>
+                <button type="button" onClick={() => setContact('event')} className="text-accent">{t('search.addEvent')}</button>
               </EmptyState>
             )}
           </>
@@ -492,8 +497,8 @@ export default function App() {
               <span className="text-[11px] text-muted">{t('common.menu')}</span>
               <button type="button" onClick={() => setMenuOpen(false)} aria-label={t('common.close')}><X size={20} strokeWidth={1.75} /></button>
             </div>
-            <a href={addEventUrl()} target="_blank" rel="noopener noreferrer" className="px-4 py-3.5 border-b hairline hover:bg-white/5">{t('menu.addEvent')}</a>
-            <a href={`${REPO_URL}/issues`} target="_blank" rel="noopener noreferrer" className="px-4 py-3.5 border-b hairline hover:bg-white/5">{t('menu.report')}</a>
+            <button type="button" onClick={() => { setMenuOpen(false); setContact('event') }} className="px-4 py-3.5 border-b hairline hover:bg-white/5 text-start">{t('menu.addEvent')}</button>
+            <button type="button" onClick={() => { setMenuOpen(false); setContact('report') }} className="px-4 py-3.5 border-b hairline hover:bg-white/5 text-start">{t('menu.report')}</button>
             <div className="px-4 pt-4 pb-2 border-b hairline">
               <p className="text-[11px] text-muted mb-1">{t('menu.language')}</p>
               <LanguageList value={lang} languages={languages} onChange={(code) => { setMenuOpen(false); setLang(code) }} />
@@ -502,6 +507,8 @@ export default function App() {
           </div>
         </div>
       )}
+
+      {contact && <ContactSheet kind={contact} onClose={() => setContact(null)} />}
 
       {openFestivalData && (
         <FestivalModal

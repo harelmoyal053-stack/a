@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { AtSign, BarChart3, Camera, LogOut, MessageCircle, Pencil } from 'lucide-react'
-import { useIsAdmin } from '../chat/admin'
+import { useInbox, useIsAdmin } from '../chat/admin'
 import { useChat } from '../chat/ChatContext'
 import { compressAvatar } from '../chat/media'
 import { instagramUrl, parseInstagram } from '../utils'
@@ -101,6 +101,8 @@ function LanguageSection() {
 export default function ProfileTab({ onOpenChats, onOpenAdmin }) {
   const { service, user, myGroups, withUser, signOut } = useChat()
   const isAdmin = useIsAdmin()
+  const { entries } = useInbox(isAdmin)
+  const openInbox = entries.filter((e) => !e.done).length
   const [editing, setEditing] = useState(false)
 
   if (!user) {
@@ -153,6 +155,7 @@ export default function ProfileTab({ onOpenChats, onOpenAdmin }) {
         {isAdmin && (
           <button type="button" onClick={onOpenAdmin} className="w-full flex items-center justify-between py-4 border-b hairline">
             <span className="flex items-center gap-3"><BarChart3 size={18} strokeWidth={1.75} className="text-accent" /> {t('profile.admin')}</span>
+            {openInbox > 0 && <span className="min-w-6 h-6 px-2 rounded-full bg-brand text-white text-[12px] font-semibold flex items-center justify-center">{openInbox}</span>}
           </button>
         )}
         <button type="button" onClick={() => signOut()} className="w-full flex items-center gap-3 py-4 border-b hairline text-rose-400">

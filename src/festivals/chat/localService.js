@@ -3,7 +3,7 @@ import { buildMessage, preview, replyRef } from './messages'
 // Preview chat backend used until Firebase is configured. Everything lives in
 // this browser's localStorage, so other people can't see these messages.
 const KEY = 'festichat:local-chat'
-const EMPTY = { user: null, myGroups: {}, groups: {} }
+const EMPTY = { user: null, myGroups: {}, groups: {}, inbox: [] }
 
 function load() {
   try {
@@ -74,6 +74,22 @@ export function createLocalService() {
     },
     async updateProfile(fields) {
       state.user = { ...state.user, ...fields }
+      save()
+    },
+    async submitInbox(entry) {
+      state.inbox = [
+        { ...entry, ...(state.user ? { uid: state.user.uid, userName: state.user.name } : {}), id: crypto.randomUUID(), createdAt: Date.now() },
+        ...(state.inbox ?? []),
+      ]
+      save()
+    },
+    onInbox: (cb) => subscribe(() => cb(structuredClone(state.inbox ?? []))),
+    async setInboxDone(id, done) {
+      state.inbox = state.inbox.map((e) => (e.id === id ? { ...e, done } : e))
+      save()
+    },
+    async deleteInbox(id) {
+      state.inbox = state.inbox.filter((e) => e.id !== id)
       save()
     },
     // Only the visitor's own profile exists in preview mode.

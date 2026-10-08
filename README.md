@@ -11,6 +11,10 @@ This repo deploys to GitHub Pages at `https://harelmoyal053-stack.github.io/a/`.
 
 A community app for festivals worldwide, in seven languages (Hebrew, English, Spanish, French, German, Russian, Arabic). The language follows the visitor's phone on first visit and can be changed from the menu or the profile tab; the layout flips between right-to-left (Hebrew, Arabic) and left-to-right. Translations live in `src/festivals/i18n/` (one file per language, same keys as `he.js`). Users find a festival or party, join its group chats (general, Israelis at the festival, rides, camping/lodging, ticket swaps, solo travelers), and chat in real time. Joined groups appear on the home screen and in the chats tab. Anyone can read a group; only members can write.
 
+### Event suggestions and problem reports
+
+"Add an event" and "Report a problem" in the site menu open a short form. Entries are stored in the Firestore `inbox` collection and listed at the top of the admin page, where they can be marked as handled or deleted. Only the admin account (its uid is listed in `isAdmin()` in `firestore.rules`) can read them, so the rules must be republished after changing that list.
+
 ### Accounts and chat (Firebase)
 
 Users sign in with Google and get a public profile (photo, name, short bio, Instagram link) that other group members can open from the chat. If `FIREBASE_CONFIG` in `src/festivals/chat/firebaseConfig.js` is set to `null`, the site runs in preview mode: sign-in asks only for a name, and accounts and messages stay in the visitor's browser. To make it live:

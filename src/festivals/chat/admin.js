@@ -30,3 +30,21 @@ export function useIsAdmin() {
   }, [service, user])
   return Boolean(user) && isAdmin
 }
+
+// Event suggestions and problem reports, newest first. `error` is set when
+// the account can't read them (the inbox rules aren't published yet).
+export function useInbox(enabled) {
+  const { service } = useChat()
+  const [state, setState] = useState({ entries: [], error: false })
+  useEffect(() => {
+    if (!enabled || !service?.onInbox) return undefined
+    return service.onInbox(
+      (entries) => setState({ entries, error: false }),
+      (err) => {
+        console.warn('inbox read failed', err)
+        setState({ entries: [], error: true })
+      },
+    )
+  }, [enabled, service])
+  return state
+}

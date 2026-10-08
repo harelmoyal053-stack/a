@@ -22,6 +22,11 @@ service cloud.firestore {
       return !(key in data) || (data[key] is string && data[key].size() <= max);
     }
 
+    // The site admin (Harel). Only this account can read the inbox.
+    function isAdmin() {
+      return signedIn() && request.auth.uid in ['lD6m1a2ifeOMtJOJaejqIJgRrw92'];
+    }
+
     function validProfile() {
       return request.resource.data.keys().hasOnly(['name', 'bio', 'instagram', 'photo', 'createdAt'])
         && request.resource.data.name is string
@@ -46,6 +51,32 @@ service cloud.firestore {
       match /groups/{groupId} {
         allow read, write: if signedIn() && request.auth.uid == uid;
       }
+    }
+
+    // Event suggestions and problem reports from the site menu. Anyone can send
+    // one (signed in or not); only the admin can read, mark as handled, or delete.
+    match /inbox/{entryId} {
+      allow create: if request.resource.data.keys().hasOnly(
+          ['type', 'category', 'name', 'date', 'place', 'link', 'message', 'contact', 'page', 'lang', 'uid', 'userName', 'createdAt'])
+        && request.resource.data.type in ['event', 'report']
+        && ((request.resource.data.type == 'event' && request.resource.data.name is string
+              && request.resource.data.name.size() > 0)
+            || (request.resource.data.type == 'report' && request.resource.data.message is string
+              && request.resource.data.message.size() > 0))
+        && (!('category' in request.resource.data) || request.resource.data.category in ['bug', 'content', 'other'])
+        && optionalString(request.resource.data, 'name', 120)
+        && optionalString(request.resource.data, 'date', 60)
+        && optionalString(request.resource.data, 'place', 120)
+        && optionalString(request.resource.data, 'link', 300)
+        && optionalString(request.resource.data, 'message', 2000)
+        && optionalString(request.resource.data, 'contact', 120)
+        && optionalString(request.resource.data, 'page', 300)
+        && optionalString(request.resource.data, 'lang', 5)
+        && optionalString(request.resource.data, 'userName', 30)
+        && (!('uid' in request.resource.data) || (signedIn() && request.resource.data.uid == request.auth.uid))
+        && request.resource.data.createdAt == request.time;
+      allow read, delete: if isAdmin();
+      allow update: if isAdmin() && changed().hasOnly(['done']) && request.resource.data.done is bool;
     }
 
     // Lets the admin page count messages across all groups (they are public anyway).
