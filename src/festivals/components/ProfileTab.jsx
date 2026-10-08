@@ -7,6 +7,7 @@ import { instagramUrl, parseInstagram } from '../utils'
 import { t } from '../i18n'
 import { useLanguage } from '../i18n/I18nProvider'
 import LanguageList from './LanguageList'
+import { CONTACT_FORMS } from '../config'
 import UserAvatar from './UserAvatar'
 
 const BIO_MAX = 160
@@ -101,7 +102,7 @@ function LanguageSection() {
 export default function ProfileTab({ onOpenChats, onOpenAdmin }) {
   const { service, user, myGroups, withUser, signOut } = useChat()
   const isAdmin = useIsAdmin()
-  const { entries } = useInbox(isAdmin)
+  const { entries } = useInbox(isAdmin && CONTACT_FORMS)
   const openInbox = entries.filter((e) => !e.done).length
   const [editing, setEditing] = useState(false)
 

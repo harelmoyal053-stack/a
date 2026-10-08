@@ -15,6 +15,7 @@ import LanguageList from './components/LanguageList'
 import Hero from './components/Hero'
 import UserAvatar from './components/UserAvatar'
 import ContactSheet from './components/ContactSheet'
+import { CONTACT_FORMS } from './config'
 import { useChat } from './chat/ChatContext'
 import { useInbox, useIsAdmin } from './chat/admin'
 import { CONTINENTS, GENRES } from './data/festivals'
@@ -149,7 +150,7 @@ export default function App() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [contact, setContact] = useState(null)
   const isAdmin = useIsAdmin()
-  const adminAlert = useInbox(isAdmin).entries.some((e) => !e.done)
+  const adminAlert = useInbox(isAdmin && CONTACT_FORMS).entries.some((e) => !e.done)
   const searchRef = useRef(null)
 
   useEffect(() => {
@@ -432,8 +433,13 @@ export default function App() {
             <p className="font-num text-[11px] text-muted mb-4">{t('count.results', { count: searchResults.length })}</p>
             {searchResults.length > 0 ? renderGrid(searchResults, `search-${query}-${continent}-${genre}-${month}-${kind}`) : (
               <EmptyState icon={SearchX} title={t('search.emptyTitle')}>
-                {t('search.emptyBody')}{' '}
-                <button type="button" onClick={() => setContact('event')} className="text-accent">{t('search.addEvent')}</button>
+                {t('search.emptyBody')}
+                {CONTACT_FORMS && (
+                  <>
+                    {' '}
+                    <button type="button" onClick={() => setContact('event')} className="text-accent">{t('search.addEvent')}</button>
+                  </>
+                )}
               </EmptyState>
             )}
           </>
@@ -497,8 +503,12 @@ export default function App() {
               <span className="text-[11px] text-muted">{t('common.menu')}</span>
               <button type="button" onClick={() => setMenuOpen(false)} aria-label={t('common.close')}><X size={20} strokeWidth={1.75} /></button>
             </div>
-            <button type="button" onClick={() => { setMenuOpen(false); setContact('event') }} className="px-4 py-3.5 border-b hairline hover:bg-white/5 text-start">{t('menu.addEvent')}</button>
-            <button type="button" onClick={() => { setMenuOpen(false); setContact('report') }} className="px-4 py-3.5 border-b hairline hover:bg-white/5 text-start">{t('menu.report')}</button>
+            {CONTACT_FORMS && (
+              <>
+                <button type="button" onClick={() => { setMenuOpen(false); setContact('event') }} className="px-4 py-3.5 border-b hairline hover:bg-white/5 text-start">{t('menu.addEvent')}</button>
+                <button type="button" onClick={() => { setMenuOpen(false); setContact('report') }} className="px-4 py-3.5 border-b hairline hover:bg-white/5 text-start">{t('menu.report')}</button>
+              </>
+            )}
             <div className="px-4 pt-4 pb-2 border-b hairline">
               <p className="text-[11px] text-muted mb-1">{t('menu.language')}</p>
               <LanguageList value={lang} languages={languages} onChange={(code) => { setMenuOpen(false); setLang(code) }} />

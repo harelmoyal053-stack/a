@@ -6,6 +6,7 @@ import { useCatalog } from '../data/CatalogContext'
 import { findGroup } from '../data/groups'
 import { locale, t } from '../i18n'
 import AdminInbox from './AdminInbox'
+import { CONTACT_FORMS } from '../config'
 import EventAvatar from './EventAvatar'
 import UserAvatar from './UserAvatar'
 
@@ -121,9 +122,9 @@ export default function AdminPage({ onBack, onOpenChat }) {
         {service?.mode === 'local' && ` · ${t('admin.previewNote')}`}
       </p>
 
-      <AdminInbox />
+      {CONTACT_FORMS && <AdminInbox />}
 
-      <div className="grid grid-cols-2 gap-2 mt-9">
+      <div className={`grid grid-cols-2 gap-2 ${CONTACT_FORMS ? 'mt-9' : ''}`}>
         <StatTile hero label={t('admin.users')} value={stats?.users} note={stats?.newUsers != null ? t('admin.newUsers', { n: plain(stats.newUsers) }) : null} />
         <StatTile label={t('admin.groups')} value={stats?.groups} />
         <StatTile label={t('admin.activeGroups')} value={stats?.activeGroups} />
