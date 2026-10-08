@@ -21,7 +21,7 @@ export function cleanName(name) {
   return name.replace(/\s*[-–|:(].*$/, '').replace(TICKET_WORDS, '').replace(/\s+/g, ' ').trim() || name.trim()
 }
 
-export const isFestivalName = (name) => /festival|fest\b|open air|weekender/i.test(name)
+export const isFestivalName = (name) => /festival|festiwal|festivaali|fesztivál|festivál|fest\b|open air|weekender/i.test(name)
 
 // Our genre keys, from the many ways sources spell them.
 const GENRE_PATTERNS = [

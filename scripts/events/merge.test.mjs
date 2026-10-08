@@ -74,6 +74,9 @@ test('single shows from the festival search are dropped; festivals stay', () => 
   assert.equal(fromTicketmaster(raw('Orquesta Moderna'), 'festival'), null)
   assert.equal(fromTicketmaster(raw('Festival Internacional Cervantino'), 'festival').kind, 'festival')
   assert.equal(fromTicketmaster(raw('Afterlife'), 'party').kind, 'party')
+  // From the "party" keyword search, only listings billed as a party stay.
+  assert.equal(fromTicketmaster(raw('Taylor Swift Tribute Night'), 'party', { billedAsParty: true }), null)
+  assert.equal(fromTicketmaster(raw('Emo Night Party'), 'party', { billedAsParty: true }).kind, 'party')
 })
 
 test('a weekly series stays one event per night; a festival weekend pair folds', () => {

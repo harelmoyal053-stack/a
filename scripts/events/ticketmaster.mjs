@@ -4,9 +4,12 @@ import { NOT_AN_EVENT, cleanName, genreKeys, getJson, isFestivalName, isoNoMilli
 const API = 'https://app.ticketmaster.com/discovery/v2/events.json'
 const MUSIC_SEGMENT = 'KZFzniwnSyZfZ7v7nJ'
 const DANCE_ELECTRONIC_GENRE = 'KnvZfZ7vAvF'
+// Every market Ticketmaster sells in, plus a few where partners list events.
+// Countries with nothing on sale cost one request per query.
 const COUNTRIES = [
-  'US', 'CA', 'MX', 'GB', 'IE', 'DE', 'NL', 'BE', 'FR', 'ES', 'IT', 'AT', 'CH', 'SE', 'NO', 'DK', 'FI',
-  'PL', 'CZ', 'TR', 'AE', 'ZA', 'AU', 'NZ', 'BR', 'IL',
+  'US', 'CA', 'MX', 'GB', 'IE', 'DE', 'NL', 'BE', 'LU', 'FR', 'ES', 'PT', 'IT', 'AT', 'CH', 'SE', 'NO', 'DK',
+  'FI', 'IS', 'PL', 'CZ', 'SK', 'HU', 'RO', 'GR', 'CY', 'EE', 'LV', 'LT', 'TR', 'AE', 'IL', 'ZA', 'NG',
+  'AU', 'NZ', 'BR', 'AR', 'CL', 'PE', 'CO', 'SG', 'JP', 'KR', 'HK', 'IN', 'TH',
 ]
 const PAGE_SIZE = 200
 const MAX_PAGES = 5 // The API refuses to page past 1000 results per query.
@@ -14,7 +17,11 @@ const REQUEST_GAP_MS = 250 // Free keys allow 5 requests per second.
 
 const QUERIES = [
   { kind: 'festival', params: { segmentId: MUSIC_SEGMENT, keyword: 'festival' } },
+  { kind: 'festival', params: { segmentId: MUSIC_SEGMENT, keyword: 'fest' } },
+  { kind: 'festival', params: { segmentId: MUSIC_SEGMENT, keyword: 'open air' } },
   { kind: 'party', params: { genreId: DANCE_ELECTRONIC_GENRE } },
+  // Keyword "party" also matches tribute shows and listening sessions.
+  { kind: 'party', billedAsParty: true, params: { segmentId: MUSIC_SEGMENT, keyword: 'party' } },
 ]
 
 function pickImage(images = []) {
@@ -23,11 +30,13 @@ function pickImage(images = []) {
   return sorted.find((i) => i.width <= 1100)?.url ?? sorted.at(-1)?.url ?? null
 }
 
-export function fromTicketmaster(raw, kind) {
+export function fromTicketmaster(raw, kind, { billedAsParty = false } = {}) {
   if (!raw?.id || !raw.name || NOT_AN_EVENT.test(raw.name)) return null
   // The "festival" keyword search also returns single shows that are part of a
   // festival's programme; keep only listings that are the festival itself.
   if (kind === 'festival' && !isFestivalName(raw.name)) return null
+  // When asked, keep only listings actually billed as a party or club night.
+  if (billedAsParty && !/\bparty\b|club night|\brave\b/i.test(raw.name)) return null
   const venue = raw._embedded?.venues?.[0]
   const start = raw.dates?.start?.localDate
   if (!venue?.country?.countryCode || !start) return null
@@ -55,6 +64,7 @@ export function fromTicketmaster(raw, kind) {
 export async function fetchTicketmaster(apiKey) {
   const { from, until } = windowDates()
   const entries = []
+  const seen = new Set() // The same listing can come back from several queries.
   for (const countryCode of COUNTRIES) {
     for (const query of QUERIES) {
       for (let page = 0; page < MAX_PAGES; page++) {
@@ -64,8 +74,12 @@ export async function fetchTicketmaster(apiKey) {
         })
         const data = await getJson(`${API}?${params}`, { label: `Ticketmaster ${countryCode}` })
         for (const raw of data._embedded?.events ?? []) {
-          const entry = fromTicketmaster(raw, query.kind)
-          if (entry) entries.push(entry)
+          if (seen.has(raw.id)) continue
+          const entry = fromTicketmaster(raw, query.kind, query)
+          if (entry) {
+            seen.add(raw.id)
+            entries.push(entry)
+          }
         }
         await sleep(REQUEST_GAP_MS)
         if (page + 1 >= (data.page?.totalPages ?? 0)) break
