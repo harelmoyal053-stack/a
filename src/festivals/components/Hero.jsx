@@ -2,35 +2,36 @@ import { useMemo, useState } from 'react'
 import { ArrowLeft, Search, Send } from 'lucide-react'
 import { locale, t } from '../i18n'
 
-// Home banner: a festival photo, the pitch, search and the main call to action.
-export default function Hero({ items, signedIn, onSearch, onJoin, onOpenFestival }) {
+// Festival crowd photos from Unsplash (free to use), tried in order. If none
+// loads, the banner keeps its gradient glow.
+const BACKDROPS = [
+  'https://unsplash.com/photos/A8edFHZtMxE/download?w=1600',
+  'https://unsplash.com/photos/JCGE51UEL2A/download?w=1600',
+]
+
+// Home banner: a party photo, the pitch, search and the main call to action.
+export default function Hero({ items, signedIn, onSearch, onJoin }) {
   const [failed, setFailed] = useState(new Set())
+  const [backdrop, setBackdrop] = useState(0)
   const withPhoto = useMemo(() => items.filter((f) => f.image?.src && !failed.has(f.image.src)), [items, failed])
-  // Prefer a real multi-day festival for the backdrop.
-  const featured = withPhoto.find((f) => f.kind === 'festival' && /fest/i.test(f.name) && f.endDate > f.startDate)
-    ?? withPhoto.find((f) => f.kind === 'festival') ?? withPhoto[0]
-  const faces = withPhoto.filter((f) => f !== featured).slice(0, 5)
+  const faces = withPhoto.slice(0, 5)
   const countries = useMemo(() => new Set(items.map((f) => f.country)).size, [items])
   const nf = new Intl.NumberFormat(locale())
   const drop = (src) => setFailed((prev) => new Set(prev).add(src))
 
   return (
     <section className="relative -mx-4 -mt-[4.5rem] mb-2 overflow-hidden">
-      {featured && (
-        <button
-          type="button"
-          onClick={() => onOpenFestival(featured.id)}
-          className="absolute bottom-3 end-4 z-10 max-w-[45%] truncate text-[11px] text-white/50 hover:text-white"
-        >
-          <span dir="auto">{t('hero.photo', { name: featured.name })}</span>
-        </button>
-      )}
-      {featured && (
+      <div className="absolute inset-0" aria-hidden="true">
+        <div className="absolute -top-20 end-[-6rem] w-96 h-96 rounded-full bg-fuchsia-600/40 blur-3xl" />
+        <div className="absolute top-40 -start-24 w-80 h-80 rounded-full bg-violet-600/40 blur-3xl" />
+        <div className="absolute bottom-0 end-10 w-72 h-72 rounded-full bg-blue-600/30 blur-3xl" />
+      </div>
+      {backdrop < BACKDROPS.length && (
         <img
-          src={featured.image.src}
+          src={BACKDROPS[backdrop]}
           alt=""
           referrerPolicy="no-referrer"
-          onError={() => drop(featured.image.src)}
+          onError={() => setBackdrop((i) => i + 1)}
           className="absolute inset-0 w-full h-full object-cover"
         />
       )}

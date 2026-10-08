@@ -329,7 +329,6 @@ export default function App() {
               signedIn={Boolean(user)}
               onSearch={() => goTab('search')}
               onJoin={() => (user ? goTab('search') : withUser())}
-              onOpenFestival={openFestival}
             />
 
             <div className="-mx-4 mb-9 border-y hairline bg-ink-950/60 grid grid-cols-5 py-4 px-1">
