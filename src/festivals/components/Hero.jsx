@@ -1,18 +1,12 @@
 import { useMemo, useState } from 'react'
 import { ArrowLeft, Search, Send } from 'lucide-react'
 import { locale, t } from '../i18n'
-
-// Festival crowd photos from Unsplash (free to use), tried in order. If none
-// loads, the banner keeps its gradient glow.
-const BACKDROPS = [
-  'https://unsplash.com/photos/A8edFHZtMxE/download?w=1600',
-  'https://unsplash.com/photos/JCGE51UEL2A/download?w=1600',
-]
+import heroTall from '../assets/hero-tall.webp'
+import heroWide from '../assets/hero-wide.webp'
 
 // Home banner: a party photo, the pitch, search and the main call to action.
 export default function Hero({ items, signedIn, onSearch, onJoin }) {
   const [failed, setFailed] = useState(new Set())
-  const [backdrop, setBackdrop] = useState(0)
   const withPhoto = useMemo(() => items.filter((f) => f.image?.src && !failed.has(f.image.src)), [items, failed])
   const faces = withPhoto.slice(0, 5)
   const countries = useMemo(() => new Set(items.map((f) => f.country)).size, [items])
@@ -26,28 +20,23 @@ export default function Hero({ items, signedIn, onSearch, onJoin }) {
         <div className="absolute top-40 -start-24 w-80 h-80 rounded-full bg-violet-600/40 blur-3xl" />
         <div className="absolute bottom-0 end-10 w-72 h-72 rounded-full bg-blue-600/30 blur-3xl" />
       </div>
-      {backdrop < BACKDROPS.length && (
-        <img
-          src={BACKDROPS[backdrop]}
-          alt=""
-          referrerPolicy="no-referrer"
-          onError={() => setBackdrop((i) => i + 1)}
-          className="absolute inset-0 w-full h-full object-cover"
-        />
-      )}
-      <div className="absolute inset-0 bg-gradient-to-b from-ink-900/80 via-ink-900/30 to-ink-900" />
-      <div className="absolute inset-0 ltr:bg-gradient-to-r rtl:bg-gradient-to-l from-ink-900/90 via-ink-900/50 to-transparent" />
+      <picture>
+        <source media="(min-width: 768px)" srcSet={heroWide} />
+        <img src={heroTall} alt="" className="absolute inset-0 w-full h-full object-cover object-[50%_60%]" />
+      </picture>
+      <div className="absolute inset-0 bg-gradient-to-b from-ink-900/70 via-ink-900/10 to-ink-900" />
+      <div className="absolute inset-0 ltr:bg-gradient-to-r rtl:bg-gradient-to-l from-ink-900/75 via-ink-900/25 to-transparent" />
       <div className="absolute -top-24 -start-24 w-80 h-80 rounded-full bg-violet-600/25 blur-3xl" />
 
       <div className="relative max-w-6xl mx-auto px-4 pt-24 pb-7">
-        <h1 className="text-[42px] sm:text-6xl leading-[1.04] font-bold tracking-tight">
+        <h1 className="text-[42px] sm:text-6xl leading-[1.04] font-bold tracking-tight drop-shadow-[0_2px_12px_rgba(0,0,0,0.6)]">
           {t('hero.l1')}
           <br />
           <span className="text-brand">{t('hero.l2')}</span>
           <br />
           <span className="text-[32px] sm:text-5xl">{t('hero.l3')}</span>
         </h1>
-        <p className="mt-4 text-[16px] text-white/85 max-w-sm leading-relaxed">{t('hero.body')}</p>
+        <p className="mt-4 text-[16px] text-white/90 max-w-sm leading-relaxed drop-shadow-[0_1px_6px_rgba(0,0,0,0.9)]">{t('hero.body')}</p>
 
         <button
           type="button"
