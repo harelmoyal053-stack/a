@@ -61,8 +61,10 @@ body {
 .no-scrollbar { scrollbar-width: none; }
 
 .chat-wallpaper {
-  background-color: #0a0e1b;
-  background-image: radial-gradient(ellipse at 50% 0%, rgba(124, 92, 255, 0.08), transparent 60%);
+  background-color: #0e0e0d;
+  background-image: linear-gradient(rgba(10, 14, 27, 0.35), rgba(10, 14, 27, 0.35)), url('./assets/chat-bg.webp');
+  background-size: cover;
+  background-position: center top;
 }
 
 /* We draw our own clear button. */

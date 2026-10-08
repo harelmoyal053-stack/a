@@ -213,7 +213,7 @@ export default function ChatScreen({ festival, group, onClose }) {
       <div className="flex-1 overflow-y-auto px-3 py-4 chat-wallpaper">
         <div className="max-w-2xl mx-auto flex flex-col gap-2">
           {!search && (
-            <div className="self-center text-center border hairline text-muted text-xs rounded-2xl px-4 py-3 mb-4 max-w-xs">
+            <div className="self-center text-center border hairline bg-ink-900/85 backdrop-blur-sm text-muted text-xs rounded-2xl px-4 py-3 mb-4 max-w-xs">
               <GroupIcon name={group.icon} size={16} className="mx-auto mb-1.5 text-white/70" />
               {group.description}
               <span className="block mt-1 text-white/40">{t('chat.hint')}</span>
@@ -225,7 +225,7 @@ export default function ChatScreen({ festival, group, onClose }) {
             const showDay = !prev || day !== dayLabel(prev.createdAt)
             return (
               <div key={m.id} className="flex flex-col">
-                {showDay && <span className="self-center text-[10px] text-muted my-3">{day}</span>}
+                {showDay && <span className="self-center text-[11px] text-white/70 bg-ink-900/85 backdrop-blur-sm rounded-full px-3 py-1 my-3">{day}</span>}
                 <MessageBubble
                   message={m}
                   mine={m.uid === user?.uid}
@@ -244,8 +244,8 @@ export default function ChatScreen({ festival, group, onClose }) {
               </div>
             )
           })}
-          {messages.length === 0 && <p className="self-center text-white/40 text-sm mt-10">{t('chat.empty')}</p>}
-          {search && visible.length === 0 && <p className="self-center text-white/40 text-sm mt-10">{t('chat.noResults')}</p>}
+          {messages.length === 0 && <p className="self-center text-white/60 text-sm mt-10 bg-ink-900/85 rounded-full px-4 py-1.5">{t('chat.empty')}</p>}
+          {search && visible.length === 0 && <p className="self-center text-white/60 text-sm mt-10 bg-ink-900/85 rounded-full px-4 py-1.5">{t('chat.noResults')}</p>}
           <div ref={bottomRef} />
         </div>
       </div>
