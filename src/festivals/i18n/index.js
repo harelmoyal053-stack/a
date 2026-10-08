@@ -28,15 +28,11 @@ function savedLang() {
   }
 }
 
-// Saved choice, else the first browser language we support, else English.
+// The visitor's saved choice, else English. Everyone starts in English and
+// picks another language from the menu or profile.
 function detectLang() {
   const saved = savedLang()
   if (DICTIONARIES[saved]) return saved
-  for (const tag of navigator.languages ?? [navigator.language]) {
-    const code = tag?.slice(0, 2).toLowerCase()
-    if (code === 'iw') return 'he'
-    if (DICTIONARIES[code]) return code
-  }
   return 'en'
 }
 

@@ -9,7 +9,7 @@ This repo deploys to GitHub Pages at `https://harelmoyal053-stack.github.io/a/`.
 
 ## FestiChat
 
-A community app for festivals worldwide, in seven languages (Hebrew, English, Spanish, French, German, Russian, Arabic). The language follows the visitor's phone on first visit and can be changed from the menu or the profile tab; the layout flips between right-to-left (Hebrew, Arabic) and left-to-right. Translations live in `src/festivals/i18n/` (one file per language, same keys as `he.js`). Users find a festival or party, join its group chats (general, Israelis at the festival, rides, camping/lodging, ticket swaps, solo travelers), and chat in real time. Joined groups appear on the home screen and in the chats tab. Anyone can read a group; only members can write.
+A community app for festivals worldwide, in seven languages (Hebrew, English, Spanish, French, German, Russian, Arabic). The site opens in English; visitors pick another language from the menu or the profile tab, and the choice is remembered; the layout flips between right-to-left (Hebrew, Arabic) and left-to-right. Translations live in `src/festivals/i18n/` (one file per language, same keys as `he.js`). Users find a festival or party, join its group chats (general, Israelis at the festival, rides, camping/lodging, ticket swaps, solo travelers), and chat in real time. Joined groups appear on the home screen and in the chats tab. Anyone can read a group; only members can write.
 
 ### Event suggestions and problem reports
 
