@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { initials } from '../utils'
 
 // Shrink for long names, and for long single words so they never split mid-word.
 function titleSize(name, large) {
@@ -29,18 +30,20 @@ export default function Poster({ festival, large = false, showTitle = true, show
   const [, m, d] = (festival.startDate ?? '').split('-')
   return (
     <div className="absolute inset-0 overflow-hidden bg-ink-800" aria-hidden="true">
-      <div className="absolute inset-0 opacity-60" style={{ background: `linear-gradient(160deg, ${tone}55 0%, transparent 55%)` }} />
+      <div className="absolute inset-0 opacity-80" style={{ background: `radial-gradient(120% 90% at 85% 10%, ${tone}66 0%, transparent 60%), radial-gradient(90% 80% at 10% 100%, #7c5cff33 0%, transparent 60%)` }} />
       <div className="absolute inset-0 poster-grain" />
       <div className={`absolute inset-0 flex flex-col justify-between ${large ? 'p-6 pt-20' : 'p-3'}`} dir="ltr">
         <div className={`flex justify-between font-num uppercase tracking-[0.12em] text-white/50 ${large ? 'text-xs' : 'text-[9px]'}`}>
           <span>{large && (festival.kind === 'festival' ? 'Festival' : 'Club night')}</span>
-          {d && <span>{d}.{m}</span>}
+          {d && !festival.tba && <span>{d}.{m}</span>}
         </div>
         {showTitle ? (
           <p className={`font-poster font-bold uppercase leading-[0.88] tracking-tight text-white line-clamp-4 break-words ${titleSize(festival.name, large)}`} dir="auto">
             {festival.name}
           </p>
-        ) : <span />}
+        ) : (
+          <p className={`self-center font-bold tracking-tight text-white/20 ${large ? 'text-8xl' : 'text-6xl'}`}>{initials(festival.name)}</p>
+        )}
         {showTitle && showCity ? (
           <p className={`font-num uppercase tracking-[0.12em] truncate ${large ? 'text-xs' : 'text-[9px]'}`} style={{ color: tone }}>
             {festival.city}

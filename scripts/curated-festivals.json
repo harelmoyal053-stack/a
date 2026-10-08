@@ -1,1 +1,1144 @@
-[]
+[
+  {
+    "name": "InDNegev",
+    "startDate": "2026-10-15",
+    "endDate": "2026-10-17",
+    "datesConfirmed": true,
+    "city": "Mitzpe Gvulot",
+    "countryCode": "IL",
+    "lat": 31.244,
+    "lng": 34.462,
+    "genres": [
+      "indie",
+      "rock",
+      "electronic"
+    ],
+    "url": "https://www.indnegev.co.il",
+    "evidence": "https://www.maariv.co.il/culture/music/article-1335529"
+  },
+  {
+    "name": "Wonderfruit",
+    "startDate": "2026-12-03",
+    "endDate": "2026-12-07",
+    "datesConfirmed": true,
+    "city": "Pattaya",
+    "countryCode": "TH",
+    "lat": 12.912,
+    "lng": 101.003,
+    "genres": [
+      "electronic",
+      "indie"
+    ],
+    "url": "https://www.wonderfruit.co",
+    "evidence": "https://www.timeout.com/asia/news/all-you-need-to-know-about-wonderfruit-2026-dates-ticketing-and-new-kyoto-edition-030926"
+  },
+  {
+    "name": "Djakarta Warehouse Project",
+    "startDate": "2026-12-11",
+    "endDate": "2026-12-13",
+    "datesConfirmed": true,
+    "city": "Jakarta",
+    "countryCode": "ID",
+    "lat": -6.2,
+    "lng": 106.85,
+    "genres": [
+      "electronic",
+      "hiphop"
+    ],
+    "url": "https://www.dwpfest.com",
+    "evidence": "https://www.indonesia.travel/cn-en/events/event-detail/djakarta-warehouse-project-2026"
+  },
+  {
+    "name": "Tomorrowland Thailand",
+    "startDate": "2026-12-11",
+    "endDate": "2026-12-13",
+    "datesConfirmed": true,
+    "city": "Pattaya",
+    "countryCode": "TH",
+    "lat": 12.85,
+    "lng": 101.05,
+    "genres": [
+      "electronic"
+    ],
+    "url": "https://www.tomorrowland.com",
+    "evidence": "https://mixmag.asia/read/tomorrowland-thailand-announces-december-2026-dates-ticket-sales-pre-registration-pattaya-local"
+  },
+  {
+    "name": "Sunburn Festival",
+    "startDate": "2026-12-18",
+    "endDate": "2026-12-19",
+    "datesConfirmed": true,
+    "city": "Mumbai",
+    "countryCode": "IN",
+    "lat": 18.982,
+    "lng": 72.819,
+    "genres": [
+      "electronic"
+    ],
+    "url": "https://sunburn.in",
+    "evidence": "https://sunburn.in/event/sunburn-festival-2026/"
+  },
+  {
+    "name": "Universo Paralello",
+    "startDate": "2026-12-27",
+    "endDate": "2027-01-04",
+    "datesConfirmed": true,
+    "city": "Ituberá",
+    "countryCode": "BR",
+    "lat": -13.66,
+    "lng": -38.97,
+    "genres": [
+      "electronic"
+    ],
+    "url": "https://universoparalello.org",
+    "evidence": "https://www.technoairlines.com/festival/universo-paralello-festival-pratigi-beach-itubera-brazil-2026 ; https://shotgun.live/pt-br/events/universo-paralello-2026-espaco-nativos-premium-camping"
+  },
+  {
+    "name": "Zamna Tulum",
+    "startDate": "2026-12-31",
+    "endDate": "2027-01-10",
+    "datesConfirmed": true,
+    "city": "Tulum",
+    "countryCode": "MX",
+    "lat": 20.21,
+    "lng": -87.46,
+    "genres": [
+      "electronic"
+    ],
+    "url": "https://zamnafestival.com",
+    "evidence": "https://magneticmag.com/2026/09/zamna-tulum-2027-dates-multipass-tickets/ ; https://tulumtimes.com/zamna-gives-tulum-10-days"
+  },
+  {
+    "name": "Day Zero Tulum",
+    "startDate": "2027-01-09",
+    "endDate": "2027-01-10",
+    "datesConfirmed": true,
+    "city": "Tulum",
+    "countryCode": "MX",
+    "lat": 20.21,
+    "lng": -87.46,
+    "genres": [
+      "electronic"
+    ],
+    "url": "https://dayzerofestival.com",
+    "evidence": "https://www.edmtunes.com/2026/08/damian-lazarus-reveals-full-day-zero-tulum-2027-lineup/ ; https://edmidentity.com/2026/08/15/day-zero-tulum-2027-lineup/"
+  },
+  {
+    "name": "EDC Mexico",
+    "startDate": "2027-02-19",
+    "endDate": "2027-02-21",
+    "datesConfirmed": true,
+    "city": "Mexico City",
+    "countryCode": "MX",
+    "lat": 19.404,
+    "lng": -99.091,
+    "genres": [
+      "electronic"
+    ],
+    "url": "https://edcmexico.com",
+    "evidence": "https://djmag.com/news/edc-mexico-2027-dates-and-ticket-pre-sale-announced"
+  },
+  {
+    "name": "Envision Festival",
+    "startDate": "2027-02-25",
+    "endDate": "2027-02-28",
+    "datesConfirmed": false,
+    "city": "Uvita",
+    "countryCode": "CR",
+    "lat": 9.16,
+    "lng": -83.74,
+    "genres": [
+      "electronic",
+      "afro"
+    ],
+    "url": "https://www.envisionfestival.com",
+    "evidence": "estimate: usual pattern late Feb/early Mar (2026: Feb 23-Mar 2; 2024: Feb 29-Mar 3); 2027 not announced (https://www.musicfestivalwizard.com/festivals/envision-festival-2027/)"
+  },
+  {
+    "name": "Lollapalooza Argentina",
+    "startDate": "2027-03-12",
+    "endDate": "2027-03-14",
+    "datesConfirmed": true,
+    "city": "Buenos Aires",
+    "countryCode": "AR",
+    "lat": -34.48,
+    "lng": -58.52,
+    "genres": [
+      "rock",
+      "pop",
+      "indie",
+      "hiphop",
+      "electronic"
+    ],
+    "url": "https://www.lollapaloozaar.com",
+    "evidence": "https://www.cronica.com.ar/elcanaldelamusica/noticias/lollapalooza-argentina-2027-ya-tiene-fecha-cuando-salen-a-la-venta-las-entradas-7216/"
+  },
+  {
+    "name": "Lollapalooza Chile",
+    "startDate": "2027-03-12",
+    "endDate": "2027-03-14",
+    "datesConfirmed": true,
+    "city": "Santiago",
+    "countryCode": "CL",
+    "lat": -33.464,
+    "lng": -70.661,
+    "genres": [
+      "rock",
+      "pop",
+      "indie",
+      "hiphop",
+      "electronic"
+    ],
+    "url": "https://www.lollapaloozacl.com",
+    "evidence": "https://www.radioagricultura.cl/entretencion/confirman-fecha-y-lugar-de-lollapalooza-chile-2027-adelantan-artistas-y-venta-de-entradas-comenzaria-antes_20260316/"
+  },
+  {
+    "name": "Lollapalooza Brasil",
+    "startDate": "2027-03-19",
+    "endDate": "2027-03-21",
+    "datesConfirmed": true,
+    "city": "São Paulo",
+    "countryCode": "BR",
+    "lat": -23.701,
+    "lng": -46.697,
+    "genres": [
+      "rock",
+      "pop",
+      "indie",
+      "hiphop",
+      "electronic"
+    ],
+    "url": "https://www.lollapaloozabr.com",
+    "evidence": "https://billboard.com.br/lollapalooza-braisl-2027-confirma-edicao-e-venda/ ; https://www.dgabc.com.br/Noticia/4291566/lollapalooza-brasil-anuncia-datas-de-sua-14-edicao-em-2027"
+  },
+  {
+    "name": "Tomorrowland Winter",
+    "startDate": "2027-03-20",
+    "endDate": "2027-03-27",
+    "datesConfirmed": true,
+    "city": "Alpe d'Huez",
+    "countryCode": "FR",
+    "lat": 45.092,
+    "lng": 6.07,
+    "genres": [
+      "electronic"
+    ],
+    "url": "https://www.tomorrowlandwinter.com",
+    "evidence": "https://djmag.com/news/tomorrowland-winter-2027-dates-and-ticket-sales-announced ; https://faq.tomorrowlandwinter.com/hc/en-us/articles/360038498011-Where-and-when-is-Tomorrowland-Winter-2027"
+  },
+  {
+    "name": "DGTL Amsterdam",
+    "startDate": "2027-03-26",
+    "endDate": "2027-03-28",
+    "datesConfirmed": true,
+    "city": "Amsterdam",
+    "countryCode": "NL",
+    "lat": 52.401,
+    "lng": 4.893,
+    "genres": [
+      "electronic"
+    ],
+    "url": "https://dgtl-festival.com",
+    "evidence": "https://dgtl-festival.com/en/dgtl-amsterdam/"
+  },
+  {
+    "name": "Ultra Music Festival Miami",
+    "startDate": "2027-03-26",
+    "endDate": "2027-03-28",
+    "datesConfirmed": true,
+    "city": "Miami",
+    "countryCode": "US",
+    "lat": 25.775,
+    "lng": -80.186,
+    "genres": [
+      "electronic"
+    ],
+    "url": "https://ultramusicfestival.com",
+    "evidence": "https://weraveyou.com/2026/04/ultra-miami-2027-dates-tickets/"
+  },
+  {
+    "name": "Time Warp Mannheim",
+    "startDate": "2027-04-03",
+    "endDate": "2027-04-04",
+    "datesConfirmed": true,
+    "city": "Mannheim",
+    "countryCode": "DE",
+    "lat": 49.47,
+    "lng": 8.528,
+    "genres": [
+      "electronic"
+    ],
+    "url": "https://www.time-warp.de",
+    "evidence": "https://www.mvp.de/mannheim/veranstaltungen/time-warp-mannheim-germany-2027-maimarkthalle/ ; https://www.technoairlines.com/festival/time-warp-mannheim-germany-2027"
+  },
+  {
+    "name": "Snowbombing",
+    "startDate": "2027-04-05",
+    "endDate": "2027-04-10",
+    "datesConfirmed": true,
+    "city": "Mayrhofen",
+    "countryCode": "AT",
+    "lat": 47.167,
+    "lng": 11.865,
+    "genres": [
+      "electronic",
+      "hiphop"
+    ],
+    "url": "https://www.snowbombing.com",
+    "evidence": "https://www.clashmusic.com/?p=457967 ; https://www.festivalhopper.de/festival/snowbombing-2027"
+  },
+  {
+    "name": "Coachella Weekend 1",
+    "startDate": "2027-04-09",
+    "endDate": "2027-04-11",
+    "datesConfirmed": true,
+    "city": "Indio",
+    "countryCode": "US",
+    "lat": 33.679,
+    "lng": -116.237,
+    "genres": [
+      "pop",
+      "rock",
+      "indie",
+      "hiphop",
+      "electronic"
+    ],
+    "url": "https://www.coachella.com",
+    "evidence": "https://djmag.com/news/coachella-announces-2027-dates ; https://www.nme.com/news/music/coachella-announce-dates-for-2027-and-how-to-get-tickets-3941844"
+  },
+  {
+    "name": "Coachella Weekend 2",
+    "startDate": "2027-04-16",
+    "endDate": "2027-04-18",
+    "datesConfirmed": true,
+    "city": "Indio",
+    "countryCode": "US",
+    "lat": 33.679,
+    "lng": -116.237,
+    "genres": [
+      "pop",
+      "rock",
+      "indie",
+      "hiphop",
+      "electronic"
+    ],
+    "url": "https://www.coachella.com",
+    "evidence": "https://djmag.com/news/coachella-announces-2027-dates ; https://www.nme.com/news/music/coachella-announce-dates-for-2027-and-how-to-get-tickets-3941844"
+  },
+  {
+    "name": "AfrikaBurn",
+    "startDate": "2027-04-26",
+    "endDate": "2027-05-02",
+    "datesConfirmed": false,
+    "city": "Tankwa Karoo",
+    "countryCode": "ZA",
+    "lat": -32.33,
+    "lng": 19.98,
+    "genres": [
+      "electronic"
+    ],
+    "url": "https://www.afrikaburn.org",
+    "evidence": "estimate: usual pattern Mon-Sun spanning end of April/start of May (2025: Apr 28-May 4; 2026: Apr 27-May 3)"
+  },
+  {
+    "name": "Tomorrowland Brasil",
+    "startDate": "2027-04-30",
+    "endDate": "2027-05-02",
+    "datesConfirmed": true,
+    "city": "Itu",
+    "countryCode": "BR",
+    "lat": -23.23,
+    "lng": -47.28,
+    "genres": [
+      "electronic"
+    ],
+    "url": "https://www.tomorrowlandbrasil.com",
+    "evidence": "https://billboard.com.br/tomorrowland-brasil-2027-ingressos/ ; https://press.tomorrowlandbrasil.com/tomorrowland-brasil-2027-the-official-countdown-has-begun"
+  },
+  {
+    "name": "EDC Las Vegas (EDC Dusk)",
+    "startDate": "2027-05-14",
+    "endDate": "2027-05-16",
+    "datesConfirmed": true,
+    "city": "Las Vegas",
+    "countryCode": "US",
+    "lat": 36.272,
+    "lng": -115.01,
+    "genres": [
+      "electronic"
+    ],
+    "url": "https://lasvegas.electricdaisycarnival.com",
+    "evidence": "https://djmag.com/news/edc-las-vegas-expands-12-days-and-two-full-weekends-2027 ; https://fox5vegas.com/2026/05/20/edc-las-vegas-announces-dusk-till-dawn-2027-spanning-2-weekends"
+  },
+  {
+    "name": "EDC Las Vegas (EDC Dawn)",
+    "startDate": "2027-05-21",
+    "endDate": "2027-05-23",
+    "datesConfirmed": true,
+    "city": "Las Vegas",
+    "countryCode": "US",
+    "lat": 36.272,
+    "lng": -115.01,
+    "genres": [
+      "electronic"
+    ],
+    "url": "https://lasvegas.electricdaisycarnival.com",
+    "evidence": "https://djmag.com/news/edc-las-vegas-expands-12-days-and-two-full-weekends-2027 ; https://fox5vegas.com/2026/05/20/edc-las-vegas-announces-dusk-till-dawn-2027-spanning-2-weekends"
+  },
+  {
+    "name": "Movement Detroit",
+    "startDate": "2027-05-29",
+    "endDate": "2027-05-31",
+    "datesConfirmed": true,
+    "city": "Detroit",
+    "countryCode": "US",
+    "lat": 42.328,
+    "lng": -83.044,
+    "genres": [
+      "electronic"
+    ],
+    "url": "https://movementfestival.com",
+    "evidence": "https://edmidentity.com/2026/09/13/movement-detroit-2027-early-access-sale/"
+  },
+  {
+    "name": "Primavera Sound Barcelona",
+    "startDate": "2027-06-03",
+    "endDate": "2027-06-05",
+    "datesConfirmed": true,
+    "city": "Barcelona",
+    "countryCode": "ES",
+    "lat": 41.41,
+    "lng": 2.221,
+    "genres": [
+      "indie",
+      "rock",
+      "pop",
+      "electronic",
+      "hiphop"
+    ],
+    "url": "https://www.primaverasound.com",
+    "evidence": "https://www.catalannews.com/culture/item/doechii-phoebe-bridgers-fontaines-dc-and-massive-attack-lead-primavera-sound-2027-lineup ; https://djmag.com/news/primavera-sound-2027-line-announced"
+  },
+  {
+    "name": "Governors Ball",
+    "startDate": "2027-06-04",
+    "endDate": "2027-06-06",
+    "datesConfirmed": false,
+    "city": "New York",
+    "countryCode": "US",
+    "lat": 40.75,
+    "lng": -73.845,
+    "genres": [
+      "pop",
+      "hiphop",
+      "indie",
+      "rock"
+    ],
+    "url": "https://www.govball.com",
+    "evidence": "estimate: usual pattern first weekend of June (2025: Jun 6-8; 2026: Jun 5-7)"
+  },
+  {
+    "name": "Rock am Ring",
+    "startDate": "2027-06-04",
+    "endDate": "2027-06-06",
+    "datesConfirmed": true,
+    "city": "Nürburg",
+    "countryCode": "DE",
+    "lat": 50.335,
+    "lng": 6.947,
+    "genres": [
+      "rock",
+      "metal"
+    ],
+    "url": "https://www.rock-am-ring.com",
+    "evidence": "https://www.nme.com/?p=3969044 ; https://www.giga.de/entertainment/rock-am-ring-2027-tickets-im-vorverkauf-termin-erster-headliner-und-die-heissesten-geruechte--01KTBCF3KCBQEN421TTDKD6HE7"
+  },
+  {
+    "name": "Afro Nation Portugal",
+    "startDate": "2027-06-09",
+    "endDate": "2027-06-11",
+    "datesConfirmed": true,
+    "city": "Portimão",
+    "countryCode": "PT",
+    "lat": 37.118,
+    "lng": -8.536,
+    "genres": [
+      "afro",
+      "hiphop"
+    ],
+    "url": "https://www.afronation.com",
+    "evidence": "https://capitalfm.africa/afro-nation-portugal-2027-locks-in-dates-venue-and-first-wave-lineup/"
+  },
+  {
+    "name": "Hellfest",
+    "startDate": "2027-06-17",
+    "endDate": "2027-06-20",
+    "datesConfirmed": true,
+    "city": "Clisson",
+    "countryCode": "FR",
+    "lat": 47.098,
+    "lng": -1.27,
+    "genres": [
+      "metal",
+      "rock"
+    ],
+    "url": "https://hellfest.fr",
+    "evidence": "https://www.jds.fr/nantes/actu/hellfest-2027-les-dates-de-la-20e-edition-sont-deja-connues-1587856_A"
+  },
+  {
+    "name": "Sónar Barcelona",
+    "startDate": "2027-06-17",
+    "endDate": "2027-06-19",
+    "datesConfirmed": true,
+    "city": "Barcelona",
+    "countryCode": "ES",
+    "lat": 41.355,
+    "lng": 2.127,
+    "genres": [
+      "electronic"
+    ],
+    "url": "https://sonar.es",
+    "evidence": "https://barcelonaurbana.com/ca/blog/sonar-2027-dates-i-preus ; https://www.technoairlines.com/festival/sonar-barcelona-spain-2027"
+  },
+  {
+    "name": "Glastonbury",
+    "startDate": "2027-06-23",
+    "endDate": "2027-06-27",
+    "datesConfirmed": true,
+    "city": "Pilton",
+    "countryCode": "GB",
+    "lat": 51.155,
+    "lng": -2.585,
+    "genres": [
+      "rock",
+      "pop",
+      "indie",
+      "electronic",
+      "hiphop"
+    ],
+    "url": "https://www.glastonburyfestivals.co.uk",
+    "evidence": "https://www.timeout.com/uk/news/glastonbury-has-officially-confirmed-the-festival-dates-for-2027-092525 ; https://mixmag.net/read/dates-confirmed-glastonbury-festival-2027-news"
+  },
+  {
+    "name": "Defqon.1",
+    "startDate": "2027-06-24",
+    "endDate": "2027-06-27",
+    "datesConfirmed": true,
+    "city": "Biddinghuizen",
+    "countryCode": "NL",
+    "lat": 52.44,
+    "lng": 5.76,
+    "genres": [
+      "electronic"
+    ],
+    "url": "https://www.defqon1.com",
+    "evidence": "https://weraveyou.com/2026/07/defqon-1-2027-dates-holy-grounds/ ; https://edmidentity.com/2026/07/08/defqon-1-weekend-festival-2027-dates/"
+  },
+  {
+    "name": "Roskilde Festival",
+    "startDate": "2027-06-26",
+    "endDate": "2027-07-03",
+    "datesConfirmed": true,
+    "city": "Roskilde",
+    "countryCode": "DK",
+    "lat": 55.62,
+    "lng": 12.07,
+    "genres": [
+      "rock",
+      "pop",
+      "indie",
+      "hiphop",
+      "electronic"
+    ],
+    "url": "https://www.roskilde-festival.dk",
+    "evidence": "https://www.visitdenmark.com/denmark/plan-your-trip/roskilde-festival-gdk619631 ; https://www.clashmusic.com/?p=462868"
+  },
+  {
+    "name": "Hideout Festival",
+    "startDate": "2027-06-29",
+    "endDate": "2027-07-02",
+    "datesConfirmed": true,
+    "city": "Novalja",
+    "countryCode": "HR",
+    "lat": 44.538,
+    "lng": 14.917,
+    "genres": [
+      "electronic",
+      "hiphop"
+    ],
+    "url": "https://www.hideoutfestival.com",
+    "evidence": "https://www.technoairlines.com/festival/hideout-festival-novalja-croatia-2027"
+  },
+  {
+    "name": "Open'er Festival",
+    "startDate": "2027-06-30",
+    "endDate": "2027-07-03",
+    "datesConfirmed": true,
+    "city": "Gdynia",
+    "countryCode": "PL",
+    "lat": 54.567,
+    "lng": 18.512,
+    "genres": [
+      "rock",
+      "pop",
+      "indie",
+      "hiphop"
+    ],
+    "url": "https://opener.pl",
+    "evidence": "https://www.ebilet.pl/now/wiemy-kiedy-odbedzie-sie-opener-festival-2027/ ; https://www.festivalinfo.nl/news/59368/Eerste-namen-Opener-2027-bekend-met-o-a-RAYE-en-Tame-Impala/"
+  },
+  {
+    "name": "Rock Werchter",
+    "startDate": "2027-07-01",
+    "endDate": "2027-07-04",
+    "datesConfirmed": true,
+    "city": "Werchter",
+    "countryCode": "BE",
+    "lat": 50.973,
+    "lng": 4.705,
+    "genres": [
+      "rock",
+      "pop",
+      "indie"
+    ],
+    "url": "https://www.rockwerchter.be",
+    "evidence": "https://www.rockwerchter.be/en/news/the-countdown-to-rock-werchter-2027-is-on"
+  },
+  {
+    "name": "Kappa FuturFestival",
+    "startDate": "2027-07-02",
+    "endDate": "2027-07-04",
+    "datesConfirmed": true,
+    "city": "Turin",
+    "countryCode": "IT",
+    "lat": 45.091,
+    "lng": 7.665,
+    "genres": [
+      "electronic"
+    ],
+    "url": "https://www.kappafuturfestival.it",
+    "evidence": "https://lespresso.it/c/cultura/2026/07/06/kappa-futur-festival-torino-2026-chiusura-messico-monterrey/63264"
+  },
+  {
+    "name": "Montreux Jazz Festival",
+    "startDate": "2027-07-02",
+    "endDate": "2027-07-17",
+    "datesConfirmed": true,
+    "city": "Montreux",
+    "countryCode": "CH",
+    "lat": 46.433,
+    "lng": 6.91,
+    "genres": [
+      "jazz",
+      "pop",
+      "rock"
+    ],
+    "url": "https://www.montreuxjazzfestival.com",
+    "evidence": "https://www.vaud.ch/en/tourism/events/montreux-jazz-festival/ ; https://www.montreuxriviera.com/en/P1075/montreux-jazz-festival"
+  },
+  {
+    "name": "Mad Cool Festival",
+    "startDate": "2027-07-07",
+    "endDate": "2027-07-10",
+    "datesConfirmed": false,
+    "city": "Madrid",
+    "countryCode": "ES",
+    "lat": 40.346,
+    "lng": -3.701,
+    "genres": [
+      "rock",
+      "indie",
+      "pop"
+    ],
+    "url": "https://madcoolfestival.es",
+    "evidence": "estimate: usual pattern Wed-Sat second week of July (2026: Jul 8-11)"
+  },
+  {
+    "name": "Electric Love Festival",
+    "startDate": "2027-07-08",
+    "endDate": "2027-07-10",
+    "datesConfirmed": true,
+    "city": "Salzburg",
+    "countryCode": "AT",
+    "lat": 47.823,
+    "lng": 13.175,
+    "genres": [
+      "electronic"
+    ],
+    "url": "https://www.electriclove.at",
+    "evidence": "https://www.regionalsuche.at/electric-love-festival/ ; https://www.technoairlines.com/festival/electric-love-festival-salzburgring-austria-2027"
+  },
+  {
+    "name": "NOS Alive",
+    "startDate": "2027-07-08",
+    "endDate": "2027-07-10",
+    "datesConfirmed": true,
+    "city": "Lisbon",
+    "countryCode": "PT",
+    "lat": 38.697,
+    "lng": -9.233,
+    "genres": [
+      "rock",
+      "indie",
+      "pop"
+    ],
+    "url": "https://www.nosalive.com",
+    "evidence": "https://echoboomer.pt/nos-alive-ja-tem-datas-2027/ ; https://rr.pt/noticia/vida/2026/09/17/sombr-estreia-se-em-portugal-no-nos-alive-2027/485776/"
+  },
+  {
+    "name": "Awakenings Summer Festival",
+    "startDate": "2027-07-09",
+    "endDate": "2027-07-11",
+    "datesConfirmed": true,
+    "city": "Hilvarenbeek",
+    "countryCode": "NL",
+    "lat": 51.522,
+    "lng": 5.12,
+    "genres": [
+      "electronic"
+    ],
+    "url": "https://www.awakenings.com",
+    "evidence": "https://www.technoairlines.com/festival/awakenings-festival-hilvarenbeek-netherlands-2027 ; https://www.frontstagefestivals.com/festival/awakenings-summer-festival-2027"
+  },
+  {
+    "name": "North Sea Jazz Festival",
+    "startDate": "2027-07-09",
+    "endDate": "2027-07-11",
+    "datesConfirmed": false,
+    "city": "Rotterdam",
+    "countryCode": "NL",
+    "lat": 51.884,
+    "lng": 4.488,
+    "genres": [
+      "jazz",
+      "hiphop",
+      "pop"
+    ],
+    "url": "https://www.northseajazz.com",
+    "evidence": "estimate: usual pattern second weekend of July at Ahoy (2026: Jul 10-12)"
+  },
+  {
+    "name": "Ultra Europe",
+    "startDate": "2027-07-09",
+    "endDate": "2027-07-11",
+    "datesConfirmed": true,
+    "city": "Split",
+    "countryCode": "HR",
+    "lat": 43.519,
+    "lng": 16.47,
+    "genres": [
+      "electronic"
+    ],
+    "url": "https://ultraeurope.com",
+    "evidence": "https://events.liveit.io/ultra-europe/ultra-europe-2027/"
+  },
+  {
+    "name": "Electric Castle",
+    "startDate": "2027-07-15",
+    "endDate": "2027-07-18",
+    "datesConfirmed": false,
+    "city": "Bonțida",
+    "countryCode": "RO",
+    "lat": 46.911,
+    "lng": 23.81,
+    "genres": [
+      "electronic",
+      "rock",
+      "indie"
+    ],
+    "url": "https://electriccastle.ro",
+    "evidence": "estimate: usual pattern mid-July Thu-Sun (2026: Jul 16-19)"
+  },
+  {
+    "name": "Parookaville",
+    "startDate": "2027-07-16",
+    "endDate": "2027-07-18",
+    "datesConfirmed": true,
+    "city": "Weeze",
+    "countryCode": "DE",
+    "lat": 51.6,
+    "lng": 6.15,
+    "genres": [
+      "electronic"
+    ],
+    "url": "https://www.parookaville.com",
+    "evidence": "https://www.festivalhopper.de/festival/parookaville-2027 ; https://www.technoairlines.com/festival/parookaville-weeze-germany-2027"
+  },
+  {
+    "name": "Tomorrowland Weekend 1",
+    "startDate": "2027-07-16",
+    "endDate": "2027-07-18",
+    "datesConfirmed": false,
+    "city": "Boom",
+    "countryCode": "BE",
+    "lat": 51.091,
+    "lng": 4.384,
+    "genres": [
+      "electronic"
+    ],
+    "url": "https://www.tomorrowland.com",
+    "evidence": "estimate: usual pattern last two weekends of July (2026: Jul 17-19 & 24-26); 2027 Belgium dates not yet announced"
+  },
+  {
+    "name": "Lollapalooza Berlin",
+    "startDate": "2027-07-17",
+    "endDate": "2027-07-18",
+    "datesConfirmed": false,
+    "city": "Berlin",
+    "countryCode": "DE",
+    "lat": 52.515,
+    "lng": 13.239,
+    "genres": [
+      "pop",
+      "rock",
+      "hiphop",
+      "electronic"
+    ],
+    "url": "https://www.lollapaloozade.com",
+    "evidence": "estimate: listing sites show Jul 17-18 2027 (https://www.festivalhopper.de/festival/lollapalooza-berlin-2027) but no official announcement found"
+  },
+  {
+    "name": "Boom Festival",
+    "startDate": "2027-07-18",
+    "endDate": "2027-07-25",
+    "datesConfirmed": true,
+    "city": "Idanha-a-Nova",
+    "countryCode": "PT",
+    "lat": 39.916,
+    "lng": -7.233,
+    "genres": [
+      "electronic"
+    ],
+    "url": "https://www.boomfestival.org",
+    "evidence": "https://www.theportugalnews.com/news/2025-08-03/boom-festival-returning-in-2027/187798"
+  },
+  {
+    "name": "Fuji Rock Festival",
+    "startDate": "2027-07-23",
+    "endDate": "2027-07-25",
+    "datesConfirmed": false,
+    "city": "Yuzawa",
+    "countryCode": "JP",
+    "lat": 36.795,
+    "lng": 138.78,
+    "genres": [
+      "rock",
+      "indie",
+      "electronic"
+    ],
+    "url": "https://www.fujirockfestival.com",
+    "evidence": "estimate: usual pattern last full weekend of July at Naeba (2025: Jul 25-27; 2026: Jul 24-26)"
+  },
+  {
+    "name": "Shambhala Music Festival",
+    "startDate": "2027-07-23",
+    "endDate": "2027-07-26",
+    "datesConfirmed": true,
+    "city": "Salmo",
+    "countryCode": "CA",
+    "lat": 49.18,
+    "lng": -117.28,
+    "genres": [
+      "electronic"
+    ],
+    "url": "https://www.shambhalamusicfestival.com",
+    "evidence": "https://shambhalamusicfestival.com/blog/how-to-prepare-for-the-shambhala-2027-ticket-sale"
+  },
+  {
+    "name": "Tomorrowland Weekend 2",
+    "startDate": "2027-07-23",
+    "endDate": "2027-07-25",
+    "datesConfirmed": false,
+    "city": "Boom",
+    "countryCode": "BE",
+    "lat": 51.091,
+    "lng": 4.384,
+    "genres": [
+      "electronic"
+    ],
+    "url": "https://www.tomorrowland.com",
+    "evidence": "estimate: usual pattern last two weekends of July (2026: Jul 17-19 & 24-26); 2027 Belgium dates not yet announced"
+  },
+  {
+    "name": "Ozora Festival",
+    "startDate": "2027-07-26",
+    "endDate": "2027-08-01",
+    "datesConfirmed": false,
+    "city": "Ozora",
+    "countryCode": "HU",
+    "lat": 46.774,
+    "lng": 18.38,
+    "genres": [
+      "electronic"
+    ],
+    "url": "https://ozorafestival.eu",
+    "evidence": "estimate: usual pattern main week Mon-Sun around end of July (2026 main week Jul 27-Aug 2); third-party listings give an extended window Jul 23-Aug 3 2027 (https://www.technoairlines.com/festival/ozora-festival-ozora-hungary-2027), not verified on official site"
+  },
+  {
+    "name": "Dekmantel Festival",
+    "startDate": "2027-07-28",
+    "endDate": "2027-08-01",
+    "datesConfirmed": false,
+    "city": "Amsterdam",
+    "countryCode": "NL",
+    "lat": 52.32,
+    "lng": 4.84,
+    "genres": [
+      "electronic"
+    ],
+    "url": "https://www.dekmantelfestival.com",
+    "evidence": "estimate: usual pattern Wed-Sun around end of July/start of August (2025: Jul 30-Aug 3; 2026: Jul 29-Aug 2)"
+  },
+  {
+    "name": "Wacken Open Air",
+    "startDate": "2027-07-28",
+    "endDate": "2027-07-31",
+    "datesConfirmed": true,
+    "city": "Wacken",
+    "countryCode": "DE",
+    "lat": 54.025,
+    "lng": 9.38,
+    "genres": [
+      "metal"
+    ],
+    "url": "https://www.wacken.com",
+    "evidence": "https://www.loudersound.com/news/wacken-2027-lineup-five-finger-death-punch-helloween-electric-callboy-announced ; https://www.regioactive.de/news/2026/08/03/wacken-open-air-2027-startet-vorverkauf-und-bestaetigt-ffdp-electric-callboy-und-helloween-gKdgbsx77l"
+  },
+  {
+    "name": "Lollapalooza Chicago",
+    "startDate": "2027-07-29",
+    "endDate": "2027-08-01",
+    "datesConfirmed": false,
+    "city": "Chicago",
+    "countryCode": "US",
+    "lat": 41.875,
+    "lng": -87.619,
+    "genres": [
+      "rock",
+      "pop",
+      "hiphop",
+      "electronic",
+      "indie"
+    ],
+    "url": "https://www.lollapalooza.com",
+    "evidence": "estimate: usual pattern Thu-Sun around end of July/start of August (2026: Jul 30-Aug 2); listings https://www.frontstagefestivals.com/festival/lollapalooza-chicago-2027"
+  },
+  {
+    "name": "Nature One",
+    "startDate": "2027-07-29",
+    "endDate": "2027-08-01",
+    "datesConfirmed": true,
+    "city": "Kastellaun",
+    "countryCode": "DE",
+    "lat": 50.08,
+    "lng": 7.42,
+    "genres": [
+      "electronic"
+    ],
+    "url": "https://www.nature-one.de",
+    "evidence": "https://www.festivalhopper.de/festival/nature-one-2027 ; https://www.technoairlines.com/festival/nature-one-kastellaun-germany-2027"
+  },
+  {
+    "name": "Untold",
+    "startDate": "2027-08-05",
+    "endDate": "2027-08-08",
+    "datesConfirmed": true,
+    "city": "Cluj-Napoca",
+    "countryCode": "RO",
+    "lat": 46.768,
+    "lng": 23.572,
+    "genres": [
+      "electronic",
+      "pop",
+      "hiphop"
+    ],
+    "url": "https://untold.com",
+    "evidence": "https://www.romania-insider.com/untold-dates-passes-star-edition-2027"
+  },
+  {
+    "name": "Outside Lands",
+    "startDate": "2027-08-06",
+    "endDate": "2027-08-08",
+    "datesConfirmed": false,
+    "city": "San Francisco",
+    "countryCode": "US",
+    "lat": 37.769,
+    "lng": -122.493,
+    "genres": [
+      "indie",
+      "rock",
+      "pop",
+      "hiphop",
+      "electronic"
+    ],
+    "url": "https://www.sfoutsidelands.com",
+    "evidence": "estimate: usual pattern first/second weekend of August; listings show Aug 6-8 2027 (https://www.frontstagefestivals.com/festival/outside-lands-2027), no official announcement found"
+  },
+  {
+    "name": "Sziget Festival",
+    "startDate": "2027-08-10",
+    "endDate": "2027-08-14",
+    "datesConfirmed": true,
+    "city": "Budapest",
+    "countryCode": "HU",
+    "lat": 47.553,
+    "lng": 19.053,
+    "genres": [
+      "pop",
+      "rock",
+      "indie",
+      "electronic",
+      "hiphop"
+    ],
+    "url": "https://szigetfestival.com",
+    "evidence": "https://www.festivalinfo.nl/news/59200/Sziget-maakt-datum-locatie-en-ticketverkoop-bekend-voor-2027-en-blikt-terug-op-2026/"
+  },
+  {
+    "name": "Medusa Festival",
+    "startDate": "2027-08-12",
+    "endDate": "2027-08-16",
+    "datesConfirmed": true,
+    "city": "Cullera",
+    "countryCode": "ES",
+    "lat": 39.18,
+    "lng": -0.24,
+    "genres": [
+      "electronic"
+    ],
+    "url": "https://medusasunbeach.com",
+    "evidence": "https://www.frontstagefestivals.com/festival/medusa-sunbeach-festival-2027 ; https://www.technoairlines.com/festival/medusa-sunbeach-festival-cullera-spain-2027"
+  },
+  {
+    "name": "Pukkelpop",
+    "startDate": "2027-08-19",
+    "endDate": "2027-08-22",
+    "datesConfirmed": true,
+    "city": "Hasselt",
+    "countryCode": "BE",
+    "lat": 50.966,
+    "lng": 5.36,
+    "genres": [
+      "rock",
+      "indie",
+      "electronic",
+      "hiphop"
+    ],
+    "url": "https://www.pukkelpop.be",
+    "evidence": "https://www.festivalinfo.nl/festival/37175/Pukkelpop/2027/ ; https://www.technoairlines.com/festival/pukkelpop-hasselt-belgium-2027"
+  },
+  {
+    "name": "Lowlands",
+    "startDate": "2027-08-20",
+    "endDate": "2027-08-22",
+    "datesConfirmed": true,
+    "city": "Biddinghuizen",
+    "countryCode": "NL",
+    "lat": 52.44,
+    "lng": 5.76,
+    "genres": [
+      "rock",
+      "indie",
+      "pop",
+      "electronic",
+      "hiphop"
+    ],
+    "url": "https://lowlands.nl",
+    "evidence": "https://www.festivalinfo.nl/news/59232/Organisatie-onthult-datums-voor-Lowlands-2027-na-succesvolle-editie/"
+  },
+  {
+    "name": "Creamfields",
+    "startDate": "2027-08-26",
+    "endDate": "2027-08-29",
+    "datesConfirmed": true,
+    "city": "Daresbury",
+    "countryCode": "GB",
+    "lat": 53.34,
+    "lng": -2.63,
+    "genres": [
+      "electronic"
+    ],
+    "url": "https://www.creamfields.com",
+    "evidence": "https://www.technoairlines.com/festival/creamfields-daresbury-united-kingdom-2027 ; https://www.ents24.com/festival/creamfields-2027/7528701"
+  },
+  {
+    "name": "Leeds Festival",
+    "startDate": "2027-08-26",
+    "endDate": "2027-08-29",
+    "datesConfirmed": true,
+    "city": "Leeds",
+    "countryCode": "GB",
+    "lat": 53.868,
+    "lng": -1.384,
+    "genres": [
+      "rock",
+      "indie",
+      "pop",
+      "hiphop"
+    ],
+    "url": "https://www.readingandleedsfestival.com",
+    "evidence": "https://www.yorkshireeveningpost.co.uk/whats-on/leeds-festival-dates-2027-early-tickets-details-8956184"
+  },
+  {
+    "name": "Reading Festival",
+    "startDate": "2027-08-26",
+    "endDate": "2027-08-29",
+    "datesConfirmed": true,
+    "city": "Reading",
+    "countryCode": "GB",
+    "lat": 51.465,
+    "lng": -0.983,
+    "genres": [
+      "rock",
+      "indie",
+      "pop",
+      "hiphop"
+    ],
+    "url": "https://www.readingandleedsfestival.com",
+    "evidence": "https://www.yorkshireeveningpost.co.uk/whats-on/leeds-festival-dates-2027-early-tickets-details-8956184"
+  },
+  {
+    "name": "Mysteryland",
+    "startDate": "2027-08-27",
+    "endDate": "2027-08-29",
+    "datesConfirmed": false,
+    "city": "Haarlemmermeer",
+    "countryCode": "NL",
+    "lat": 52.345,
+    "lng": 4.66,
+    "genres": [
+      "electronic"
+    ],
+    "url": "https://www.mysteryland.nl",
+    "evidence": "estimate: sources conflict (Aug 27-29 per https://www.technoairlines.com/festival/mysteryland-haarlemmermeer-netherlands-2027 citing official FAQ; Aug 20-22 provisional per https://www.iamsterdam.com/uit/agenda/festivals/events/mysteryland); usual pattern last weekend of August"
+  },
+  {
+    "name": "Burning Man",
+    "startDate": "2027-08-29",
+    "endDate": "2027-09-06",
+    "datesConfirmed": true,
+    "city": "Black Rock City",
+    "countryCode": "US",
+    "lat": 40.786,
+    "lng": -119.206,
+    "genres": [
+      "electronic"
+    ],
+    "url": "https://burningman.org",
+    "evidence": "https://burningman.org/event/black ; https://outside.so/planning/burning-man-2027-planning"
+  },
+  {
+    "name": "Lost Lands",
+    "startDate": "2027-09-17",
+    "endDate": "2027-09-19",
+    "datesConfirmed": false,
+    "city": "Thornville",
+    "countryCode": "US",
+    "lat": 39.88,
+    "lng": -82.43,
+    "genres": [
+      "electronic"
+    ],
+    "url": "https://www.lostlandsfestival.com",
+    "evidence": "estimate: usual pattern third weekend of September at Legend Valley (2025: Sep 19-21; 2026: Sep 18-20)"
+  }
+]

@@ -7,13 +7,12 @@ import Poster from './Poster'
 // Event card: artwork on top, then name, place, dates and genre.
 export default function EventCard({ festival, onOpen, isFavorite, onToggleFavorite, className = '' }) {
   const price = priceLabel(festival)
-  const hasPhoto = Boolean(festival.image?.src)
   return (
     <article className={`group relative rounded-2xl overflow-hidden bg-ink-800 border border-white/[0.06] hover:border-white/15 transition-colors ${className}`}>
       <button type="button" onClick={onOpen} className="block w-full text-start outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-2xl">
         <div className="relative aspect-[4/3] overflow-hidden bg-ink-700">
           <div className="absolute inset-0 transition-transform duration-500 group-hover:scale-[1.04]">
-            <Poster festival={festival} showTitle={!hasPhoto} showCity={false} />
+            <Poster festival={festival} showTitle={false} showCity={false} />
           </div>
           {price && (
             <span className="absolute bottom-2 start-2 bg-black/70 backdrop-blur-sm font-num text-[11px] text-white px-2 py-0.5 rounded-full">{price}</span>
