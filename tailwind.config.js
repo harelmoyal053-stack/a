@@ -8,17 +8,19 @@ export default {
   theme: {
     extend: {
       colors: {
-        // FestiChat palette: near-black surfaces, one acid accent.
-        ink: { 950: '#070707', 900: '#0b0b0b', 800: '#141414', 700: '#1c1c1c', 600: '#262626' },
-        muted: '#8b8b8b',
-        accent: '#c6ff3d',
-        whatsapp: '#c6ff3d',
+        // FestiChat palette: night-blue surfaces, a purple-to-blue brand gradient.
+        ink: { 950: '#060913', 900: '#0a0e1b', 800: '#111729', 700: '#182038', 600: '#252e4b' },
+        muted: '#8e99b3',
+        accent: '#a974ff',
+        whatsapp: '#a974ff',
+        online: '#22c55e',
       },
       fontFamily: {
         hebrew: ['Rubik', 'Arial', 'sans-serif'],
-        ui: ['"IBM Plex Sans Hebrew"', '"IBM Plex Sans"', '"IBM Plex Sans Arabic"', 'system-ui', 'sans-serif'],
-        num: ['"IBM Plex Mono"', '"IBM Plex Sans Hebrew"', '"IBM Plex Sans"', '"IBM Plex Sans Arabic"', 'ui-monospace', 'monospace'],
-        poster: ['"IBM Plex Sans Condensed"', '"IBM Plex Sans Hebrew"', '"IBM Plex Sans"', '"IBM Plex Sans Arabic"', 'sans-serif'],
+        // Rubik covers Latin, Hebrew, Cyrillic and Arabic in one geometric family.
+        ui: ['Rubik', 'system-ui', 'sans-serif'],
+        num: ['Rubik', 'system-ui', 'sans-serif'],
+        poster: ['Rubik', 'system-ui', 'sans-serif'],
       },
       animation: {
         'pulse-slow': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',

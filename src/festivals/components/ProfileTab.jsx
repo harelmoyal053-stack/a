@@ -48,13 +48,13 @@ function EditProfile({ user, onDone }) {
     }
   }
 
-  const field = 'w-full bg-ink-800 border border-ink-600 rounded-md px-3 outline-none focus:border-white/40'
+  const field = 'w-full bg-ink-800 border border-ink-600 rounded-xl px-3 outline-none focus:border-white/40'
   return (
     <form onSubmit={save} className="flex flex-col gap-5">
       <div className="flex items-center gap-4">
         <button type="button" onClick={() => fileRef.current.click()} className="relative" aria-label={t('profile.changePhoto')}>
           <UserAvatar name={name} photo={photo} size="xl" />
-          <span className="absolute bottom-0 end-0 w-8 h-8 rounded-full bg-accent text-black flex items-center justify-center"><Camera size={15} /></span>
+          <span className="absolute bottom-0 end-0 w-8 h-8 rounded-full bg-brand text-white flex items-center justify-center"><Camera size={15} /></span>
         </button>
         <div className="flex flex-col gap-1.5 text-[13px]">
           <button type="button" onClick={() => fileRef.current.click()} className="text-accent text-start">{t('profile.uploadPhoto')}</button>
@@ -81,8 +81,8 @@ function EditProfile({ user, onDone }) {
 
       {error && <p className="text-rose-400 text-sm">{error}</p>}
       <div className="flex gap-2">
-        <button type="submit" disabled={busy} className="flex-1 h-11 rounded-md bg-accent text-black font-medium disabled:opacity-50">{busy ? t('common.saving') : t('common.save')}</button>
-        <button type="button" onClick={onDone} className="h-11 px-5 rounded-md border border-ink-600">{t('common.cancel')}</button>
+        <button type="submit" disabled={busy} className="flex-1 h-11 rounded-xl bg-brand text-white font-medium disabled:opacity-50">{busy ? t('common.saving') : t('common.save')}</button>
+        <button type="button" onClick={onDone} className="h-11 px-5 rounded-xl border border-ink-600">{t('common.cancel')}</button>
       </div>
     </form>
   )
@@ -109,7 +109,7 @@ export default function ProfileTab({ onOpenChats, onOpenAdmin }) {
         <UserAvatar name="?" size="xl" />
         <h1 className="text-[22px] font-semibold mt-5">{t('profile.yours')}</h1>
         <p className="text-sm text-muted mt-2 max-w-xs leading-relaxed">{t('profile.signedOutBody')}</p>
-        <button type="button" onClick={() => withUser()} className="mt-6 h-11 px-6 rounded-md bg-white text-black font-medium">
+        <button type="button" onClick={() => withUser()} className="mt-6 h-11 px-6 rounded-full bg-brand text-white font-medium shadow-brand">
           {service?.canUseGoogle ? t('profile.signInGoogle') : t('profile.signIn')}
         </button>
         <div className="w-full max-w-sm mt-12 text-start"><LanguageSection /></div>
@@ -140,7 +140,7 @@ export default function ProfileTab({ onOpenChats, onOpenAdmin }) {
             <AtSign size={15} />{user.instagram}
           </a>
         )}
-        <button type="button" onClick={() => { setEditing(true); window.scrollTo({ top: 0 }) }} className="mt-6 h-10 px-5 rounded-md border border-ink-600 hover:border-white/40 flex items-center gap-2 text-[14px]">
+        <button type="button" onClick={() => { setEditing(true); window.scrollTo({ top: 0 }) }} className="mt-6 h-10 px-5 rounded-xl border border-ink-600 hover:border-white/40 flex items-center gap-2 text-[14px]">
           <Pencil size={15} /> {t('profile.edit')}
         </button>
       </div>

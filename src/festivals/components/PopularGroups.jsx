@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
-import { ArrowRight, Users } from 'lucide-react'
+import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { useChat, useGroupMeta } from '../chat/ChatContext'
 import { useCatalog } from '../data/CatalogContext'
 import { findGroup, groupsFor } from '../data/groups'
-import { isEnded } from '../utils'
+import { isEnded, membersLabel } from '../utils'
 import { t } from '../i18n'
 import Carousel from './Carousel'
 import EventAvatar from './EventAvatar'
@@ -38,8 +38,8 @@ function usePopularGroups() {
 
 function MemberCount({ count }) {
   return count > 0
-    ? <span className="flex items-center gap-1.5 font-num text-[11px] text-accent"><Users size={13} /> {count}</span>
-    : <span className="text-[11px] text-muted">{t('group.new')}</span>
+    ? <span className="flex items-center gap-1.5 text-[12px] text-white/80"><span className="w-1.5 h-1.5 rounded-full bg-online" />{membersLabel(count)}</span>
+    : <span className="text-[12px] text-muted">{t('group.new')}</span>
 }
 
 function GroupCard({ id, memberCount, festival, group, onOpen }) {
@@ -48,19 +48,25 @@ function GroupCard({ id, memberCount, festival, group, onOpen }) {
     <button
       type="button"
       onClick={() => onOpen(id)}
-      className="snap-start shrink-0 w-64 text-start rounded-lg border hairline bg-ink-800 p-3.5 hover:border-white/20"
+      className="snap-start shrink-0 w-[17rem] text-start rounded-2xl border border-white/[0.06] bg-ink-800 p-3.5 hover:border-white/15 transition-colors"
     >
-      <span className="flex items-center gap-3">
-        <EventAvatar festival={festival} size="sm" />
-        <span className="min-w-0">
-          <span className="block text-[14px] font-medium truncate">{group.title}</span>
+      <span className="flex items-start gap-3">
+        <span className="relative shrink-0">
+          <EventAvatar festival={festival} round />
+          {memberCount > 0 && <span className="absolute bottom-0 end-0 w-3 h-3 rounded-full bg-online ring-2 ring-ink-800" />}
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block text-[14px] font-semibold truncate">{group.title}</span>
           <span className="block text-[12px] text-muted truncate" dir="auto">{festival.name}</span>
+          <span className="block text-[13px] text-white/75 mt-1.5 h-9 line-clamp-2 leading-snug">
+            {lastMessage ? `${lastMessage.name}: ${lastMessage.text}` : group.description}
+          </span>
         </span>
       </span>
-      <span className="block text-[13px] text-white/70 mt-3 h-10 line-clamp-2 leading-snug">
-        {lastMessage ? `${lastMessage.name}: ${lastMessage.text}` : group.description}
+      <span className="flex items-center justify-between mt-3">
+        <MemberCount count={memberCount} />
+        <ArrowLeft size={16} className="text-muted ltr:-scale-x-100" />
       </span>
-      <span className="block mt-3"><MemberCount count={memberCount} /></span>
     </button>
   )
 }
@@ -72,10 +78,16 @@ export default function PopularGroups({ onOpen, onSeeAll }) {
   const groups = [...ranked, ...suggested].slice(0, 12)
   if (groups.length === 0) return null
   const popular = mode === 'popular'
+  const total = ranked.reduce((sum, g) => sum + g.memberCount, 0)
   return (
     <Carousel
       title={popular ? t('popular.title') : t('popular.suggested')}
-      subtitle={popular ? t('popular.titleSub') : t('popular.suggestedSub')}
+      subtitle={popular ? null : t('popular.suggestedSub')}
+      badge={popular && (
+        <span className="flex items-center gap-1.5 text-[13px] font-normal text-white/80">
+          <span className="w-2 h-2 rounded-full bg-online" />{membersLabel(total)}
+        </span>
+      )}
       onSeeAll={onSeeAll}
     >
       {groups.map((g) => <GroupCard key={g.id} {...g} onOpen={onOpen} />)}
@@ -108,11 +120,11 @@ function GroupRow({ rank, id, memberCount, festival, group, onOpen }) {
         </span>
       </button>
       {isMember ? (
-        <button type="button" onClick={() => onOpen(id)} className="shrink-0 h-8 px-3 rounded-md border border-ink-600 text-[13px] hover:border-white/40">{t('common.open')}</button>
+        <button type="button" onClick={() => onOpen(id)} className="shrink-0 h-8 px-3 rounded-xl border border-ink-600 text-[13px] hover:border-white/40">{t('common.open')}</button>
       ) : isEnded(festival) ? (
         <span className="shrink-0 text-[12px] text-muted px-2">{t('common.closed')}</span>
       ) : (
-        <button type="button" onClick={joinAndOpen} className="shrink-0 h-8 px-3 rounded-md bg-accent text-black text-[13px] font-medium hover:brightness-110">{t('common.join')}</button>
+        <button type="button" onClick={joinAndOpen} className="shrink-0 h-8 px-3 rounded-xl bg-brand text-white text-[13px] font-medium hover:brightness-110">{t('common.join')}</button>
       )}
     </li>
   )

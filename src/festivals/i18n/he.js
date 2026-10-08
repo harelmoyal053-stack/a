@@ -288,4 +288,17 @@ export default {
   'admin.linkUsers': 'משתמשים',
   'admin.linkDb': 'מסד הנתונים',
   'admin.linkAnalytics': 'מבקרים באתר (Analytics)',
+
+  'brand.tagline': 'צ׳אט פסטיבלים ומסיבות בעולם',
+  'hero.l1': 'מכירים. מדברים.',
+  'hero.l2': 'חוגגים.',
+  'hero.l3': 'בכל העולם.',
+  'hero.body': 'קבוצות צ׳אט לכל פסטיבל ומסיבה בעולם. מוצאים אירוע, מצטרפים לקבוצה ומכירים את החבר׳ה לפני שמגיעים.',
+  'hero.join': 'הצטרפו לקהילה',
+  'hero.explore': 'מצאו את האירוע הבא',
+  'hero.proof': '{events} אירועים ב-{countries} מדינות',
+  'hero.proofSub': 'מתעדכן כל לילה',
+  'hero.photo': 'בתמונה: {name}',
+  'kind.oneFestival': 'פסטיבל',
+  'kind.oneParty': 'מסיבה',
 }

@@ -13,7 +13,7 @@ const CATEGORIES = [
 export default function EmojiPicker({ onPick, className = '' }) {
   const [category, setCategory] = useState(0)
   return (
-    <div className={`bg-ink-800 border border-white/10 rounded-lg shadow-2xl overflow-hidden ${className}`}>
+    <div className={`bg-ink-800 border border-white/10 rounded-2xl shadow-2xl overflow-hidden ${className}`}>
       <div className="flex border-b border-white/10">
         {CATEGORIES.map((c, i) => (
           <button
@@ -30,7 +30,7 @@ export default function EmojiPicker({ onPick, className = '' }) {
       </div>
       <div className="grid grid-cols-8 gap-0.5 p-2 h-52 overflow-y-auto">
         {CATEGORIES[category].emojis.map((emoji) => (
-          <button key={emoji} type="button" onClick={() => onPick(emoji)} className="text-2xl h-10 rounded-lg hover:bg-white/10">
+          <button key={emoji} type="button" onClick={() => onPick(emoji)} className="text-2xl h-10 rounded-2xl hover:bg-white/10">
             {emoji}
           </button>
         ))}

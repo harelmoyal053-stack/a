@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
-  ArrowRight, CalendarClock, CalendarRange, Disc3, Heart, Home, Lock, Menu, MessageCircle, Search, SearchX, Tent, User, X,
+  ArrowRight, CalendarClock, CalendarRange, Disc3, Globe, Heart, Home, Lock, Menu, MessageCircle, Search, SearchX, Tent, User, X,
 } from 'lucide-react'
 import Carousel from './components/Carousel'
 import EventSlide from './components/EventSlide'
@@ -12,6 +12,8 @@ import FestivalModal from './components/FestivalModal'
 import ChatScreen from './components/ChatScreen'
 import MyGroups from './components/MyGroups'
 import LanguageList from './components/LanguageList'
+import Hero from './components/Hero'
+import UserAvatar from './components/UserAvatar'
 import { useChat } from './chat/ChatContext'
 import { CONTINENTS, GENRES } from './data/festivals'
 import { findGroup, groupsFor } from './data/groups'
@@ -40,10 +42,10 @@ const KINDS = [
 
 // Home shortcuts; each opens a filtered list.
 const PRESETS = [
-  { id: 'today', key: 'preset.today', icon: CalendarClock, match: (f) => overlaps(f, todayIso(), todayIso()) },
-  { id: 'weekend', key: 'preset.weekend', icon: CalendarRange, match: (f) => overlaps(f, ...weekendRange()) },
-  { id: 'festival', key: 'kind.festival', icon: Tent, match: (f) => f.kind === 'festival' },
-  { id: 'party', key: 'kind.party', icon: Disc3, match: (f) => f.kind === 'party' },
+  { id: 'today', key: 'preset.today', icon: CalendarClock, color: 'text-sky-400', match: (f) => overlaps(f, todayIso(), todayIso()) },
+  { id: 'weekend', key: 'preset.weekend', icon: CalendarRange, color: 'text-emerald-400', match: (f) => overlaps(f, ...weekendRange()) },
+  { id: 'festival', key: 'kind.festival', icon: Tent, color: 'text-violet-400', match: (f) => f.kind === 'festival' },
+  { id: 'party', key: 'kind.party', icon: Disc3, color: 'text-rose-400', match: (f) => f.kind === 'party' },
 ].map((preset) => ({ ...preset, get label() { return t(preset.key) } }))
 // Lists reachable from "see all" links but not shown as shortcuts.
 const ALL_PRESETS = [...PRESETS, { id: 'week', get label() { return t('preset.week') }, match: (f) => overlaps(f, ...thisWeekRange()) }]
@@ -90,8 +92,8 @@ function Chip({ active, onClick, children }) {
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`whitespace-nowrap h-8 px-3 rounded-md text-[13px] border transition-colors ${
-        active ? 'bg-white text-black border-white font-medium' : 'text-white/75 border-ink-600 hover:border-white/40'
+      className={`whitespace-nowrap h-8 px-3 rounded-xl text-[13px] border transition-colors ${
+        active ? 'bg-brand text-white border-transparent font-medium' : 'text-white/75 border-ink-600 hover:border-white/40'
       }`}
     >
       {children}
@@ -140,7 +142,8 @@ export default function App() {
   const [month, setMonth] = useState('all')
   const [favorites, setFavorites] = useState(loadFavorites)
   const [route, setRoute] = useState(routeFromHash)
-  const { myGroups, groupsReady } = useChat()
+  const { user, withUser, myGroups, groupsReady } = useChat()
+  const [atTop, setAtTop] = useState(true)
   const catalog = useCatalog()
   const [menuOpen, setMenuOpen] = useState(false)
   const searchRef = useRef(null)
@@ -153,6 +156,13 @@ export default function App() {
       window.removeEventListener('popstate', onNav)
       window.removeEventListener('hashchange', onNav)
     }
+  }, [])
+
+  // The header is see-through over the home banner until the page scrolls.
+  useEffect(() => {
+    const onScroll = () => setAtTop(window.scrollY < 24)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
   useEffect(() => {
@@ -259,28 +269,40 @@ export default function App() {
   const chatClosed = route?.type === 'chat' && !openChatData && catalog.loaded && groupsReady
   const hasGroups = Object.keys(myGroups).length > 0
   const favoriteList = catalog.items.filter((f) => favorites.has(f.id))
+  const homeTop = tab === 'home' && !preset
+  const overHero = homeTop && atTop && !menuOpen
   const updated = catalog.updatedAt ? new Date(catalog.updatedAt).toLocaleDateString(locale(), { day: '2-digit', month: '2-digit' }) : null
 
   return (
-    <div className="min-h-screen bg-ink-900 text-[#ededed] font-ui pb-20">
-      <header className="sticky top-0 z-40 bg-ink-900/90 backdrop-blur-md border-b hairline">
-        <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
-          <button type="button" onClick={() => goTab('home')} className="flex items-center gap-2" dir="ltr" aria-label={t('home.label')}>
-            <span className="w-2.5 h-2.5 bg-accent rounded-[2px]" />
-            <span className="text-[17px] font-semibold tracking-tight lowercase">festichat</span>
+    <div className="min-h-screen bg-ink-900 text-white font-ui pb-24">
+      <header className={`fixed top-0 inset-x-0 z-40 transition-colors duration-300 ${overHero ? 'bg-transparent border-b border-transparent' : 'bg-ink-900/85 backdrop-blur-md border-b hairline'}`}>
+        <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+          <button type="button" onClick={() => goTab('home')} className="flex items-center gap-2.5 text-start" aria-label={t('home.label')}>
+            <span className="w-10 h-10 rounded-full bg-brand p-[1.5px] shrink-0">
+              <span className="w-full h-full rounded-full bg-ink-900 flex items-center justify-center">
+                <Globe size={22} strokeWidth={1.6} className="text-accent" />
+              </span>
+            </span>
+            <span className="leading-none">
+              <span className="block text-[18px] font-bold tracking-[0.06em]" dir="ltr">FESTICHAT</span>
+              <span className="block text-[10.5px] text-white/70 mt-1">{t('brand.tagline')}</span>
+            </span>
           </button>
-          <div className="flex items-center -me-2">
-            <button type="button" onClick={() => goTab('search')} className="w-10 h-10 flex items-center justify-center text-white/80 hover:text-white" aria-label={t('common.search')}>
-              <Search size={20} strokeWidth={1.75} />
+          <div className="flex items-center gap-1 -me-1">
+            <button type="button" onClick={() => goTab('search')} className="w-10 h-10 flex items-center justify-center text-white/90 hover:text-white" aria-label={t('common.search')}>
+              <Search size={22} strokeWidth={1.75} />
             </button>
-            <button type="button" onClick={() => setMenuOpen(true)} className="w-10 h-10 flex items-center justify-center text-white/80 hover:text-white" aria-label={t('common.menu')}>
-              <Menu size={20} strokeWidth={1.75} />
+            <button type="button" onClick={() => setMenuOpen(true)} className="w-10 h-10 flex items-center justify-center text-white/90 hover:text-white" aria-label={t('common.menu')}>
+              <Menu size={22} strokeWidth={1.75} />
+            </button>
+            <button type="button" onClick={() => goTab('profile')} className="ms-1 rounded-full ring-2 ring-accent/60" aria-label={t('nav.profile')}>
+              {user ? <UserAvatar name={user.name} photo={user.photo} size="sm" /> : <span className="w-9 h-9 rounded-full bg-ink-700 flex items-center justify-center"><User size={18} /></span>}
             </button>
           </div>
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-4 pt-5">
+      <main className="max-w-6xl mx-auto px-4 pt-[4.5rem]">
         {tab === 'home' && preset === 'groups' && (
           <PopularGroupsPage onOpen={openChat} onBack={() => setPreset(null)} />
         )}
@@ -300,23 +322,30 @@ export default function App() {
           </>
         )}
 
-        {tab === 'home' && !preset && (
+        {homeTop && (
           <>
-            <div className="grid grid-cols-4 gap-2 mb-8">
-              {PRESETS.map((p) => {
+            <Hero
+              items={catalog.items}
+              signedIn={Boolean(user)}
+              onSearch={() => goTab('search')}
+              onJoin={() => (user ? goTab('search') : withUser())}
+              onOpenFestival={openFestival}
+            />
+
+            <div className="-mx-4 mb-9 border-y hairline bg-ink-950/60 grid grid-cols-5 py-4 px-1">
+              {[...PRESETS, { id: 'chats', key: 'nav.chats', icon: MessageCircle, color: 'text-amber-400' }].map((p) => {
                 const Icon = p.icon
+                const count = p.id === 'chats' ? Object.keys(myGroups).length : presetCounts[p.id]
                 return (
                   <button
                     key={p.id}
                     type="button"
-                    onClick={() => setPreset(p.id)}
-                    className="flex flex-col items-start gap-3 rounded-lg border hairline bg-ink-800 px-3 py-3 hover:border-white/20 text-start"
+                    onClick={() => (p.id === 'chats' ? goTab('chats') : setPreset(p.id))}
+                    className="flex flex-col items-center gap-2 text-center hover:bg-white/[0.03] rounded-xl py-1"
                   >
-                    <Icon size={18} strokeWidth={1.75} className="text-accent" />
-                    <span>
-                      <span className="block text-[13px] font-medium leading-tight">{p.label}</span>
-                      <span className="block font-num text-[10px] text-muted mt-0.5">{catalog.loaded ? numberFormat.format(presetCounts[p.id]) : '–'}</span>
-                    </span>
+                    <Icon size={30} strokeWidth={1.5} className={p.color} />
+                    <span className="text-[13px] leading-tight">{t(p.key)}</span>
+                    <span className="font-num text-[11px] text-muted -mt-1">{catalog.loaded ? numberFormat.format(count) : '–'}</span>
                   </button>
                 )
               })}
@@ -332,22 +361,26 @@ export default function App() {
               </section>
             )}
 
-            <PopularGroups onOpen={openChat} onSeeAll={() => setPreset('groups')} />
-
             {!catalog.loaded && (
               <div className="flex gap-3 overflow-hidden mb-10" aria-label={t('home.loadingEvents')}>
-                {[0, 1].map((i) => <div key={i} className="shrink-0 w-[78%] sm:w-80 aspect-[4/5] rounded-lg bg-ink-800 animate-pulse" />)}
+                {[0, 1, 2].map((i) => <div key={i} className="shrink-0 w-[46%] sm:w-56 aspect-[3/4] rounded-2xl bg-ink-800 animate-pulse" />)}
               </div>
             )}
 
             {upcomingFestivals.length > 0 && (
-              <Carousel title={t('home.upcomingFestivals')} subtitle={t('home.upcomingFestivalsSub')} onSeeAll={() => setPreset('festival')}>
+              <Carousel title={t('home.upcomingFestivals')} onSeeAll={() => setPreset('festival')}>
                 {upcomingFestivals.map((f) => <EventSlide key={f.id} festival={f} onOpen={() => openFestival(f.id)} />)}
               </Carousel>
             )}
 
+            <PopularGroups onOpen={openChat} onSeeAll={() => setPreset('groups')} />
+
             {thisWeek.length > 0 && (
-              <Carousel title={t('home.thisWeek')} count={numberFormat.format(thisWeekCount)} subtitle={t('home.thisWeekSub')} onSeeAll={() => setPreset('week')}>
+              <Carousel
+                title={t('home.thisWeek')}
+                badge={<span className="font-num text-[13px] font-normal text-muted">{numberFormat.format(thisWeekCount)}</span>}
+                onSeeAll={() => setPreset('week')}
+              >
                 {thisWeek.map((f) => <EventSlide key={f.id} festival={f} onOpen={() => openFestival(f.id)} />)}
               </Carousel>
             )}
@@ -361,7 +394,7 @@ export default function App() {
 
         {tab === 'search' && (
           <>
-            <label className="flex items-center gap-2.5 h-11 bg-ink-800 border border-ink-600 rounded-md px-3 mb-4 focus-within:border-white/40">
+            <label className="flex items-center gap-2.5 h-11 bg-ink-800 border border-ink-600 rounded-xl px-3 mb-4 focus-within:border-white/40">
               <Search size={18} strokeWidth={1.75} className="text-muted shrink-0" />
               <input
                 ref={searchRef}
@@ -442,12 +475,11 @@ export default function App() {
                 key={item.id}
                 type="button"
                 onClick={() => goTab(item.id)}
-                className={`relative flex flex-col items-center gap-1 pt-2.5 pb-2 text-[11px] transition-colors ${active ? 'text-white' : 'text-muted hover:text-white/80'}`}
+                className={`flex flex-col items-center gap-1 pt-3 pb-2.5 text-[11.5px] transition-colors ${active ? 'text-accent font-medium' : 'text-white/70 hover:text-white'}`}
                 aria-current={active ? 'page' : undefined}
               >
-                {active && <span className="absolute top-0 h-0.5 w-6 bg-accent" />}
-                <Icon size={21} strokeWidth={active ? 2 : 1.6} />
-                {item.label}
+                <Icon size={24} strokeWidth={active ? 2 : 1.6} className={active ? 'fill-accent/25' : ''} />
+                <span className="max-w-full truncate px-1">{item.label}</span>
               </button>
             )
           })}
@@ -457,7 +489,7 @@ export default function App() {
       {menuOpen && (
         <div className="fixed inset-0 z-50 bg-black/60" onClick={() => setMenuOpen(false)}>
           <div className="absolute top-0 end-0 h-full w-72 max-w-[85%] bg-ink-800 border-s hairline flex flex-col overflow-y-auto animate-slide-up" onClick={(e) => e.stopPropagation()}>
-            <div className="h-14 px-4 flex items-center justify-between border-b hairline">
+            <div className="h-16 px-4 flex items-center justify-between border-b hairline">
               <span className="text-[11px] text-muted">{t('common.menu')}</span>
               <button type="button" onClick={() => setMenuOpen(false)} aria-label={t('common.close')}><X size={20} strokeWidth={1.75} /></button>
             </div>
@@ -485,11 +517,11 @@ export default function App() {
 
       {chatClosed && (
         <div className="fixed inset-0 z-[55] bg-black/80 flex items-center justify-center p-6" onClick={closeScreen}>
-          <div className="bg-ink-800 border hairline rounded-lg p-6 max-w-sm w-full" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-ink-800 border hairline rounded-2xl p-6 max-w-sm w-full" onClick={(e) => e.stopPropagation()}>
             <Lock size={20} strokeWidth={1.75} className="text-muted" />
             <p className="font-semibold text-lg mt-4">{t('closed.title')}</p>
             <p className="text-sm text-muted mt-1.5 leading-relaxed">{t('closed.body')}</p>
-            <button type="button" onClick={closeScreen} className="mt-6 w-full h-11 bg-white text-black font-medium rounded-md">{t('closed.cta')}</button>
+            <button type="button" onClick={closeScreen} className="mt-6 w-full h-11 bg-white text-black font-medium rounded-xl">{t('closed.cta')}</button>
           </div>
         </div>
       )}

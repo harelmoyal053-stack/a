@@ -18,7 +18,7 @@ export default function MessageMenu({ message, mine, myReaction, canInteract, is
   return (
     <div className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center" onClick={onClose}>
       <div className="w-full sm:max-w-sm p-3 flex flex-col gap-2 animate-slide-up" onClick={(e) => e.stopPropagation()}>
-        <div className="bg-ink-700 rounded-lg px-4 py-3 text-sm text-white/80 line-clamp-3" dir="auto">
+        <div className="bg-ink-700 rounded-2xl px-4 py-3 text-sm text-white/80 line-clamp-3" dir="auto">
           <span className="font-medium text-accent">{message.name}: </span>{preview(message)}
         </div>
 
@@ -26,7 +26,7 @@ export default function MessageMenu({ message, mine, myReaction, canInteract, is
           moreEmoji ? (
             <EmojiPicker onPick={(emoji) => onReact(emoji === myReaction ? null : emoji)} />
           ) : (
-            <div className="bg-ink-800 rounded-lg p-1.5 flex justify-between shadow-xl border border-ink-600">
+            <div className="bg-ink-800 rounded-2xl p-1.5 flex justify-between shadow-xl border border-ink-600">
               {REACTIONS.map((emoji) => (
                 <button
                   key={emoji}
@@ -45,7 +45,7 @@ export default function MessageMenu({ message, mine, myReaction, canInteract, is
           )
         )}
 
-        <ul className="bg-ink-800 rounded-lg overflow-hidden border border-white/10">
+        <ul className="bg-ink-800 rounded-2xl overflow-hidden border border-white/10">
           {actions.map((action) => {
             const Icon = action.icon
             return (

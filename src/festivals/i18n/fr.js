@@ -287,4 +287,17 @@ export default {
   'admin.linkUsers': 'Utilisateurs',
   'admin.linkDb': 'Base de données',
   'admin.linkAnalytics': 'Visiteurs du site (Analytics)',
+
+  'brand.tagline': 'Le chat mondial des festivals',
+  'hero.l1': 'Rencontre. Discute.',
+  'hero.l2': 'Fais la fête.',
+  'hero.l3': 'Partout dans le monde.',
+  'hero.body': 'Des chats de groupe pour chaque festival et soirée dans le monde. Trouve un événement, rejoins son groupe et rencontre ta bande avant d’arriver.',
+  'hero.join': 'Rejoins la communauté',
+  'hero.explore': 'Trouve ton prochain événement',
+  'hero.proof': '{events} événements dans {countries} pays',
+  'hero.proofSub': 'Mis à jour chaque nuit',
+  'hero.photo': 'En photo : {name}',
+  'kind.oneFestival': 'Festival',
+  'kind.oneParty': 'Soirée',
 }

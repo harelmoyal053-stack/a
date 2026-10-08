@@ -33,7 +33,7 @@ export default function SignInSheet({ canUseGoogle, onGoogle, onPreviewName, onC
 
   return (
     <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-sm" onClick={onClose}>
-      <div onClick={(e) => e.stopPropagation()} className="bg-ink-800 w-full sm:max-w-sm rounded-t-lg sm:rounded-lg border hairline p-6 animate-slide-up">
+      <div onClick={(e) => e.stopPropagation()} className="bg-ink-800 w-full sm:max-w-sm rounded-t-lg sm:rounded-2xl border hairline p-6 animate-slide-up">
         <div className="flex justify-between items-start">
           <div>
             <h2 className="text-xl font-semibold">{t('signin.title')}</h2>
@@ -47,7 +47,7 @@ export default function SignInSheet({ canUseGoogle, onGoogle, onPreviewName, onC
             type="button"
             disabled={busy}
             onClick={() => run(onGoogle)}
-            className="w-full h-12 mt-6 rounded-md bg-white text-black font-medium flex items-center justify-center gap-2.5 disabled:opacity-50"
+            className="w-full h-12 mt-6 rounded-xl bg-white text-black font-medium flex items-center justify-center gap-2.5 disabled:opacity-50"
           >
             <GoogleMark /> {busy ? t('signin.connecting') : t('signin.google')}
           </button>
@@ -59,7 +59,7 @@ export default function SignInSheet({ canUseGoogle, onGoogle, onPreviewName, onC
             }}
             className="mt-5"
           >
-            <p className="text-[12px] text-accent border border-accent/30 rounded-md px-3 py-2 mb-4 leading-relaxed">
+            <p className="text-[12px] text-accent border border-accent/30 rounded-xl px-3 py-2 mb-4 leading-relaxed">
               {t('signin.preview')}
             </p>
             <input
@@ -68,9 +68,9 @@ export default function SignInSheet({ canUseGoogle, onGoogle, onPreviewName, onC
               onChange={(e) => setName(e.target.value)}
               maxLength={30}
               placeholder={t('signin.namePlaceholder')}
-              className="w-full h-12 bg-ink-900 border border-ink-600 rounded-md px-3 outline-none focus:border-white/40"
+              className="w-full h-12 bg-ink-900 border border-ink-600 rounded-xl px-3 outline-none focus:border-white/40"
             />
-            <button type="submit" disabled={!trimmed || busy} className="w-full h-12 mt-3 rounded-md bg-accent text-black font-medium disabled:opacity-40">
+            <button type="submit" disabled={!trimmed || busy} className="w-full h-12 mt-3 rounded-xl bg-brand text-white font-medium disabled:opacity-40">
               {busy ? t('signin.wait') : t('signin.enter')}
             </button>
           </form>

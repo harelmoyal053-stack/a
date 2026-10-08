@@ -23,7 +23,7 @@ function GroupRow({ festival, group, onOpenChat }) {
   return (
     <li className="flex items-center gap-3 py-3.5 border-b hairline">
       <button type="button" onClick={() => onOpenChat(group.id)} className="flex items-center gap-3 flex-1 min-w-0 text-start">
-        <span className={`w-9 h-9 shrink-0 rounded-md flex items-center justify-center ${isMember ? 'bg-accent text-black' : 'bg-ink-700 text-white/70'}`}>
+        <span className={`w-9 h-9 shrink-0 rounded-xl flex items-center justify-center ${isMember ? 'bg-brand text-white' : 'bg-ink-700 text-white/70'}`}>
           <GroupIcon name={group.icon} size={17} />
         </span>
         <span className="flex-1 min-w-0">
@@ -33,13 +33,13 @@ function GroupRow({ festival, group, onOpenChat }) {
         {memberCount > 0 && <span className="font-num text-[11px] text-muted shrink-0">{memberCount}</span>}
       </button>
       {isMember ? (
-        <button type="button" onClick={() => onOpenChat(group.id)} className="shrink-0 h-8 px-3 rounded-md border border-ink-600 text-[13px] hover:border-white/40">
+        <button type="button" onClick={() => onOpenChat(group.id)} className="shrink-0 h-8 px-3 rounded-xl border border-ink-600 text-[13px] hover:border-white/40">
           {t('common.open')}
         </button>
       ) : isEnded(festival) ? (
         <span className="shrink-0 text-[12px] text-muted px-2">{t('common.closed')}</span>
       ) : (
-        <button type="button" onClick={joinAndOpen} className="shrink-0 h-8 px-3 rounded-md bg-accent text-black text-[13px] font-medium hover:brightness-110">
+        <button type="button" onClick={joinAndOpen} className="shrink-0 h-8 px-3 rounded-xl bg-brand text-white text-[13px] font-medium hover:brightness-110">
           {t('common.join')}
         </button>
       )}
@@ -68,7 +68,7 @@ export default function FestivalModal({ festival, groups, isFavorite, onToggleFa
   }, [onClose])
 
   const shareText = t('event.share', { name: festival.name, url: window.location.href })
-  const iconButton = 'w-9 h-9 rounded-md bg-black/60 backdrop-blur flex items-center justify-center'
+  const iconButton = 'w-9 h-9 rounded-xl bg-black/60 backdrop-blur flex items-center justify-center'
 
   return (
     <div className="fixed inset-0 z-50 flex justify-center bg-black/80 backdrop-blur-sm sm:p-6" onClick={onClose}>
@@ -76,7 +76,7 @@ export default function FestivalModal({ festival, groups, isFavorite, onToggleFa
         role="dialog"
         aria-modal="true"
         aria-labelledby="festival-title"
-        className="bg-ink-900 w-full sm:max-w-lg h-full sm:h-auto sm:max-h-full overflow-y-auto sm:rounded-lg sm:border hairline animate-slide-up"
+        className="bg-ink-900 w-full sm:max-w-lg h-full sm:h-auto sm:max-h-full overflow-y-auto sm:rounded-2xl sm:border hairline animate-slide-up"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="relative aspect-[4/3]">
@@ -117,8 +117,8 @@ export default function FestivalModal({ festival, groups, isFavorite, onToggleFa
                   href={ticket.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`h-12 px-4 rounded-md flex items-center justify-between text-[15px] font-medium ${
-                    i === 0 ? 'bg-accent text-black hover:brightness-110' : 'border border-ink-600 hover:border-white/40'
+                  className={`h-12 px-4 rounded-xl flex items-center justify-between text-[15px] font-medium ${
+                    i === 0 ? 'bg-brand text-white hover:brightness-110' : 'border border-ink-600 hover:border-white/40'
                   }`}
                 >
                   <span className="flex items-center gap-2">{t('event.tickets', { source: sourceLabel(ticket.source) })}<ArrowUpLeft size={16} className="ltr:-scale-x-100" /></span>

@@ -50,7 +50,7 @@ export default function GroupInfo({ festival, group, messages, memberCount, isMe
           {images.length ? (
             <div className="grid grid-cols-3 gap-1">
               {images.map((m) => (
-                <button key={m.id} type="button" onClick={() => onOpenImage(m)} className="aspect-square overflow-hidden rounded-lg">
+                <button key={m.id} type="button" onClick={() => onOpenImage(m)} className="aspect-square overflow-hidden rounded-2xl">
                   <img src={m.image} alt={m.caption || t('common.image')} className="w-full h-full object-cover" loading="lazy" />
                 </button>
               ))}
@@ -64,7 +64,7 @@ export default function GroupInfo({ festival, group, messages, memberCount, isMe
             <ul className="flex flex-col gap-2">
               {polls.map((m) => (
                 <li key={m.id}>
-                  <button type="button" onClick={() => onJumpTo(m.id)} className="w-full text-start bg-ink-800 rounded-lg px-4 py-3">
+                  <button type="button" onClick={() => onJumpTo(m.id)} className="w-full text-start bg-ink-800 rounded-2xl px-4 py-3">
                     <p className="font-semibold" dir="auto">{m.poll.question}</p>
                     <p className="text-xs text-white/50">{t('count.votes', { count: Object.keys(m.votes ?? {}).length })} · {m.name}</p>
                   </button>
@@ -76,7 +76,7 @@ export default function GroupInfo({ festival, group, messages, memberCount, isMe
 
         <section className="mt-8">
           <h3 className="flex items-center gap-2 font-semibold mb-3"><Users size={18} /> {t('info.members')} <span className="text-white/40 text-sm">{members.length}</span></h3>
-          <ul className="bg-ink-800 rounded-lg overflow-hidden">
+          <ul className="bg-ink-800 rounded-2xl overflow-hidden">
             {members.map((member) => (
               <MemberRow key={member.uid} member={member} isMe={member.uid === user?.uid} onOpenProfile={onOpenProfile} />
             ))}
@@ -85,7 +85,7 @@ export default function GroupInfo({ festival, group, messages, memberCount, isMe
         </section>
 
         {isMember && (
-          <button type="button" onClick={onLeave} className="w-full mt-8 flex items-center justify-center gap-2 text-rose-400 bg-ink-800 rounded-lg py-3.5">
+          <button type="button" onClick={onLeave} className="w-full mt-8 flex items-center justify-center gap-2 text-rose-400 bg-ink-800 rounded-2xl py-3.5">
             <LogOut size={18} /> {t('info.leave')}
           </button>
         )}

@@ -11,14 +11,14 @@ import UserAvatar from './UserAvatar'
 const CONSOLE = 'https://console.firebase.google.com/project/festichat-e3f5f'
 // One series, so one colour: a darker step of the accent that passes the
 // dark-surface lightness band (the bright accent is too light for a filled mark).
-const BAR = '#7aa61a'
+const BAR = '#8b5cf6'
 const plain = (n) => new Intl.NumberFormat(locale()).format(n)
 // Full figures until they get long; 2,963 shouldn't read as "3K".
 const tileValue = (n) => (n >= 10000 ? new Intl.NumberFormat(locale(), { notation: 'compact', maximumFractionDigits: 1 }).format(n) : plain(n))
 
 function StatTile({ label, value, hero = false, note }) {
   return (
-    <div className={`rounded-lg border hairline bg-ink-800 p-4 ${hero ? 'col-span-2' : ''}`}>
+    <div className={`rounded-2xl border hairline bg-ink-800 p-4 ${hero ? 'col-span-2' : ''}`}>
       <p className="text-[13px] text-muted">{label}</p>
       <p className={`font-semibold tracking-tight mt-1 ${hero ? 'text-5xl' : 'text-[28px]'}`} title={value == null ? t('admin.unavailable') : undefined}>
         {value == null ? '–' : tileValue(value)}
@@ -48,8 +48,8 @@ function BarList({ rows }) {
       {rows.map((row) => (
         <li key={row.label} role="row" className="grid grid-cols-[6.5rem_1fr_3.5rem] items-center gap-3" title={`${row.label}: ${t('count.events', { count: row.value })}`}>
           <span role="cell" className="text-[13px] truncate">{row.label}</span>
-          <span role="cell" className="h-2.5 rounded-sm bg-ink-700 overflow-hidden" aria-hidden="true">
-            <span className="block h-full rounded-sm" style={{ width: `${(row.value / max) * 100}%`, background: BAR }} />
+          <span role="cell" className="h-2.5 rounded-md bg-ink-700 overflow-hidden" aria-hidden="true">
+            <span className="block h-full rounded-md" style={{ width: `${(row.value / max) * 100}%`, background: BAR }} />
           </span>
           <span role="cell" className="font-num text-[12px] text-white/80 text-end tabular-nums">{plain(row.value)}</span>
         </li>
@@ -98,7 +98,7 @@ export default function AdminPage({ onBack, onOpenChat }) {
       <div className="py-20 text-center">
         <p className="font-medium">{t('admin.noAccess')}</p>
         <p className="text-sm text-muted mt-1">{t('admin.noAccessBody')}</p>
-        <button type="button" onClick={onBack} className="mt-6 h-10 px-5 rounded-md border border-ink-600">{t('common.back')}</button>
+        <button type="button" onClick={onBack} className="mt-6 h-10 px-5 rounded-xl border border-ink-600">{t('common.back')}</button>
       </div>
     )
   }

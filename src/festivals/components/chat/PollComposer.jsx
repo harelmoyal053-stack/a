@@ -25,7 +25,7 @@ export default function PollComposer({ onSend, onClose }) {
 
   return (
     <div className="fixed inset-0 z-[70] bg-black/70 flex items-end sm:items-center justify-center" onClick={onClose}>
-      <form onSubmit={submit} onClick={(e) => e.stopPropagation()} className="bg-ink-800 w-full sm:max-w-md max-h-[90vh] overflow-y-auto rounded-t-3xl sm:rounded-lg p-5 animate-slide-up">
+      <form onSubmit={submit} onClick={(e) => e.stopPropagation()} className="bg-ink-800 w-full sm:max-w-md max-h-[90vh] overflow-y-auto rounded-t-3xl sm:rounded-2xl p-5 animate-slide-up">
         <div className="flex justify-between items-center mb-4">
           <h2 className="font-semibold text-xl">{t('poll.new')}</h2>
           <button type="button" onClick={onClose} aria-label={t('common.close')}><X size={22} className="text-white/60" /></button>
@@ -37,7 +37,7 @@ export default function PollComposer({ onSend, onClose }) {
           onChange={(e) => setQuestion(e.target.value)}
           maxLength={200}
           placeholder={t('poll.questionPlaceholder')}
-          className="w-full bg-ink-900 border border-white/15 rounded-lg px-4 py-3 mt-1 mb-4 outline-none focus:border-whatsapp"
+          className="w-full bg-ink-900 border border-white/15 rounded-2xl px-4 py-3 mt-1 mb-4 outline-none focus:border-whatsapp"
         />
         <label className="text-sm text-white/60">{t('poll.options')}</label>
         <div className="flex flex-col gap-2 mt-1">
@@ -48,7 +48,7 @@ export default function PollComposer({ onSend, onClose }) {
                 onChange={(e) => setOption(i, e.target.value)}
                 maxLength={100}
                 placeholder={t('poll.option', { n: i + 1 })}
-                className="flex-1 bg-ink-900 border border-white/15 rounded-lg px-4 py-2.5 outline-none focus:border-whatsapp"
+                className="flex-1 bg-ink-900 border border-white/15 rounded-2xl px-4 py-2.5 outline-none focus:border-whatsapp"
               />
               {options.length > 2 && (
                 <button type="button" onClick={() => setOptions((prev) => prev.filter((_, j) => j !== i))} aria-label={t('poll.removeOption')} className="text-white/50">
@@ -67,7 +67,7 @@ export default function PollComposer({ onSend, onClose }) {
           <span>{t('poll.allowMultiple')}</span>
           <input type="checkbox" checked={multiple} onChange={(e) => setMultiple(e.target.checked)} className="w-5 h-5 accent-whatsapp" />
         </label>
-        <button type="submit" disabled={!valid} className="w-full mt-2 bg-whatsapp text-black font-semibold py-3 rounded-lg disabled:opacity-40">
+        <button type="submit" disabled={!valid} className="w-full mt-2 bg-brand text-white font-semibold py-3 rounded-2xl disabled:opacity-40">
           {t('poll.send')}
         </button>
       </form>

@@ -18,7 +18,7 @@ export default function ProfileSheet({ uid, fallbackName, onClose }) {
 
   return (
     <div className="fixed inset-0 z-[75] flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm" onClick={onClose}>
-      <div onClick={(e) => e.stopPropagation()} className="bg-ink-800 w-full sm:max-w-sm rounded-t-lg sm:rounded-lg border hairline p-6 animate-slide-up">
+      <div onClick={(e) => e.stopPropagation()} className="bg-ink-800 w-full sm:max-w-sm rounded-t-lg sm:rounded-2xl border hairline p-6 animate-slide-up">
         <div className="flex justify-end -mt-2 -me-2">
           <button type="button" onClick={onClose} className="w-9 h-9 flex items-center justify-center" aria-label={t('common.close')}><X size={20} className="text-muted" /></button>
         </div>
@@ -33,7 +33,7 @@ export default function ProfileSheet({ uid, fallbackName, onClose }) {
             href={instagramUrl(profile.instagram)}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-6 h-11 rounded-md border border-ink-600 hover:border-white/40 flex items-center justify-center gap-2 text-[15px]"
+            className="mt-6 h-11 rounded-xl border border-ink-600 hover:border-white/40 flex items-center justify-center gap-2 text-[15px]"
           >
             <AtSign size={16} /> <span dir="ltr">{profile.instagram}</span> {t('profile.onInstagram')}
           </a>

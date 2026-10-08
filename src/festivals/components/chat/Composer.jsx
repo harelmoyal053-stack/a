@@ -51,7 +51,7 @@ export default function Composer({ replyTo, editing, onCancel, onSend, onPickIma
   return (
     <div className="max-w-2xl mx-auto">
       {context && (
-        <div className="flex items-center gap-2 bg-ink-800 rounded-md px-3 py-2 mb-2 border-s-2 border-accent">
+        <div className="flex items-center gap-2 bg-ink-800 rounded-xl px-3 py-2 mb-2 border-s-2 border-accent">
           {editing ? <Pencil size={16} className="text-whatsapp shrink-0" /> : <Reply size={16} className="text-whatsapp shrink-0" />}
           <div className="flex-1 min-w-0">
             <p className="text-xs font-semibold text-whatsapp">{editing ? t('composer.editing') : t('composer.replyTo', { name: replyTo.name })}</p>
@@ -63,12 +63,12 @@ export default function Composer({ replyTo, editing, onCancel, onSend, onPickIma
 
       {panel === 'emoji' && <EmojiPicker className="mb-2" onPick={(emoji) => setText((t) => t + emoji)} />}
       {panel === 'attach' && (
-        <div className="grid grid-cols-4 gap-2 border hairline rounded-lg p-4 mb-2 text-muted">
+        <div className="grid grid-cols-4 gap-2 border hairline rounded-2xl p-4 mb-2 text-muted">
           {ATTACHMENTS.map((a) => {
             const Icon = a.icon
             return (
               <button key={a.id} type="button" onClick={() => attach(a.id)} className="flex flex-col items-center gap-1.5 text-xs">
-                <span className="w-11 h-11 rounded-md border border-ink-600 flex items-center justify-center"><Icon size={19} strokeWidth={1.75} /></span>
+                <span className="w-11 h-11 rounded-xl border border-ink-600 flex items-center justify-center"><Icon size={19} strokeWidth={1.75} /></span>
                 {t(`composer.${a.id}`)}
               </button>
             )
@@ -77,7 +77,7 @@ export default function Composer({ replyTo, editing, onCancel, onSend, onPickIma
       )}
 
       <form onSubmit={submit} className="flex items-end gap-2">
-        <div className="flex-1 flex items-end bg-ink-800 border border-ink-600 rounded-lg focus-within:border-white/30">
+        <div className="flex-1 flex items-end bg-ink-800 border border-ink-600 rounded-2xl focus-within:border-white/30">
           <button type="button" onClick={() => setPanel(panel === 'emoji' ? null : 'emoji')} className="w-11 h-11 shrink-0 flex items-center justify-center text-white/60" aria-label={t('composer.emojis')} aria-pressed={panel === 'emoji'}>
             <Smile size={22} />
           </button>
@@ -100,7 +100,7 @@ export default function Composer({ replyTo, editing, onCancel, onSend, onPickIma
             </button>
           )}
         </div>
-        <button type="submit" disabled={!text.trim()} className="w-11 h-11 shrink-0 rounded-lg bg-accent text-black flex items-center justify-center disabled:opacity-30" aria-label={t('common.send')}>
+        <button type="submit" disabled={!text.trim()} className="w-11 h-11 shrink-0 rounded-2xl bg-brand text-white flex items-center justify-center disabled:opacity-30" aria-label={t('common.send')}>
           <Send size={20} className="rtl:-scale-x-100" />
         </button>
       </form>

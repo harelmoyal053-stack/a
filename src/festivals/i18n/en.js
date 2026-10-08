@@ -287,4 +287,17 @@ export default {
   'admin.linkUsers': 'Users',
   'admin.linkDb': 'Database',
   'admin.linkAnalytics': 'Site visitors (Analytics)',
+
+  'brand.tagline': 'Global festival & party chat',
+  'hero.l1': 'Meet. Chat.',
+  'hero.l2': 'Party.',
+  'hero.l3': 'Around the world.',
+  'hero.body': 'Group chats for every festival and party worldwide. Find an event, join its group, and meet your crew before you get there.',
+  'hero.join': 'Join the community',
+  'hero.explore': 'Find your next event',
+  'hero.proof': '{events} events in {countries} countries',
+  'hero.proofSub': 'Updated every night',
+  'hero.photo': 'Pictured: {name}',
+  'kind.oneFestival': 'Festival',
+  'kind.oneParty': 'Party',
 }

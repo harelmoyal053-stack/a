@@ -163,7 +163,7 @@ export default function ChatScreen({ festival, group, onClose }) {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={t('chat.searchPlaceholder')}
-            className="flex-1 h-9 bg-ink-700 rounded-md px-3 outline-none text-base"
+            className="flex-1 h-9 bg-ink-700 rounded-xl px-3 outline-none text-base"
             aria-label={t('chat.search')}
           />
         ) : (
@@ -213,7 +213,7 @@ export default function ChatScreen({ festival, group, onClose }) {
       <div className="flex-1 overflow-y-auto px-3 py-4 chat-wallpaper">
         <div className="max-w-2xl mx-auto flex flex-col gap-2">
           {!search && (
-            <div className="self-center text-center border hairline text-muted text-xs rounded-lg px-4 py-3 mb-4 max-w-xs">
+            <div className="self-center text-center border hairline text-muted text-xs rounded-2xl px-4 py-3 mb-4 max-w-xs">
               <GroupIcon name={group.icon} size={16} className="mx-auto mb-1.5 text-white/70" />
               {group.description}
               <span className="block mt-1 text-white/40">{t('chat.hint')}</span>
@@ -251,7 +251,7 @@ export default function ChatScreen({ festival, group, onClose }) {
       </div>
 
       {error && <p className="text-rose-400 text-sm text-center py-1 shrink-0">{error}</p>}
-      {toast && <p className="fixed bottom-24 inset-x-0 mx-auto w-fit bg-white text-black text-[13px] rounded-md px-3 py-1.5 z-[90]">{toast}</p>}
+      {toast && <p className="fixed bottom-24 inset-x-0 mx-auto w-fit bg-white text-black text-[13px] rounded-xl px-3 py-1.5 z-[90]">{toast}</p>}
 
       <footer className="shrink-0 bg-ink-900 border-t hairline px-3 py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
         {isMember ? (
@@ -270,7 +270,7 @@ export default function ChatScreen({ festival, group, onClose }) {
         ) : (
           <div className="max-w-2xl mx-auto flex flex-col items-center gap-2 py-1">
             <p className="text-xs text-white/50">{t('chat.membersOnly')}</p>
-            <button type="button" onClick={() => withUser(() => run(() => chat.join(group, festival)))} className="w-full h-11 bg-accent text-black font-medium rounded-md">
+            <button type="button" onClick={() => withUser(() => run(() => chat.join(group, festival)))} className="w-full h-11 bg-brand text-white font-medium rounded-xl">
               {t('chat.join')}
             </button>
           </div>

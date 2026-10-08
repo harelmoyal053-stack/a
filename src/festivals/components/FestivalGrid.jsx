@@ -3,7 +3,7 @@ import { dayHeading } from '../utils'
 import FestivalCard from './FestivalCard'
 
 const PAGE = 24
-const GRID = 'grid gap-x-3 gap-y-6 sm:gap-x-5 grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
+const GRID = 'grid gap-3 sm:gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
 
 // Event grid that loads more as you scroll, optionally split into day sections.
 // Give it a `key` that changes with the filters to start again from the top.
@@ -44,7 +44,7 @@ export default function FestivalGrid({ items, grouped = false, favorites, onTogg
     }
     body = sections.map((section) => (
       <section key={section.heading} className="mb-8">
-        <h2 className="sticky top-14 z-10 -mx-4 px-4 py-2 mb-3 bg-ink-900/95 backdrop-blur border-b hairline flex items-baseline justify-between">
+        <h2 className="sticky top-16 z-10 -mx-4 px-4 py-2 mb-3 bg-ink-900/95 backdrop-blur border-b hairline flex items-baseline justify-between">
           <span className="text-[13px] font-semibold">{section.heading}</span>
           <span className="font-num text-[11px] text-muted">{section.items.length}</span>
         </h2>

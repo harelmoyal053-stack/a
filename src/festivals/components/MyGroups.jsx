@@ -16,7 +16,7 @@ function GroupRow({ id, onOpen }) {
 
   return (
     <li>
-      <button type="button" onClick={() => onOpen(id)} className="w-full flex items-center gap-3 py-3 text-start border-b hairline hover:bg-white/[0.03] -mx-2 px-2 rounded-sm">
+      <button type="button" onClick={() => onOpen(id)} className="w-full flex items-center gap-3 py-3 text-start border-b hairline hover:bg-white/[0.03] -mx-2 px-2 rounded-md">
         <EventAvatar festival={festival} />
         <span className="flex-1 min-w-0">
           <span className="flex items-baseline justify-between gap-2">
@@ -26,7 +26,7 @@ function GroupRow({ id, onOpen }) {
             {lastMessage && <span className="font-num text-[11px] text-muted shrink-0">{shortTime(lastMessage.createdAt)}</span>}
           </span>
           <span className="flex items-center gap-2 mt-0.5">
-            {isEnded(festival) && <span className="text-[10px] text-muted border border-ink-600 rounded-sm px-1">{t('common.ended')}</span>}
+            {isEnded(festival) && <span className="text-[10px] text-muted border border-ink-600 rounded-md px-1">{t('common.ended')}</span>}
             <span className="text-[13px] text-muted truncate">
               {lastMessage ? `${lastMessage.name}: ${lastMessage.text}` : t('mygroups.noMessages')}
             </span>

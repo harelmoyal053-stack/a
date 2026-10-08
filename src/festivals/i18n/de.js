@@ -287,4 +287,17 @@ export default {
   'admin.linkUsers': 'Nutzer',
   'admin.linkDb': 'Datenbank',
   'admin.linkAnalytics': 'Website-Besucher (Analytics)',
+
+  'brand.tagline': 'Weltweiter Festival- & Party-Chat',
+  'hero.l1': 'Treffen. Chatten.',
+  'hero.l2': 'Feiern.',
+  'hero.l3': 'Überall auf der Welt.',
+  'hero.body': 'Gruppenchats für jedes Festival und jede Party weltweit. Finde ein Event, tritt der Gruppe bei und lerne deine Crew vorher kennen.',
+  'hero.join': 'Werde Teil der Community',
+  'hero.explore': 'Finde dein nächstes Event',
+  'hero.proof': '{events} Events in {countries} Ländern',
+  'hero.proofSub': 'Jede Nacht aktualisiert',
+  'hero.photo': 'Im Bild: {name}',
+  'kind.oneFestival': 'Festival',
+  'kind.oneParty': 'Party',
 }

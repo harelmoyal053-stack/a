@@ -287,4 +287,17 @@ export default {
   'admin.linkUsers': 'Пользователи',
   'admin.linkDb': 'База данных',
   'admin.linkAnalytics': 'Посетители сайта (Analytics)',
+
+  'brand.tagline': 'Чат фестивалей и вечеринок',
+  'hero.l1': 'Знакомься. Общайся.',
+  'hero.l2': 'Отрывайся.',
+  'hero.l3': 'По всему миру.',
+  'hero.body': 'Групповые чаты для каждого фестиваля и вечеринки в мире. Найди событие, вступи в группу и познакомься с компанией ещё до поездки.',
+  'hero.join': 'Присоединиться',
+  'hero.explore': 'Найти следующее событие',
+  'hero.proof': 'Событий: {events} · стран: {countries}',
+  'hero.proofSub': 'Обновляется каждую ночь',
+  'hero.photo': 'На фото: {name}',
+  'kind.oneFestival': 'Фестиваль',
+  'kind.oneParty': 'Вечеринка',
 }

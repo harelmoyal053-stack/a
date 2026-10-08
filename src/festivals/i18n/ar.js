@@ -287,4 +287,17 @@ export default {
   'admin.linkUsers': 'المستخدمون',
   'admin.linkDb': 'قاعدة البيانات',
   'admin.linkAnalytics': 'زوار الموقع (Analytics)',
+
+  'brand.tagline': 'دردشة المهرجانات حول العالم',
+  'hero.l1': 'تعارف. دردشة.',
+  'hero.l2': 'احتفال.',
+  'hero.l3': 'حول العالم.',
+  'hero.body': 'دردشات جماعية لكل مهرجان وحفلة حول العالم. اعثر على فعالية، انضم إلى مجموعتها وتعرّف على رفاقك قبل الوصول.',
+  'hero.join': 'انضم إلى المجتمع',
+  'hero.explore': 'اعثر على فعاليتك القادمة',
+  'hero.proof': '{events} فعالية في {countries} دولة',
+  'hero.proofSub': 'يُحدَّث كل ليلة',
+  'hero.photo': 'في الصورة: {name}',
+  'kind.oneFestival': 'مهرجان',
+  'kind.oneParty': 'حفلة',
 }

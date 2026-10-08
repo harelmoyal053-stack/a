@@ -65,7 +65,7 @@ export default function MessageBubble({
       <div className={`group flex flex-col min-w-0 ${mine ? 'items-end' : 'items-start'}`}>
         <div
           className={`relative select-none sm:select-text transition-shadow ${flash ? 'ring-2 ring-accent' : ''} ${
-            big ? 'px-1' : `rounded-lg px-3 py-2 ${mine ? 'bg-[#1e2a0b] rounded-ee-sm' : 'bg-ink-800 border hairline rounded-es-sm'}`
+            big ? 'px-1' : `rounded-2xl px-3 py-2 ${mine ? 'bg-brand rounded-ee-sm' : 'bg-ink-800 border hairline rounded-es-sm'}`
           }`}
           onPointerDown={startPress}
           onPointerUp={cancelPress}
@@ -98,7 +98,7 @@ export default function MessageBubble({
             <button
               type="button"
               onClick={() => onJumpTo(m.replyTo.id)}
-              className="block w-full text-start bg-black/30 border-s-2 border-accent rounded-sm px-2 py-1 mb-1.5"
+              className="block w-full text-start bg-black/30 border-s-2 border-accent rounded-md px-2 py-1 mb-1.5"
             >
               <p className="text-[12px] font-medium text-accent">{m.replyTo.name}</p>
               <p className="text-xs text-white/70 line-clamp-2" dir="auto">{m.replyTo.text}</p>
@@ -111,7 +111,7 @@ export default function MessageBubble({
             <>
               {m.type === 'image' && (
                 <button type="button" onClick={() => onOpenImage(m)} className="block -mx-1 mb-1">
-                  <img src={m.image} alt={m.caption || t('common.image')} className="rounded-md max-h-80 w-full object-cover" loading="lazy" />
+                  <img src={m.image} alt={m.caption || t('common.image')} className="rounded-xl max-h-80 w-full object-cover" loading="lazy" />
                 </button>
               )}
               {m.type === 'location' && (
@@ -119,9 +119,9 @@ export default function MessageBubble({
                   href={`https://www.google.com/maps?q=${m.location.lat},${m.location.lng}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2.5 bg-black/30 rounded-md p-2.5 mb-1 min-w-[12rem]"
+                  className="flex items-center gap-2.5 bg-black/30 rounded-xl p-2.5 mb-1 min-w-[12rem]"
                 >
-                  <span className="w-10 h-10 rounded-md bg-ink-600 flex items-center justify-center"><MapPin size={18} /></span>
+                  <span className="w-10 h-10 rounded-xl bg-ink-600 flex items-center justify-center"><MapPin size={18} /></span>
                   <span>
                     <span className="block font-semibold text-sm">{t('msg.myLocation')}</span>
                     <span className="block text-xs text-white/60">{t('msg.openMaps')}</span>

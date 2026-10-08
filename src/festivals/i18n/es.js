@@ -287,4 +287,17 @@ export default {
   'admin.linkUsers': 'Usuarios',
   'admin.linkDb': 'Base de datos',
   'admin.linkAnalytics': 'Visitantes del sitio (Analytics)',
+
+  'brand.tagline': 'Chat global de festivales y fiestas',
+  'hero.l1': 'Conoce. Chatea.',
+  'hero.l2': 'Fiesta.',
+  'hero.l3': 'En todo el mundo.',
+  'hero.body': 'Chats de grupo para cada festival y fiesta del mundo. Encuentra un evento, únete a su grupo y conoce a tu gente antes de llegar.',
+  'hero.join': 'Únete a la comunidad',
+  'hero.explore': 'Encuentra tu próximo evento',
+  'hero.proof': '{events} eventos en {countries} países',
+  'hero.proofSub': 'Actualizado cada noche',
+  'hero.photo': 'En la foto: {name}',
+  'kind.oneFestival': 'Festival',
+  'kind.oneParty': 'Fiesta',
 }

@@ -15,7 +15,7 @@ export default function RichText({ text, highlight }) {
     let from = 0
     let at = part.toLowerCase().indexOf(q)
     while (at !== -1) {
-      pieces.push(part.slice(from, at), <mark key={`${i}-${at}`} className="bg-accent text-black rounded px-0.5">{part.slice(at, at + q.length)}</mark>)
+      pieces.push(part.slice(from, at), <mark key={`${i}-${at}`} className="bg-accent/40 text-white rounded px-0.5">{part.slice(at, at + q.length)}</mark>)
       from = at + q.length
       at = part.toLowerCase().indexOf(q, from)
     }

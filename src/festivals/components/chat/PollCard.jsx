@@ -34,7 +34,7 @@ export default function PollCard({ poll, votes, myUid, canVote, onVote }) {
               >
                 <div className="flex items-center gap-2">
                   <span className={`w-5 h-5 shrink-0 rounded-full border-2 flex items-center justify-center ${selected ? 'bg-whatsapp border-whatsapp' : 'border-white/40'}`}>
-                    {selected && <Check size={12} className="text-black" strokeWidth={3} />}
+                    {selected && <Check size={12} className="text-white" strokeWidth={3} />}
                   </span>
                   <span className="flex-1 text-sm" dir="auto">{option.text}</span>
                   <span className="text-xs text-white/60">{counts[option.id]}</span>
