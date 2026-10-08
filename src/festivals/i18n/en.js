@@ -334,4 +334,5 @@ export default {
   'admin.from': 'From {name}',
   'admin.anonymous': 'Guest',
   'admin.inboxOpen': { zero: 'Nothing open', one: '1 open', other: '{n} open' },
+  'date.tba': 'Expected {month}',
 }

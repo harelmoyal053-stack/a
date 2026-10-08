@@ -122,3 +122,26 @@ test('community issue form is parsed and validated', () => {
   assert.equal(e.priceFrom, 90)
   assert.equal(fromIssue({ body: body.replace('2026-10-15', 'next week') }), null)
 })
+
+test('a curated festival keeps its estimate flag until a ticket source lists it', async () => {
+  const { fromCurated } = await import('./curated.mjs')
+  const curated = fromCurated({
+    name: 'Tomorrowland', startDate: '2027-07-16', endDate: '2027-07-18', datesConfirmed: false,
+    city: 'Boom', countryCode: 'BE', genres: ['electronic'], url: 'https://www.tomorrowland.com',
+  })
+  const [alone] = mergeAll([curated], [], { today: TODAY })
+  assert.equal(alone.tba, true)
+  const listed = entry({ source: 'ticketmaster', kind: 'festival', name: 'Tomorrowland 2027', startDate: '2027-07-17', city: 'Boom', countryCode: 'BE' })
+  const [merged] = mergeAll([curated, listed], [], { today: TODAY })
+  assert.equal(merged.tba, undefined)
+  assert.equal(merged.name, 'Tomorrowland')
+  assert.deepEqual(merged.sources, ['curated', 'ticketmaster'])
+})
+
+test('over the cap, festivals stay and late parties are dropped', () => {
+  const parties = ['2026-11-01', '2026-11-02', '2026-11-03'].map((startDate, i) =>
+    entry({ source: 'ticketmaster', kind: 'party', name: `Night ${i}`, startDate, city: 'Leeds', countryCode: 'GB' }))
+  const fest = entry({ source: 'ticketmaster', kind: 'festival', name: 'Late Festival', startDate: '2027-08-01', city: 'Leeds', countryCode: 'GB' })
+  const kept = mergeAll([...parties, fest], [], { today: TODAY, maxEvents: 2 })
+  assert.deepEqual(kept.map((e) => e.name), ['Night 0', 'Late Festival'])
+})

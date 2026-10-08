@@ -127,7 +127,12 @@ export default function FestivalModal({ festival, groups, isFavorite, onToggleFa
               ))}
             </div>
           )}
-          {festival.website && (
+          {festival.website && !festival.tickets?.length && (
+            <a href={festival.website} target="_blank" rel="noopener noreferrer" className="mt-5 h-12 px-4 rounded-xl flex items-center gap-2 text-[15px] font-medium bg-brand text-white hover:brightness-110">
+              {t('event.website')} <ArrowUpLeft size={16} className="ltr:-scale-x-100" />
+            </a>
+          )}
+          {festival.website && festival.tickets?.length > 0 && (
             <a href={festival.website} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-[13px] text-muted hover:text-white mt-3">
               {t('event.website')} <ArrowUpLeft size={14} className="ltr:-scale-x-100" />
             </a>

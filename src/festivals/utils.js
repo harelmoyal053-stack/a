@@ -21,6 +21,7 @@ function daysUntil(isoDate) {
 // Countdown badge: days for the next six weeks, then months.
 export function countdownFor(item) {
   if (!item.startDate) return countdownLabel(item.month)
+  if (item.tba) return countdownLabel(Number(item.startDate.slice(5, 7)))
   const days = daysUntil(item.startDate)
   if (days <= 0) return daysUntil(item.endDate ?? item.startDate) >= 0 ? t('countdown.now') : t('countdown.ended')
   if (days === 1) return t('countdown.tomorrow')
@@ -36,6 +37,7 @@ function shortDate(isoDate) {
 // "Thursday · 12.11", "09.04–16.04", or the usual month for undated festivals.
 export function dateChip(item) {
   if (!item.startDate) return monthName(item.month)
+  if (item.tba) return expectedLabel(item)
   // Isolated as left-to-right, or the range reads backwards inside Hebrew text.
   if (item.endDate && item.endDate !== item.startDate) return `\u2066${shortDate(item.startDate)}–${shortDate(item.endDate)}\u2069`
   const weekday = new Date(`${item.startDate}T12:00:00`).toLocaleDateString(locale(), { weekday: 'long' }).replace(/^יום /, '')
@@ -124,8 +126,15 @@ export function dayHeading(isoDate) {
   return `${weekday} ${d}.${m}`
 }
 
+// "Expected July 2027", for festivals that haven't announced their dates.
+export function expectedLabel(item) {
+  const month = new Date(`${item.startDate}T12:00:00`).toLocaleDateString(locale(), { month: 'long', year: 'numeric' })
+  return t('date.tba', { month })
+}
+
 // Compact meta line for a card: "Sat 11.10 · 23:00" or "09.04–16.04".
 export function cardDate(item) {
+  if (item.tba) return expectedLabel(item)
   if (item.endDate && item.endDate !== item.startDate) {
     const [, m1, d1] = item.startDate.split('-')
     const [, m2, d2] = item.endDate.split('-')

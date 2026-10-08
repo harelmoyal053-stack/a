@@ -335,4 +335,5 @@ export default {
   'admin.from': 'מאת {name}',
   'admin.anonymous': 'אורח',
   'admin.inboxOpen': { zero: 'אין פניות פתוחות', one: 'פנייה פתוחה אחת', other: '{n} פניות פתוחות' },
+  'date.tba': 'צפוי ב{month}',
 }

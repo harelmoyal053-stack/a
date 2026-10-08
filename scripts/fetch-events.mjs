@@ -8,15 +8,18 @@
 //   SEATGEEK_CLIENT_ID     SeatGeek Platform API
 //   GITHUB_REPOSITORY      approved "add an event" issues (GITHUB_TOKEN optional)
 //   scripts/partner-feeds.json  partner promoter feeds
+//   scripts/curated-festivals.json  hand-kept list of the big festivals (always)
 import { readFile, writeFile } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
 import { fetchCommunity } from './events/community.mjs'
+import { fetchCurated } from './events/curated.mjs'
 import { entriesFromPrevious, mergeAll } from './events/merge.mjs'
 import { fetchPartners } from './events/partners.mjs'
 import { fetchSeatGeek } from './events/seatgeek.mjs'
 import { fetchTicketmaster } from './events/ticketmaster.mjs'
 
 const PARTNER_FEEDS = fileURLToPath(new URL('./partner-feeds.json', import.meta.url))
+const CURATED = fileURLToPath(new URL('./curated-festivals.json', import.meta.url))
 
 function option(args, name) {
   const i = args.indexOf(name)
@@ -32,7 +35,7 @@ async function readJson(path, fallback) {
 }
 
 function configuredSources(env) {
-  const sources = []
+  const sources = [['curated', () => fetchCurated(CURATED)]]
   if (env.TICKETMASTER_API_KEY) sources.push(['ticketmaster', () => fetchTicketmaster(env.TICKETMASTER_API_KEY)])
   if (env.SEATGEEK_CLIENT_ID) sources.push(['seatgeek', () => fetchSeatGeek(env.SEATGEEK_CLIENT_ID)])
   if (env.GITHUB_REPOSITORY) sources.push(['community', () => fetchCommunity(env.GITHUB_REPOSITORY, env.GITHUB_TOKEN)])

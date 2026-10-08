@@ -334,4 +334,5 @@ export default {
   'admin.from': 'От {name}',
   'admin.anonymous': 'Гость',
   'admin.inboxOpen': { zero: 'Нет открытых', one: 'Открыто: {n}', few: 'Открыто: {n}', many: 'Открыто: {n}', other: 'Открыто: {n}' },
+  'date.tba': 'Ожидается: {month}',
 }

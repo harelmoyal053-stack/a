@@ -334,4 +334,5 @@ export default {
   'admin.from': 'De {name}',
   'admin.anonymous': 'Invitado',
   'admin.inboxOpen': { zero: 'Nada pendiente', one: '1 pendiente', other: '{n} pendientes' },
+  'date.tba': 'Previsto: {month}',
 }

@@ -3,7 +3,7 @@
 // every ticket link, and reuses the previous run's ids so chats survive.
 
 // When sources disagree, the earlier one wins for names and details.
-export const SOURCE_PRIORITY = ['community', 'partner', 'ticketmaster', 'seatgeek']
+export const SOURCE_PRIORITY = ['curated', 'community', 'partner', 'ticketmaster', 'seatgeek']
 const priority = (source) => {
   const i = SOURCE_PRIORITY.indexOf(source.split(':')[0])
   return i === -1 ? SOURCE_PRIORITY.length : i
@@ -78,6 +78,8 @@ function absorb(target, entry) {
   }
   if (entry.endDate > target.endDate) target.endDate = entry.endDate
   if (entry.kind === 'festival') target.kind = 'festival'
+  // Dates from any source that lists them beat a hand-kept estimate.
+  if (!entry.tba) delete target.tba
   for (const key of ['time', 'venue', 'city', 'lat', 'lng', 'image']) target[key] ??= entry[key]
   for (const g of entry.genres) if (!target.genres.includes(g)) target.genres.push(g)
   const ticket = target.tickets.find((t) => t.source === entry.source)
@@ -96,12 +98,13 @@ function startEvent(entry) {
     name: entry.name, kind: entry.kind, startDate: entry.startDate, endDate: entry.endDate, time: entry.time,
     venue: entry.venue, city: entry.city, countryCode: entry.countryCode, lat: entry.lat, lng: entry.lng,
     genres: [], image: entry.image, tickets: [], sources: [],
+    ...(entry.tba ? { tba: true } : {}),
   }
   absorb(event, entry)
   return event
 }
 
-export function mergeAll(entries, previous = [], { today = new Date().toISOString().slice(0, 10), maxEvents = 4000 } = {}) {
+export function mergeAll(entries, previous = [], { today = new Date().toISOString().slice(0, 10), maxEvents = 6000 } = {}) {
   // 1. Within a source, fold day/weekend/VIP listings into one entry, but only
   //    when their dates are close together.
   const groups = new Map()
@@ -158,9 +161,12 @@ export function mergeAll(entries, previous = [], { today = new Date().toISOStrin
     event.tickets.sort((a, b) => (a.priceFrom ?? Infinity) - (b.priceFrom ?? Infinity))
   }
 
-  return events
-    .sort((a, b) => a.startDate.localeCompare(b.startDate) || a.name.localeCompare(b.name))
-    .slice(0, maxEvents)
+  // Over the cap, festivals stay and the furthest-off parties go.
+  const sorted = events.sort((a, b) => a.startDate.localeCompare(b.startDate) || a.name.localeCompare(b.name))
+  if (sorted.length <= maxEvents) return sorted
+  const festivals = sorted.filter((e) => e.kind === 'festival').length
+  let partiesLeft = Math.max(0, maxEvents - festivals)
+  return sorted.filter((e) => e.kind === 'festival' || partiesLeft-- > 0)
 }
 
 // Turns a previous catalog event back into entries, used when a source fails

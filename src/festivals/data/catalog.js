@@ -34,13 +34,16 @@ export function sourceLabel(source) {
   if (source === 'ticketmaster') return 'Ticketmaster'
   if (source === 'seatgeek') return 'SeatGeek'
   if (source === 'community') return t('source.community')
+  if (source === 'curated') return 'FestiChat'
   if (source.startsWith('partner:')) return source.slice('partner:'.length)
   return source
 }
 
 function fromEvent(e, regionNames) {
   const style = GENRE_STYLE[e.genres[0]] ?? DEFAULT_STYLE
-  const tickets = (e.tickets ?? []).filter((t) => t.url)
+  // The hand-kept list links the festival's own site rather than a ticket shop.
+  const official = (e.tickets ?? []).find((t) => t.source === 'curated')
+  const tickets = (e.tickets ?? []).filter((t) => t.url && t.source !== 'curated')
   const cheapest = (e.tickets ?? []).find((t) => t.priceFrom != null)
   return {
     id: e.id,
@@ -59,7 +62,11 @@ function fromEvent(e, regionNames) {
     emoji: style.emoji,
     colors: style.colors,
     image: e.image ? { src: e.image } : null,
-    website: null,
+    website: official?.url ?? null,
+    // One of the big festivals from the hand-kept list.
+    major: (e.sources ?? []).includes('curated'),
+    // Dates are an estimate until the festival announces them.
+    tba: Boolean(e.tba),
     tickets,
     priceFrom: cheapest?.priceFrom ?? null,
     currency: cheapest?.currency ?? null,

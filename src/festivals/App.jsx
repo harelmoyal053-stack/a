@@ -221,10 +221,11 @@ export default function App() {
     () => (activePreset ? catalog.items.filter(activePreset.match) : []),
     [catalog.items, activePreset],
   )
-  const upcomingFestivals = useMemo(
-    () => catalog.items.filter((f) => f.kind === 'festival').slice(0, CAROUSEL_SIZE),
-    [catalog.items],
-  )
+  // The big festivals lead; smaller ones fill the row if there are few.
+  const upcomingFestivals = useMemo(() => {
+    const festivals = catalog.items.filter((f) => f.kind === 'festival')
+    return [...festivals.filter((f) => f.major), ...festivals.filter((f) => !f.major)].slice(0, CAROUSEL_SIZE)
+  }, [catalog.items])
   const thisWeek = useMemo(() => {
     const [from, to] = thisWeekRange()
     // Lead with events that have artwork; they make the row.

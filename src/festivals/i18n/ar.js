@@ -334,4 +334,5 @@ export default {
   'admin.from': 'من {name}',
   'admin.anonymous': 'زائر',
   'admin.inboxOpen': { zero: 'لا شيء مفتوح', one: 'رسالة مفتوحة واحدة', two: 'رسالتان مفتوحتان', few: '{n} رسائل مفتوحة', many: '{n} رسالة مفتوحة', other: '{n} رسالة مفتوحة' },
+  'date.tba': 'متوقع: {month}',
 }
