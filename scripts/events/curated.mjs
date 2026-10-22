@@ -3,7 +3,9 @@ import { genreKeys } from './shared.mjs'
 
 // The big international festivals that ticket APIs miss (Tomorrowland, Zamna,
 // Ozora…), kept by hand in scripts/curated-festivals.json:
-//   [{ name, startDate, endDate, datesConfirmed, city, countryCode, lat, lng, genres, url }]
+//   [{ name, startDate, endDate, datesConfirmed, city, countryCode, lat, lng, genres, url, image? }]
+// `image` is an https URL or a file we host, like "img/zamna-tulum.webp"
+// (public/festivals/img/, published next to events.json).
 // Entries whose dates aren't announced yet carry an estimate and show as
 // "expected in <month>" on the site.
 
@@ -25,7 +27,7 @@ export function fromCurated(raw) {
     lat: Number.isFinite(raw.lat) ? raw.lat : null,
     lng: Number.isFinite(raw.lng) ? raw.lng : null,
     genres: genreKeys(Array.isArray(raw.genres) ? raw.genres : []),
-    image: null,
+    image: /^https:\/\/\S+$/.test(raw.image ?? '') || /^img\/[\w.-]+\.(webp|jpg|png)$/.test(raw.image ?? '') ? raw.image : null,
     url: /^https:\/\/\S+$/.test(raw.url ?? '') ? raw.url : null,
     priceFrom: null,
     currency: null,

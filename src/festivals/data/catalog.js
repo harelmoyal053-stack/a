@@ -61,7 +61,8 @@ function fromEvent(e, regionNames) {
     genres: e.genres,
     emoji: style.emoji,
     colors: style.colors,
-    image: e.image ? { src: e.image } : null,
+    // Our own artwork is stored next to events.json; sources give full URLs.
+    image: e.image ? { src: /^https?:/.test(e.image) ? e.image : `${import.meta.env.BASE_URL}festivals/${e.image}` } : null,
     website: official?.url ?? null,
     // One of the big festivals from the hand-kept list.
     major: (e.sources ?? []).includes('curated'),
