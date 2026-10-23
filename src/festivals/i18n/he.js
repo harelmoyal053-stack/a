@@ -100,8 +100,6 @@ export default {
   'group.new': 'קבוצה חדשה',
   'group.general.title': 'קבוצה כללית',
   'group.general.description': 'עדכונים, ליינאפ ושאלות לפני ובמהלך הפסטיבל',
-  'group.israelis.title': 'ישראלים שמגיעים',
-  'group.israelis.description': 'מכירים את החבר׳ה מהארץ שמגיעים',
   'group.rides.title': 'טרמפים והסעות',
   'group.rides.description': 'חלוקת נסיעות משדה התעופה ומהעיר',
   'group.camping.title': 'קמפינג ולינה',

@@ -99,8 +99,6 @@ export default {
   'group.new': 'New group',
   'group.general.title': 'General',
   'group.general.description': 'Updates, lineup, and questions before and during the event',
-  'group.israelis.title': 'Israelis going',
-  'group.israelis.description': 'Meet the people from Israel who are going',
   'group.rides.title': 'Rides & shuttles',
   'group.rides.description': 'Share rides from the airport and the city',
   'group.camping.title': 'Camping & stays',

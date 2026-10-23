@@ -106,13 +106,13 @@ export function thisWeekRange() {
   return [from, addDaysIso(from, 6)]
 }
 
-// The coming Israeli weekend, Thursday to Saturday (this one if we're in it).
+// The coming weekend, Friday to Sunday (the rest of this one if we're in it).
 export function weekendRange() {
   const today = todayIso()
   const day = new Date(`${today}T12:00:00`).getDay()
-  const toThursday = day >= 4 ? 0 : 4 - day
-  const from = day >= 4 ? today : addDaysIso(today, toThursday)
-  return [from, addDaysIso(from, 6 - Math.max(day, 4))]
+  if (day === 0) return [today, today]
+  const from = day >= 5 ? today : addDaysIso(today, 5 - day)
+  return [from, addDaysIso(from, day === 6 ? 1 : 2)]
 }
 
 // Section heading for a day in the event list: "Today", "Tomorrow", "Sat 11.10".

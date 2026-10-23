@@ -99,8 +99,6 @@ export default {
   'group.new': 'Neue Gruppe',
   'group.general.title': 'Allgemein',
   'group.general.description': 'Updates, Line-up und Fragen vor und während des Events',
-  'group.israelis.title': 'Israelis vor Ort',
-  'group.israelis.description': 'Lerne die Leute aus Israel kennen, die hingehen',
   'group.rides.title': 'Mitfahrten & Shuttles',
   'group.rides.description': 'Teile Fahrten vom Flughafen und aus der Stadt',
   'group.camping.title': 'Camping & Unterkunft',

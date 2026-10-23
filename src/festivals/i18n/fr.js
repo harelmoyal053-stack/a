@@ -99,8 +99,6 @@ export default {
   'group.new': 'Nouveau groupe',
   'group.general.title': 'Général',
   'group.general.description': "Infos, line-up et questions avant et pendant l'événement",
-  'group.israelis.title': 'Israéliens présents',
-  'group.israelis.description': "Rencontre les personnes venant d'Israël",
   'group.rides.title': 'Covoiturage & navettes',
   'group.rides.description': "Partage des trajets depuis l'aéroport et la ville",
   'group.camping.title': 'Camping & hébergement',

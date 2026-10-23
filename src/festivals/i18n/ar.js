@@ -99,8 +99,6 @@ export default {
   'group.new': 'مجموعة جديدة',
   'group.general.title': 'عام',
   'group.general.description': 'تحديثات، التشكيلة، وأسئلة قبل الفعالية وخلالها',
-  'group.israelis.title': 'إسرائيليون ذاهبون',
-  'group.israelis.description': 'تعرّف على الذاهبين من إسرائيل',
   'group.rides.title': 'توصيلات ونقل',
   'group.rides.description': 'شارك التوصيلة من المطار ومن المدينة',
   'group.camping.title': 'تخييم وإقامة',

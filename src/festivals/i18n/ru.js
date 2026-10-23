@@ -99,8 +99,6 @@ export default {
   'group.new': 'Новая группа',
   'group.general.title': 'Общий',
   'group.general.description': 'Новости, лайнап и вопросы до и во время события',
-  'group.israelis.title': 'Едут израильтяне',
-  'group.israelis.description': 'Познакомься с теми, кто едет из Израиля',
   'group.rides.title': 'Попутки и трансферы',
   'group.rides.description': 'Вместе из аэропорта и из города',
   'group.camping.title': 'Кемпинг и жильё',

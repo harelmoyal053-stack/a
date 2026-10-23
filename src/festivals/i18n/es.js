@@ -99,8 +99,6 @@ export default {
   'group.new': 'Grupo nuevo',
   'group.general.title': 'General',
   'group.general.description': 'Novedades, cartel y dudas antes y durante el evento',
-  'group.israelis.title': 'Israelíes que van',
-  'group.israelis.description': 'Conoce a la gente de Israel que va',
   'group.rides.title': 'Viajes compartidos',
   'group.rides.description': 'Comparte trayectos desde el aeropuerto y la ciudad',
   'group.camping.title': 'Camping y alojamiento',

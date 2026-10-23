@@ -15,7 +15,6 @@ const groupType = (type, icon, extra = {}) => ({
 // Every festival gets these group chats.
 export const GROUP_TYPES = [
   groupType('general', 'MessageCircle'),
-  groupType('israelis', 'Flag'),
   groupType('rides', 'Car'),
   groupType('camping', 'Tent', { festivalOnly: true }),
   groupType('tickets', 'Ticket'),
